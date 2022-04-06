@@ -135,20 +135,10 @@
 
 /* Transfer Block */
 
-
 .transfer-block__amount {
     text-align: center;
 }
 
-.transfer-block__slider-container {
-    display: grid;
-    grid-template-columns: 3fr 1fr;
-    align-items: center;
-}
-
-.transfer-block__slider-value {
-    text-align: center;
-}
 
 /* Repetitions Block */
 
@@ -240,4 +230,14 @@
 
 .missing-img::after {
     content: "?";
+}
+
+.slider-container {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    align-items: center;
+}
+
+.slider-container__slider-value {
+    text-align: center;
 }

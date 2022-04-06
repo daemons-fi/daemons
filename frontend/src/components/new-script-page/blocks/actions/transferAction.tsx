@@ -97,7 +97,7 @@ export const TransferAction = ({ form, update }: { form: ITransferActionForm; up
                                     />
                                 }
                             </Field>)
-                            : (<div className='transfer-block__slider-container'>
+                            : (<div className='slider-container'>
 
                                 <Field name="floatAmount"
                                     component="input"
@@ -120,7 +120,7 @@ export const TransferAction = ({ form, update }: { form: ITransferActionForm; up
                                     }
                                 </Field>
 
-                                <div className='transfer-block__slider-value'>
+                                <div className='slider-container__slider-value'>
                                     {`${form.floatAmount / 100}%`}
                                 </div>
 
