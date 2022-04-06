@@ -32,8 +32,8 @@ export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (n
         if (!form.tokenFromAddress || !form.tokenToAddress)
             update({
                 ...form,
-                tokenFromAddress: tokens[0].address,
-                tokenToAddress: tokens[1].address
+                tokenFromAddress: tokens[0]?.address,
+                tokenToAddress: tokens[1]?.address
             });
     }, []);
 
