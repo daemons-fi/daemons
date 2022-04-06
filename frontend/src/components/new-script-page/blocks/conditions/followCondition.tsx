@@ -5,7 +5,15 @@ import { BaseScript } from '../../../../data/script/base-script';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../state';
 
-const scriptSelectValidation = (value: any) => value ? undefined : 'required';
+const validateForm = (form: IFollowConditionForm) => {
+    return form.parentScriptId ? {} : { 'parentScriptId': 'required' };
+};
+
+const isFormValid = (values: IFollowConditionForm) => {
+    const errors = validateForm(values);
+    const isValid = Object.keys(errors).length === 0;
+    return isValid;
+};
 
 export const FollowCondition = ({ form, update }: { form: IFollowConditionForm; update: (next: IFollowConditionForm) => void; }) => {
     const userScripts: BaseScript[] = useSelector((state: RootState) => state.script.userScripts);
@@ -13,15 +21,15 @@ export const FollowCondition = ({ form, update }: { form: IFollowConditionForm; 
     return (
         <Form
             initialValues={form}
+            validate={validateForm}
             onSubmit={() => { /** Individual forms are not submitted */ }}
             render={({ handleSubmit, valid }) => (
                 <form onSubmit={handleSubmit}>
-                    <div className='script-block__panel--row follow-block'>
+                    <div className='follow-block'>
 
                         <Field
                             name="parentScriptId"
                             component="select"
-                            validate={scriptSelectValidation}
                         >
                             {({ input, meta }) => <select
                                 {...input}
@@ -29,15 +37,10 @@ export const FollowCondition = ({ form, update }: { form: IFollowConditionForm; 
                                 onChange={(e) => {
                                     input.onChange(e);
                                     const script: BaseScript | undefined = userScripts.find(script => script.getId() === e.target.value);
-                                    if (script) update({
-                                        ...form,
-                                        parentScriptId: script.getId(),
-                                        parentScriptExecutor: script.getExecutorAddress(),
-                                    });
-                                }}
-                                onBlur={(e) => {
-                                    input.onBlur(e);
-                                    update({ ...form, valid });
+                                    if (!script) return;
+                                    const updatedForm = { ...form, parentScriptId: script.getId(), parentScriptExecutor: script.getExecutorAddress() };
+                                    const valid = isFormValid(updatedForm);
+                                    update({ ...updatedForm, valid });
                                 }}
                             >
                                 <option key={0} value="" disabled ></option>

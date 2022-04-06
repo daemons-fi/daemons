@@ -100,6 +100,12 @@
 
 /* Frequency Block */
 
+.frequency-block {
+    row-gap: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
 .frequency-block__time-unit {
     width: 70px;
 }

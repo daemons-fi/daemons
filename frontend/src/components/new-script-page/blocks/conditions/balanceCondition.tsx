@@ -1,43 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { IBalanceConditionForm } from './conditions-interfaces';
 import { Form, Field } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../state';
-import { IToken, Token } from '../../../../data/tokens';
+import { Token } from '../../../../data/tokens';
 import { TokensModal } from "../shared/tokens-modal";
 
 
-const amountValidation = (value: string) => {
-    if (!value || value === '') return 'required';
-    if (Number(value) <= 0) return 'required > 0';
-    return undefined;
+const validateForm = (form: IBalanceConditionForm) => {
+    const errors: any = {};
+    if (!form.floatAmount || (form.floatAmount as any) === '') {
+        errors.floatAmount = 'required';
+    }
+    if (form.floatAmount && Number(form.floatAmount) <= 0) {
+        errors.floatAmount = 'required > 0';
+    }
+    return errors;
+};
+
+const isFormValid = (values: IBalanceConditionForm) => {
+    const errors = validateForm(values);
+    const isValid = Object.keys(errors).length === 0;
+    return isValid;
 };
 
 export const BalanceCondition = ({ form, update }: { form: IBalanceConditionForm; update: (next: IBalanceConditionForm) => void; }) => {
     const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
-    const [selectedToken, setSelectedToken] = useState<IToken | undefined>();
 
     useEffect(() => {
-        setSelectedToken(tokens[0]);
-    }, [tokens]);
-
-    useEffect(() => {
-        if (selectedToken)
-            update({ ...form, tokenAddress: selectedToken.address });
-    }, [selectedToken]);
+        if (!form.tokenAddress)
+            update({ ...form, tokenAddress: tokens[0].address });
+    }, []);
 
     return (
         <Form
             initialValues={form}
+            validate={validateForm}
             onSubmit={() => { /** Individual forms are not submitted */ }}
-            render={({ handleSubmit, valid }) => (
+            render={({ handleSubmit }) => (
                 <form onSubmit={handleSubmit}>
                     <div className='script-block__panel--three-columns balance-block'>
 
                         <TokensModal
                             tokens={tokens}
-                            selectedToken={selectedToken}
-                            setSelectedToken={setSelectedToken}
+                            selectedToken={tokens.filter(t => t.address === form.tokenAddress)[0]}
+                            setSelectedToken={(token) => update({ ...form, tokenAddress: token.address })}
                         />
 
                         <Field
@@ -61,7 +68,6 @@ export const BalanceCondition = ({ form, update }: { form: IBalanceConditionForm
                             component="input"
                             type="number"
                             placeholder='1.00'
-                            validate={amountValidation}
                         >
                             {({ input, meta }) =>
                                 <input
@@ -70,16 +76,16 @@ export const BalanceCondition = ({ form, update }: { form: IBalanceConditionForm
                                     onChange={(e) => {
                                         e.target.value = Number(e.target.value) < 0 ? '0' : e.target.value;
                                         input.onChange(e);
-                                        update({ ...form, floatAmount: Number(e.target.value) });
-                                    }}
-                                    onBlur={(e) => {
-                                        input.onBlur(e);
-                                        update({ ...form, valid });
+                                        const updatedForm = { ...form, floatAmount: Number(e.target.value) };
+                                        const valid = isFormValid(updatedForm);
+                                        update({ ...updatedForm, valid });
                                     }}
                                 />
                             }
                         </Field>
 
+                        {/* ENABLE WHEN DEBUGGING!  */}
+                        {/* <p>{JSON.stringify(form, null, ' ')}</p> */}
                     </div>
                 </form>
             )}

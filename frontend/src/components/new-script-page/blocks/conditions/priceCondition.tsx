@@ -7,40 +7,46 @@ import { RootState } from '../../../../state';
 import { TokensModal } from "../shared/tokens-modal";
 
 
-const valueValidation = (value: string) => {
-    if (!value || value === '') return 'required';
-    if (Number(value) <= 0) return 'required > 0';
-    return undefined;
+const validateForm = (form: IPriceConditionForm) => {
+    const errors: any = {};
+    if (!form.floatValue || (form.floatValue as any) === '') {
+        errors.floatValue = 'required';
+    }
+    if (form.floatValue && Number(form.floatValue) <= 0) {
+        errors.floatValue = 'required > 0';
+    }
+    return errors;
+};
+
+const isFormValid = (values: IPriceConditionForm) => {
+    const errors = validateForm(values);
+    const isValid = Object.keys(errors).length === 0;
+    return isValid;
 };
 
 export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; update: (next: IPriceConditionForm) => void; }) => {
     const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
-    const [filteredTokens, setFilteredTokens] = useState<IToken[]>([]);
-    const [selectedToken, setSelectedToken] = useState<IToken | undefined>();
 
     useEffect(() => {
-        const tokensWithPriceFeed = tokens.filter(token => token.hasPriceFeed);
-        setFilteredTokens(tokensWithPriceFeed);
-        setSelectedToken(tokensWithPriceFeed[0]);
-    }, [tokens]);
-
-    useEffect(() => {
-        if (selectedToken)
-            update({ ...form, tokenAddress: selectedToken.address });
-    }, [selectedToken]);
+        if (!form.tokenAddress) {
+            const filteredTokens = tokens.filter(token => token.hasPriceFeed);
+            update({ ...form, tokenAddress: filteredTokens[0].address });
+        }
+    }, []);
 
     return (
         <Form
             initialValues={form}
+            validate={validateForm}
             onSubmit={() => { /** Individual forms are not submitted */ }}
-            render={({ handleSubmit, valid }) => (
+            render={({ handleSubmit }) => (
                 <form onSubmit={handleSubmit}>
                     <div className='script-block__panel--three-columns price-block'>
 
-                        {filteredTokens?.length > 0 && <TokensModal
-                            tokens={filteredTokens}
-                            selectedToken={selectedToken}
-                            setSelectedToken={setSelectedToken}
+                        {tokens.some(token => token.hasPriceFeed) && <TokensModal
+                            tokens={tokens.filter(token => token.hasPriceFeed)}
+                            selectedToken={tokens.filter(t => t.address === form.tokenAddress)[0]}
+                            setSelectedToken={(token) => update({ ...form, tokenAddress: token.address })}
                         />
                         }
 
@@ -65,7 +71,6 @@ export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; up
                             component="input"
                             type="number"
                             placeholder='1.00'
-                            validate={valueValidation}
                         >
                             {({ input, meta }) =>
                                 <input
@@ -74,11 +79,9 @@ export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; up
                                     onChange={(e) => {
                                         e.target.value = Number(e.target.value) < 0 ? '0' : e.target.value;
                                         input.onChange(e);
-                                        update({ ...form, floatValue: Number(e.target.value) });
-                                    }}
-                                    onBlur={(e) => {
-                                        input.onBlur(e);
-                                        update({ ...form, valid });
+                                        const updatedForm = { ...form, floatValue: Number(e.target.value) };
+                                        const valid = isFormValid(updatedForm);
+                                        update({ ...updatedForm, valid });
                                     }}
                                 />
                             }

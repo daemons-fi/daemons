@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { ITransferActionForm } from './actions-interfaces';
 import { Form, Field } from 'react-final-form';
 import { ethers } from 'ethers';
-import { IToken, Token } from '../../../../data/tokens';
+import { Token } from '../../../../data/tokens';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../state';
 import { TokensModal } from "../shared/tokens-modal";
@@ -35,16 +35,11 @@ const isFormValid = (values: ITransferActionForm) => {
 
 export const TransferAction = ({ form, update }: { form: ITransferActionForm; update: (next: ITransferActionForm) => void; }) => {
     const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
-    const [selectedToken, setSelectedToken] = useState<IToken | undefined>();
 
     useEffect(() => {
-        setSelectedToken(tokens[0]);
-    }, [tokens]);
-
-    useEffect(() => {
-        if (selectedToken)
-            update({ ...form, tokenAddress: selectedToken.address });
-    }, [selectedToken]);
+        if (!form.tokenAddress)
+            update({ ...form, tokenAddress: tokens[0].address });
+    }, []);
 
     return (
         <Form
@@ -59,8 +54,8 @@ export const TransferAction = ({ form, update }: { form: ITransferActionForm; up
 
                             <TokensModal
                                 tokens={tokens}
-                                selectedToken={selectedToken}
-                                setSelectedToken={setSelectedToken}
+                                selectedToken={tokens.filter(t => t.address === form.tokenAddress)[0]}
+                                setSelectedToken={(token) => update({ ...form, tokenAddress: token.address })}
                             />
 
                             <ToggleButtonField
@@ -146,7 +141,8 @@ export const TransferAction = ({ form, update }: { form: ITransferActionForm; up
                             }
                         </Field>
 
-                        {/* ENABLE WHEN DEBUGGING! <p>{JSON.stringify(form, null, ' ')}</p> */}
+                        {/* ENABLE WHEN DEBUGGING!  */}
+                        {/* <p>{JSON.stringify(form, null, ' ')}</p> */}
                     </div >
                 </form>
             )}
