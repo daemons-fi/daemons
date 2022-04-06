@@ -45,7 +45,7 @@ export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; up
 
                         {tokens.some(token => token.hasPriceFeed) && <TokensModal
                             tokens={tokens.filter(token => token.hasPriceFeed)}
-                            selectedToken={tokens.filter(t => t.address === form.tokenAddress)[0]}
+                            selectedToken={tokens.find(t => t.address === form.tokenAddress)}
                             setSelectedToken={(token) => update({ ...form, tokenAddress: token.address })}
                         />
                         }

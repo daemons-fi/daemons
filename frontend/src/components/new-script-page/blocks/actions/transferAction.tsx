@@ -54,7 +54,7 @@ export const TransferAction = ({ form, update }: { form: ITransferActionForm; up
 
                             <TokensModal
                                 tokens={tokens}
-                                selectedToken={tokens.filter(t => t.address === form.tokenAddress)[0]}
+                                selectedToken={tokens.find(t => t.address === form.tokenAddress)}
                                 setSelectedToken={(token) => update({ ...form, tokenAddress: token.address })}
                             />
 

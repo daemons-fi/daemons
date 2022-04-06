@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { IBaseMMActionForm } from './actions-interfaces';
 import { Form, Field } from 'react-final-form';
-import { IToken } from '../../../../data/tokens';
 import { TokensModal } from "../shared/tokens-modal";
 import { ToggleButtonField } from '../shared/toggle-button';
 import { BaseMoneyMarketActionType } from '@daemons-fi/shared-definitions';
@@ -15,16 +14,11 @@ const amountValidation = (value: string) => {
 
 export const MmBaseAction = ({ form, update }: { form: IBaseMMActionForm; update: (next: IBaseMMActionForm) => void; }) => {
     const tokens = form.moneyMarket.supportedTokens;
-    const [selectedToken, setSelectedToken] = useState<IToken | undefined>();
 
     useEffect(() => {
-        setSelectedToken(tokens[0]);
-    }, [tokens]);
-
-    useEffect(() => {
-        if (selectedToken)
-            update({ ...form, tokenAddress: selectedToken.address });
-    }, [selectedToken]);
+        if (!form.tokenAddress)
+            update({ ...form, tokenAddress: tokens[0]?.address });
+    }, []);
 
     return (
         <Form
@@ -47,8 +41,8 @@ export const MmBaseAction = ({ form, update }: { form: IBaseMMActionForm; update
 
                             <TokensModal
                                 tokens={tokens}
-                                selectedToken={selectedToken}
-                                setSelectedToken={setSelectedToken}
+                                selectedToken={tokens.find(t => t.address === form.tokenAddress)}
+                                setSelectedToken={(token) => update({ ...form, tokenAddress: token.address })}
                             />
 
                             <Field name="floatAmount"
