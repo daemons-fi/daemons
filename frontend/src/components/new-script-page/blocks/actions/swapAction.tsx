@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ISwapActionForm } from './actions-interfaces';
 import { Form, Field } from 'react-final-form';
-import { IToken, Token } from '../../../../data/tokens';
+import { Token } from '../../../../data/tokens';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../state';
 import { TokensModal } from "../shared/tokens-modal";
@@ -27,35 +27,15 @@ const isFormValid = (values: ISwapActionForm) => {
 
 export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (next: ISwapActionForm) => void; }) => {
     const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
-    const [selectedTokenFrom, setSelectedTokenFrom] = useState<IToken | undefined>();
-    const [selectedTokenTo, setSelectedTokenTo] = useState<IToken | undefined>();
 
     useEffect(() => {
-        if (tokens?.length > 2) {
-            const initialTokenFrom = tokens[0];
-            const initialTokenTo = tokens[1];
-            setSelectedTokenFrom(initialTokenFrom);
-            setSelectedTokenTo(initialTokenTo);
+        if (!form.tokenFromAddress || !form.tokenToAddress)
             update({
                 ...form,
-                tokenFromAddress: initialTokenFrom.address,
-                tokenToAddress: initialTokenTo.address
+                tokenFromAddress: tokens[0].address,
+                tokenToAddress: tokens[1].address
             });
-        }
-    }, [tokens]);
-
-    const onSetSelectedTokenFrom = (tokenFrom: IToken) => {
-        if (tokenFrom.address !== selectedTokenTo?.address) {
-            update({ ...form, tokenFromAddress: tokenFrom.address });
-            setSelectedTokenFrom(tokenFrom);
-        }
-    };
-    const onSetSelectedTokenTo = (tokenTo: IToken) => {
-        if (tokenTo.address !== selectedTokenFrom?.address) {
-            update({ ...form, tokenToAddress: tokenTo.address });
-            setSelectedTokenTo(tokenTo);
-        }
-    };
+    }, []);
 
     return (
         <Form
@@ -68,9 +48,9 @@ export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (n
                     <div className='swap-block'>
                         <div className='script-block__panel--two-columns'>
                             <TokensModal
-                                tokens={tokens.filter(t => t.address !== selectedTokenTo?.address)}
-                                selectedToken={selectedTokenFrom}
-                                setSelectedToken={onSetSelectedTokenFrom}
+                                tokens={tokens.filter(t => t.address !== form.tokenToAddress)}
+                                selectedToken={tokens.filter(t => t.address === form.tokenFromAddress)[0]}
+                                setSelectedToken={(token) => update({ ...form, tokenFromAddress: token.address })}
                             />
 
                             <ToggleButtonField
@@ -85,8 +65,8 @@ export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (n
                             />
 
                         </div>
-                        {form.amountType === AmountType.Absolute ?
-                            <Field name="floatAmount"
+                        {form.amountType === AmountType.Absolute
+                            ? <Field name="floatAmount"
                                 component="input"
                                 type="number"
                                 placeholder='1.00'
@@ -104,7 +84,8 @@ export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (n
                                         }}
                                     />
                                 }
-                            </Field> : (<div className='slider-container'>
+                            </Field>
+                            : (<div className='slider-container'>
                                 <Field name="floatAmount"
                                     component="input"
                                     type="range"
@@ -135,9 +116,9 @@ export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (n
 
                         <div className='script-block__panel--two-columns'>
                             <TokensModal
-                                tokens={tokens.filter(t => t.address !== selectedTokenFrom?.address)}
-                                selectedToken={selectedTokenTo}
-                                setSelectedToken={onSetSelectedTokenTo}
+                                tokens={tokens.filter(t => t.address !== form.tokenFromAddress)}
+                                selectedToken={tokens.filter(t => t.address === form.tokenToAddress)[0]}
+                                setSelectedToken={(token) => update({ ...form, tokenToAddress: token.address })}
                             />
                         </div >
                     </div >
