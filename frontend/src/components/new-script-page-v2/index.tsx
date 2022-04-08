@@ -10,158 +10,200 @@ import "./blocks.css";
 import "./killme-styles.css";
 import "../tooltip.css";
 import { ConditionBlock } from "./blocks/conditions/conditions-block";
+import { IScriptActionForm } from "../../data/chains-data/action-form-interfaces";
+import { IScriptConditionForm } from "../../data/chains-data/condition-form-interfaces";
+import { ScriptFactory } from "../new-script-page/script-factory";
+import { StorageProxy } from "../../data/storage-proxy";
+import { addNewScript } from "../../state/action-creators/script-action-creators";
+
+/**
+ * Wrapper containing actions and conditions.
+ * --> Used as state <--
+ */
+interface ICurrentScript {
+    action: IAction;
+    conditions: { [title: string]: ICondition };
+}
 
 export function ScriptDesignerPage(): JSX.Element {
-  // redux
-  const dispatch = useDispatch();
-  const chainId: string | undefined = useSelector((state: RootState) => state.wallet.chainId);
-  const authenticated: boolean = useSelector((state: RootState) => state.wallet.authenticated);
-  const supportedChain: boolean = useSelector((state: RootState) => state.wallet.supportedChain);
-  const tokens: IToken[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
+    // redux
+    const dispatch = useDispatch();
+    const chainId: string | undefined = useSelector((state: RootState) => state.wallet.chainId);
+    const authenticated: boolean = useSelector((state: RootState) => state.wallet.authenticated);
+    const supportedChain: boolean = useSelector((state: RootState) => state.wallet.supportedChain);
+    const tokens: IToken[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
 
-  // states
-  const [redirect, setRedirect] = useState<boolean>(false);
-  const [actions, setActions] = useState<IAction[]>([]);
-  const [selectedAction, setSelectedAction] = useState<IAction | undefined>();
-  const [conditions, setConditions] = useState<ICondition[]>([]);
-  const [selectedConditions, setSelectedConditions] = useState<Set<ICondition>>(new Set());
+    // states
+    const [redirect, setRedirect] = useState<boolean>(false);
+    const [actions, setActions] = useState<IAction[]>([]);
+    const [conditions, setConditions] = useState<ICondition[]>([]);
+    const [currentScript, _setCurrentScript] = useState<ICurrentScript | undefined>();
 
-  useEffect(() => {
-    setActions(GetCurrentChain(chainId!).actions);
-  }, [chainId]);
+    useEffect(() => {
+        setActions(GetCurrentChain(chainId!).actions);
+    }, [chainId]);
 
-  useEffect(() => {
-    setConditions(selectedAction?.conditions ?? []);
-    setSelectedConditions(new Set());
-  }, [selectedAction]);
+    useEffect(() => {
+        const currentAction: IAction | undefined = actions.find(
+            (action) => action.title === currentScript?.action.title
+        );
+        setConditions(currentAction?.conditions ?? []);
+    }, [currentScript]);
 
-  const cleanAction = () => setSelectedAction(undefined);
-  const removeCondition = (condition: ICondition) => {
-    setSelectedConditions(
-      new Set([...selectedConditions].filter((c) => c.title !== condition.title))
+    const setCurrentScript = (action: IAction) => {
+        if (currentScript && currentScript.action.title === action.title) return;
+        const actionCopy = { ...action };
+        _setCurrentScript({ action: actionCopy, conditions: {} });
+    };
+
+    // Actions handlers
+    const cleanAction = () => _setCurrentScript(undefined);
+    const updateActionForm = (newForm: IScriptActionForm) => {
+        if (!currentScript) return;
+        if (currentScript.action.form.type !== newForm.type) throw new Error("Incompatible forms");
+        _setCurrentScript({ ...currentScript, action: { ...currentScript.action, form: newForm } });
+    };
+
+    // Conditions handlers
+    const addCondition = (condition: ICondition) => {
+        if (!currentScript) return;
+        if (!!currentScript.conditions[condition.title]) return;
+        const copiedConditions = { ...currentScript.conditions };
+        copiedConditions[condition.title] = { ...condition };
+        _setCurrentScript({ ...currentScript, conditions: copiedConditions });
+    };
+    const removeCondition = (conditionTitle: string) => {
+        if (!currentScript) return;
+        if (!currentScript.conditions[conditionTitle]) return;
+        const copiedConditions = { ...currentScript.conditions };
+        delete copiedConditions[conditionTitle];
+        _setCurrentScript({ ...currentScript, conditions: copiedConditions });
+    };
+    const updateConditionForm = (conditionTitle: string, newForm: IScriptConditionForm) => {
+        if (!currentScript) return;
+        if (!currentScript.conditions[conditionTitle]) return;
+        const conditionToUpdate = currentScript.conditions[conditionTitle];
+        if (conditionToUpdate.form.type !== newForm.type) throw new Error("Incompatible forms");
+        conditionToUpdate.form = newForm;
+        const copiedConditions = { ...currentScript.conditions };
+        copiedConditions[conditionTitle] = conditionToUpdate;
+        _setCurrentScript({ ...currentScript, conditions: copiedConditions });
+    };
+
+    const createAndSignScript = async () => {
+        if (!chainId) throw new Error("Cannot create the script! The chain is unknown");
+
+        // const scriptFactory = new ScriptFactory(chainId, tokens);
+        // const script = await scriptFactory.SubmitScriptsForSignature(bundle);
+        // if (!await script.hasAllowance()) {
+        //     await script.requestAllowance();
+        // }
+        // await StorageProxy.script.saveScript(script);
+        // dispatch(addNewScript(script));
+        setRedirect(true);
+    };
+
+    const buttonDisabled = () => {
+        if (!currentScript) return true;
+        if (!currentScript.action.form.valid) return true;
+        return Object.values(currentScript.conditions).some((condition) => !condition.form.valid);
+    };
+
+    const shouldRedirect = redirect || !authenticated || !supportedChain;
+    if (shouldRedirect) return <Navigate to="/my-page" />;
+
+    return (
+        <div className="designer">
+            {/* List of actions and conditions */}
+            <div className="designer__choices">
+                <div className="designer__choices-section">
+                    <div className="designer__choices-title">Actions</div>
+                    <div className="designer__choices-list">
+                        {actions.map((action) =>
+                            createChoice(
+                                action.title,
+                                action.description,
+                                currentScript?.action?.title === action.title,
+                                () => {
+                                    setCurrentScript(action);
+                                }
+                            )
+                        )}
+                    </div>
+
+                    {currentScript && (
+                        <>
+                            <div className="designer__choices-title">
+                                {currentScript.action.title} Conditions
+                            </div>
+                            <div className="designer__choices-list">
+                                {conditions.map((condition) => {
+                                    const selected = !!currentScript.conditions[condition.title];
+                                    return createChoice(
+                                        condition.title,
+                                        condition.description,
+                                        selected,
+                                        () => {
+                                            selected
+                                                ? removeCondition(condition.title)
+                                                : addCondition(condition);
+                                        }
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {/* The area where the user can create scripts */}
+            <div className="designer__workbench">
+                {currentScript && (
+                    <>
+                        <div className="workbench__section">
+                            <ActionBlock
+                                action={currentScript.action}
+                                onUpdate={updateActionForm}
+                                onRemove={cleanAction}
+                            />
+                        </div>
+                        <div className="workbench__section">
+                            {Object.values(currentScript.conditions).map((condition) => (
+                                <ConditionBlock
+                                    key={condition.title}
+                                    condition={condition}
+                                    onUpdate={updateConditionForm}
+                                    onRemove={removeCondition}
+                                />
+                            ))}
+                        </div>
+
+                        <button
+                            className="workbench__deploy-button"
+                            disabled={buttonDisabled()}
+                            onClick={() => {}}
+                        >
+                            {"Sign & Deploy"}
+                        </button>
+                    </>
+                )}
+            </div>
+            <p> {JSON.stringify(currentScript, null, " ")}</p>
+        </div>
     );
-  };
-  const addCondition = (condition: ICondition) => {
-    setSelectedConditions(new Set([...selectedConditions, condition]));
-  };
-
-  // // action forms
-  // const noActionForm: INoActionForm = { action: ScriptAction.None, valid: false };
-  // const transferActionForm: ITransferActionForm = { action: ScriptAction.Transfer, valid: false, tokenAddress: '', destinationAddress: '', amountType: AmountType.Absolute, floatAmount: 0 };
-  // const swapActionForm: ISwapActionForm = { action: ScriptAction.Swap, valid: false, tokenFromAddress: '', tokenToAddress: '', amountType: AmountType.Absolute, floatAmount: 0 };
-  // const aaveBaseActionForm: IBaseMMActionForm = { action: ScriptAction.MmBase, valid: false, tokenAddress: '', amountType: AmountType.Absolute, floatAmount: 0, actionType: BaseMoneyMarketActionType.Deposit, moneyMarket: GetCurrentChain(chainId!).moneyMarket };
-
-  // const [actionForm, setActionForm] = useState<IScriptActionForm>(noActionForm);
-  // const [frequencyCondition, setFrequencyCondition] = useState<IFrequencyConditionForm>({ valid: true, enabled: false, ticks: 1, unit: FrequencyUnits.Hours, startNow: true });
-  // const [balanceCondition, setBalanceCondition] = useState<IBalanceConditionForm>({ valid: false, enabled: false, comparison: ComparisonType.GreaterThan, floatAmount: 0 });
-  // const [priceCondition, setPriceCondition] = useState<IPriceConditionForm>({ valid: false, enabled: false, comparison: ComparisonType.GreaterThan, floatValue: 0 });
-  // const [repetitionsCondition, setRepetitionsCondition] = useState<IRepetitionsConditionForm>({ valid: false, enabled: false, amount: 0 });
-  // const [followCondition, setFollowCondition] = useState<IFollowConditionForm>({ valid: false, enabled: false });
-
-  // const toggleFrequencyCondition = () => setFrequencyCondition({ ...frequencyCondition, enabled: !frequencyCondition.enabled });
-  // const toggleBalanceCondition = () => setBalanceCondition({ ...balanceCondition, enabled: !balanceCondition.enabled });
-  // const togglePriceCondition = () => setPriceCondition({ ...priceCondition, enabled: !priceCondition.enabled });
-  // const toggleRepetitionsCondition = () => setRepetitionsCondition({ ...repetitionsCondition, enabled: !repetitionsCondition.enabled });
-  // const toggleFollowCondition = () => setFollowCondition({ ...followCondition, enabled: !followCondition.enabled });
-
-  // const setTransferActionAsSelected = () => { if (actionForm.action !== ScriptAction.Transfer) setActionForm(transferActionForm); };
-  // const setSwapActionAsSelected = () => { if (actionForm.action !== ScriptAction.Swap) setActionForm(swapActionForm); };
-  // const setMmBaseActionAsSelected = () => { if (actionForm.action !== ScriptAction.MmBase) setActionForm(aaveBaseActionForm); };
-
-  // const createBundle = (): INewScriptBundle => ({
-  //     frequencyCondition,
-  //     balanceCondition,
-  //     priceCondition,
-  //     repetitionsCondition,
-  //     followCondition,
-  //     actionForm,
-  // });
-
-  // const createAndSignScript = async () => {
-  //     if (!chainId) throw new Error("Cannot create the script! The chain is unknown");
-
-  //     const scriptFactory = new ScriptFactory(chainId, tokens);
-  //     const bundle = createBundle();
-  //     const script = await scriptFactory.SubmitScriptsForSignature(bundle);
-  //     if (!await script.hasAllowance()) {
-  //         await script.requestAllowance();
-  //     }
-  //     await StorageProxy.script.saveScript(script);
-  //     dispatch(addNewScript(script));
-  //     setRedirect(true);
-  // };
-
-  // const buttonDisabled = () => {
-  //     const bundle = createBundle();
-  //     const actionIsInvalid = !actionForm.valid;
-  //     const invalidCondition = Object.values(bundle).some(c => c.enabled && !c.valid);
-  //     return actionIsInvalid || invalidCondition;
-  // };
-
-  const shouldRedirect = redirect || !authenticated || !supportedChain;
-  if (shouldRedirect) return <Navigate to="/my-page" />;
-
-  return (
-    <div className="designer">
-      {/* List of actions and conditions */}
-      <div className="designer__choices">
-        <div className="designer__choices-section">
-          <div className="designer__choices-title">Actions</div>
-          <div className="designer__choices-list">
-            {actions.map((action) =>
-              createChoice(
-                action.title,
-                action.description,
-                selectedAction?.title === action.title,
-                () => {
-                  setSelectedAction(action);
-                }
-              )
-            )}
-          </div>
-
-          {selectedAction && (
-            <>
-              <div className="designer__choices-title">{selectedAction.title} Conditions</div>
-              <div className="designer__choices-list">
-                {conditions.map((condition) => {
-                  const selected = selectedConditions.has(condition);
-                  return createChoice(condition.title, condition.description, selected, () => {
-                    selected ? removeCondition(condition) : addCondition(condition);
-                  });
-                })}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* The area where the user can create scripts */}
-      <div className="designer__workbench">
-        <div className="workbench__section">
-          {selectedAction && <ActionBlock action={selectedAction} onRemove={cleanAction} />}
-        </div>
-        <div className="workbench__section">
-          {[...selectedConditions].map((condition) => (
-            <ConditionBlock condition={condition} onRemove={() => removeCondition(condition)} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
 }
 
 const createChoice = (
-  title: string,
-  description: string,
-  selected: boolean,
-  onClick: () => void
+    title: string,
+    description: string,
+    selected: boolean,
+    onClick: () => void
 ): JSX.Element => (
-  <div key={title} className={`choice ${selected ? "choice--selected" : ""}`} onClick={onClick}>
-    <div className="choice-name">{title}</div>
-    <div className="tooltip">
-      <div className="tooltip__text">?</div>
-      <div className="tooltip__content">{description}</div>
+    <div key={title} className={`choice ${selected ? "choice--selected" : ""}`} onClick={onClick}>
+        <div className="choice-name">{title}</div>
+        <div className="tooltip">
+            <div className="tooltip__text">?</div>
+            <div className="tooltip__content">{description}</div>
+        </div>
     </div>
-  </div>
 );

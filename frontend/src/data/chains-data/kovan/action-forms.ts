@@ -8,14 +8,14 @@ export const TransferAction: IAction = {
     title: "Transfer",
     description: "Transfer some tokens from your wallet to another address.",
 
-    toActionForm: (): ITransferActionForm => ({
+    form: {
         type: ScriptAction.TRANSFER,
         valid: false,
         tokenAddress: '',
         destinationAddress: '',
         amountType: AmountType.Absolute,
         floatAmount: 0,
-    }),
+    } as ITransferActionForm,
 
     conditions: [
         FrequencyCondition,
@@ -30,14 +30,14 @@ export const SwapAction: IAction = {
     title: "Swap",
     description: "Swap one token for another using the Sushi DEX.",
 
-    toActionForm: (): ISwapActionForm => ({
+    form: {
         type: ScriptAction.SWAP,
         valid: false,
         tokenFromAddress: '',
         tokenToAddress: '',
         amountType: AmountType.Absolute,
         floatAmount: 0,
-    }),
+    } as ISwapActionForm,
 
     conditions: [
         FrequencyCondition,
@@ -52,7 +52,7 @@ export const AaveMMBaseAction: IAction = {
     title: "AAVE Base",
     description: "Deposit and withdraw tokens into Aave.",
 
-    toActionForm: (): IBaseMMActionForm => ({
+    form: {
         type: ScriptAction.MMBASE,
         valid: false,
         tokenAddress: '',
@@ -60,7 +60,7 @@ export const AaveMMBaseAction: IAction = {
         floatAmount: 0,
         actionType: BaseMoneyMarketActionType.Deposit,
         moneyMarket: kovanAaveMM,
-    }),
+    }as IBaseMMActionForm,
 
     conditions: [
         FrequencyCondition,

@@ -24,14 +24,14 @@ export type MoneyMarket = {
 export interface IAction {
     title: string;
     description: string;
-    toActionForm: () => IScriptActionForm;
     conditions: ICondition[];
+    form: IScriptActionForm;
 }
 
 export interface ICondition {
     title: string;
     description: string;
-    toConditionForm: () => IScriptConditionForm;
+    form: IScriptConditionForm;
 }
 
 export interface IChainInfo {
