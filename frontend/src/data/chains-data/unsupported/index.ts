@@ -13,4 +13,5 @@ export const unsupportedChain: IChainInfo = {
     explorerTxUrl: 'https://kovan.etherscan.io/tx/',
     tokens: [],
     moneyMarket: { aTokens: {}, name: "Unsupported", supportedTokens: [], poolAddress: '' },
+    actions: [],
 };

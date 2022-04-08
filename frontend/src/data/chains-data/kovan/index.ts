@@ -1,4 +1,5 @@
 import { IChainInfo } from '../interfaces';
+import { AaveMMBaseAction, SwapAction, TransferAction } from './action-forms';
 import { kovanAaveMM, kovanTokens } from './tokens';
 
 export const kovanInfo: IChainInfo = {
@@ -14,4 +15,5 @@ export const kovanInfo: IChainInfo = {
     explorerTxUrl: 'https://kovan.etherscan.io/tx/',
     tokens: kovanTokens,
     moneyMarket: kovanAaveMM,
+    actions: [TransferAction, SwapAction, AaveMMBaseAction]
 };

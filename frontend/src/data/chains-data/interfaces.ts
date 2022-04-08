@@ -1,3 +1,7 @@
+import { IScriptActionForm } from './action-form-interfaces';
+import { IScriptConditionForm } from './condition-form-interfaces';
+
+
 export interface IToken {
     name: string;
     symbol: string;
@@ -16,6 +20,20 @@ export type MoneyMarket = {
     aTokens: { [tokenAddress: string]: Token; };
 };
 
+
+export interface IAction {
+    title: string;
+    description: string;
+    toActionForm: () => IScriptActionForm;
+    conditions: ICondition[];
+}
+
+export interface ICondition {
+    title: string;
+    description: string;
+    toConditionForm: () => IScriptConditionForm;
+}
+
 export interface IChainInfo {
     name: string;
     id: string;
@@ -29,4 +47,5 @@ export interface IChainInfo {
     explorerTxUrl: string;
     tokens: Token[];
     moneyMarket: MoneyMarket;
+    actions: IAction[];
 }
