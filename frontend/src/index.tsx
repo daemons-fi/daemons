@@ -9,6 +9,7 @@ import { NewScriptPage } from './components/new-script-page';
 import { DashboardPage } from './components/dashboard-page';
 import { MyPage } from './components/my-page';
 import { ExecutePage } from './components/execute-page';
+import { ScriptDesignerPage } from "./components/new-script-page-v2";
 
 ReactDOM.render(
     <Provider store={store}>
@@ -16,7 +17,7 @@ ReactDOM.render(
             <Routes>
                 <Route path="/" element={<App><DashboardPage /></App>} />
                 <Route path="my-page" element={<App><MyPage /></App>} />
-                <Route path="new-script" element={<App><NewScriptPage /></App>} />
+                <Route path="new-script" element={<App><ScriptDesignerPage /></App>} />
                 <Route path="execute" element={<App><ExecutePage /></App>} />
             </Routes>
         </BrowserRouter>

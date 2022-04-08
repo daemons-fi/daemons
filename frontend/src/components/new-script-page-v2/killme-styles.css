@@ -1,0 +1,249 @@
+/* Add Script page */
+
+.new-script {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    column-gap: 50px;
+}
+
+.new-script__step {
+    border-radius: 5px;
+    margin: 20px;
+    padding: 25px;
+    background: var(--secondary-background);
+    box-shadow: 0 1px 15px rgb(0 0 0 / 4%), 0 1px 6px rgb(0 0 0 / 4%);
+    /* height: fit-content; */
+}
+
+.new-script__block-title {
+    margin-bottom: 25px;
+    font-size: 20px;
+    color: var(--primary-colour);
+    font-weight: bolder;
+}
+
+
+/* Blocks */
+
+.script-block {
+    margin-bottom: 15px;
+    width: 270px;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.script-block__accordion {
+    cursor: pointer;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.script-block__title {
+    line-height: 30px;
+    font-weight: bolder;
+}
+
+.script-block--selected .script-block__title {
+    font-weight: bold;
+}
+
+.script-block__panel--two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+}
+
+.script-block__panel--three-columns {
+    display: grid;
+    grid-template-columns: 1fr 0.4fr 1fr;
+    column-gap: 10px;
+}
+
+.script-block__panel--row {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+}
+
+.script-block__field--error {
+    border: 2px solid red;
+}
+
+.script-block__toggle-button {
+    border-radius: 10px;
+    border: 1px solid #d9d9da;
+    box-shadow: 1px 1px rgb(0 0 0 / 4%);
+    padding: 5px 7px;
+    width: 100%;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+
+/* Balance Block */
+
+.balance-block__token {
+    width: 70px;
+}
+
+.balance-block__comparison {
+    width: 50px;
+}
+
+.balance-block__amount {
+    text-align: center;
+}
+
+
+/* Frequency Block */
+
+.frequency-block {
+    row-gap: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.frequency-block__time-unit {
+    width: 70px;
+}
+
+.frequency-block__amount {
+    width: 70px;
+    text-align: right;
+}
+
+.frequency-block__ticks {
+    width: 50%;
+    text-align: center;
+}
+
+.frequency-block__time-unit {
+    width: 35%;
+    padding: 5px;
+}
+
+.frequency-block__starting-point {
+    margin: auto 3px;
+}
+
+
+/* Price Block */
+
+.price-block__value {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+
+/* Transfer Block */
+
+.transfer-block__amount {
+    text-align: center;
+}
+
+
+/* Repetitions Block */
+
+.repetitions-block__ticks {
+    text-align: center;
+}
+
+
+/* Shared */
+
+.swap-block,
+.transfer-block {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.balance-block__token-address,
+.price-block__token-address {
+    width: 35%;
+}
+
+.script-block__panel pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.farms-block__protocol,
+.farms-block__action {
+    width: 50%;
+}
+
+.transfer-block__token,
+.farms-block__pool,
+.dao-block__dao,
+.dao-block__action {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.swap-block__token-from-address,
+.swap-block__token-to-address {
+    width: 33%;
+}
+
+.balance-block__amount {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.new-script__button {
+    padding: 8px 15px;
+    border-radius: 10px;
+    color: white;
+    border: none;
+    background-color: var(--primary-colour);
+    font-size: 15px;
+    cursor: pointer;
+    height: fit-content;
+    margin: auto 70px;
+}
+
+.new-script__button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.arrow-down {
+    border: solid black;
+    border-width: 0 1.5px 1.5px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    right: 10px;
+    position: absolute;
+    bottom: auto;
+    margin-bottom: 3px;
+}
+
+.missing-img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 8px;
+    border: solid 1px;
+    line-height: 1.7rem;
+    font-size: 1rem;
+}
+
+.missing-img::after {
+    content: "?";
+}
+
+.slider-container {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    align-items: center;
+}
+
+.slider-container__slider-value {
+    text-align: center;
+}
