@@ -1,37 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { IPriceConditionForm } from './conditions-interfaces';
+import React, { useEffect } from 'react'
 import { Form, Field } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../state';
 import { TokensModal } from "../shared/tokens-modal";
 import { Token } from '../../../../data/chains-data/interfaces';
+import { IBalanceConditionForm } from "../../../../data/chains-data/condition-form-interfaces";
 
 
-const validateForm = (form: IPriceConditionForm) => {
+const validateForm = (form: IBalanceConditionForm) => {
     const errors: any = {};
-    if (!form.floatValue || (form.floatValue as any) === '') {
-        errors.floatValue = 'required';
+    if (!form.floatAmount || (form.floatAmount as any) === '') {
+        errors.floatAmount = 'required';
     }
-    if (form.floatValue && Number(form.floatValue) <= 0) {
-        errors.floatValue = 'required > 0';
+    if (form.floatAmount && Number(form.floatAmount) <= 0) {
+        errors.floatAmount = 'required > 0';
     }
     return errors;
 };
 
-const isFormValid = (values: IPriceConditionForm) => {
+const isFormValid = (values: IBalanceConditionForm) => {
     const errors = validateForm(values);
     const isValid = Object.keys(errors).length === 0;
     return isValid;
 };
 
-export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; update: (next: IPriceConditionForm) => void; }) => {
+export const BalanceCondition = ({ form, update }: { form: IBalanceConditionForm; update: (next: IBalanceConditionForm) => void; }) => {
     const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
 
     useEffect(() => {
-        if (!form.tokenAddress) {
-            const filteredTokens = tokens.filter(token => token.hasPriceFeed);
-            update({ ...form, tokenAddress: filteredTokens[0]?.address });
-        }
+        if (!form.tokenAddress)
+            update({ ...form, tokenAddress: tokens[0]?.address });
     }, []);
 
     return (
@@ -41,14 +39,13 @@ export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; up
             onSubmit={() => { /** Individual forms are not submitted */ }}
             render={({ handleSubmit }) => (
                 <form onSubmit={handleSubmit}>
-                    <div className='script-block__panel--three-columns price-block'>
+                    <div className='script-block__panel--three-columns balance-block'>
 
-                        {tokens.some(token => token.hasPriceFeed) && <TokensModal
-                            tokens={tokens.filter(token => token.hasPriceFeed)}
+                        <TokensModal
+                            tokens={tokens}
                             selectedToken={tokens.find(t => t.address === form.tokenAddress)}
                             setSelectedToken={(token) => update({ ...form, tokenAddress: token.address })}
                         />
-                        }
 
                         <Field
                             name="comparison"
@@ -60,14 +57,14 @@ export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; up
                                     input.onChange(e);
                                     update({ ...form, comparison: Number(e.target.value) });
                                 }}
-                                className='price-block__comparison'
+                                className='balance-block__comparison'
                             >
                                 <option value={0}>&gt;</option>
                                 <option value={1}>&lt;</option>
                             </select>}
                         </Field>
 
-                        <Field name="floatValue"
+                        <Field name="floatAmount"
                             component="input"
                             type="number"
                             placeholder='1.00'
@@ -75,11 +72,11 @@ export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; up
                             {({ input, meta }) =>
                                 <input
                                     {...input}
-                                    className={`price-block__value ${meta.error ? 'script-block__field--error' : null}`}
+                                    className={`balance-block__amount ${meta.error ? 'script-block__field--error' : null}`}
                                     onChange={(e) => {
                                         e.target.value = Number(e.target.value) < 0 ? '0' : e.target.value;
                                         input.onChange(e);
-                                        const updatedForm = { ...form, floatValue: Number(e.target.value) };
+                                        const updatedForm = { ...form, floatAmount: Number(e.target.value) };
                                         const valid = isFormValid(updatedForm);
                                         update({ ...updatedForm, valid });
                                     }}
@@ -87,10 +84,11 @@ export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; up
                             }
                         </Field>
 
+                        {/* ENABLE WHEN DEBUGGING!  */}
+                        {/* <p>{JSON.stringify(form, null, ' ')}</p> */}
                     </div>
                 </form>
             )}
         />
     );
-
 };

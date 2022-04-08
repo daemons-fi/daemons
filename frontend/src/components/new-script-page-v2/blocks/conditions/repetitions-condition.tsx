@@ -1,6 +1,6 @@
 import React from 'react';
-import { IRepetitionsConditionForm } from './conditions-interfaces';
 import { Form, Field } from 'react-final-form';
+import { IRepetitionsConditionForm } from "../../../../data/chains-data/condition-form-interfaces";
 
 
 const validateForm = (form: IRepetitionsConditionForm) => {

@@ -3,10 +3,13 @@ import { RootState } from "../../state";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { IAction, ICondition, IToken } from "../../data/chains-data/interfaces";
-import "./styles.css";
-import "./killme-styles.css";
 import { GetCurrentChain } from "../../data/chain-info";
-import { ActionBlock } from "./blocks/actions/actions-block-factory";
+import { ActionBlock } from "./blocks/actions/actions-block";
+import "./styles.css";
+import "./blocks.css";
+import "./killme-styles.css";
+import "../tooltip.css";
+import { ConditionBlock } from "./blocks/conditions/conditions-block";
 
 export function ScriptDesignerPage(): JSX.Element {
   // redux
@@ -21,7 +24,7 @@ export function ScriptDesignerPage(): JSX.Element {
   const [actions, setActions] = useState<IAction[]>([]);
   const [selectedAction, setSelectedAction] = useState<IAction | undefined>();
   const [conditions, setConditions] = useState<ICondition[]>([]);
-  const [selectedConditions, setSelectedConditions] = useState<ICondition[]>([]);
+  const [selectedConditions, setSelectedConditions] = useState<Set<ICondition>>(new Set());
 
   useEffect(() => {
     setActions(GetCurrentChain(chainId!).actions);
@@ -29,8 +32,18 @@ export function ScriptDesignerPage(): JSX.Element {
 
   useEffect(() => {
     setConditions(selectedAction?.conditions ?? []);
-    setSelectedConditions([]);
+    setSelectedConditions(new Set());
   }, [selectedAction]);
+
+  const cleanAction = () => setSelectedAction(undefined);
+  const removeCondition = (condition: ICondition) => {
+    setSelectedConditions(
+      new Set([...selectedConditions].filter((c) => c.title !== condition.title))
+    );
+  };
+  const addCondition = (condition: ICondition) => {
+    setSelectedConditions(new Set([...selectedConditions, condition]));
+  };
 
   // // action forms
   // const noActionForm: INoActionForm = { action: ScriptAction.None, valid: false };
@@ -96,40 +109,59 @@ export function ScriptDesignerPage(): JSX.Element {
           <div className="designer__choices-title">Actions</div>
           <div className="designer__choices-list">
             {actions.map((action) =>
-              createChoice(action.title, action.description, () => {
-                setSelectedAction(action);
-              })
+              createChoice(
+                action.title,
+                action.description,
+                selectedAction?.title === action.title,
+                () => {
+                  setSelectedAction(action);
+                }
+              )
             )}
           </div>
 
-          <div className="designer__choices-title">Conditions</div>
-          <div className="designer__choices-list">
-            {conditions.map((condition) =>
-              createChoice(condition.title, condition.description, () => {
-                const newSelectedConditions = [...selectedConditions, condition];
-                setSelectedConditions(newSelectedConditions);
-                const newConditions = conditions.filter(c => c.title !== condition.title);
-                setConditions(newConditions);
-              })
-            )}
-          </div>
+          {selectedAction && (
+            <>
+              <div className="designer__choices-title">{selectedAction.title} Conditions</div>
+              <div className="designer__choices-list">
+                {conditions.map((condition) => {
+                  const selected = selectedConditions.has(condition);
+                  return createChoice(condition.title, condition.description, selected, () => {
+                    selected ? removeCondition(condition) : addCondition(condition);
+                  });
+                })}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* The script the user is currently creating */}
-      <div className="designer__workspace">
-        <div className="workspace__action">
-              {selectedAction && <ActionBlock action={selectedAction}/>}
+      {/* The area where the user can create scripts */}
+      <div className="designer__workbench">
+        <div className="workbench__section">
+          {selectedAction && <ActionBlock action={selectedAction} onRemove={cleanAction} />}
         </div>
-
-
+        <div className="workbench__section">
+          {[...selectedConditions].map((condition) => (
+            <ConditionBlock condition={condition} onRemove={() => removeCondition(condition)} />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-const createChoice = (title: string, description: string, onClick: () => void): JSX.Element => (
-  <div key={title} className="choice" onClick={onClick}>
+const createChoice = (
+  title: string,
+  description: string,
+  selected: boolean,
+  onClick: () => void
+): JSX.Element => (
+  <div key={title} className={`choice ${selected ? "choice--selected" : ""}`} onClick={onClick}>
     <div className="choice-name">{title}</div>
+    <div className="tooltip">
+      <div className="tooltip__text">?</div>
+      <div className="tooltip__content">{description}</div>
+    </div>
   </div>
 );

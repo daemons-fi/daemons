@@ -1,6 +1,6 @@
 import React from 'react';
-import { IFrequencyConditionForm } from './conditions-interfaces';
 import { Form, Field } from 'react-final-form';
+import { IFrequencyConditionForm } from "../../../../data/chains-data/condition-form-interfaces";
 
 const validateForm = (form: IFrequencyConditionForm) => {
     const errors: any = {};

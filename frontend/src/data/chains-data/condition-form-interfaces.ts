@@ -10,6 +10,7 @@ export enum ScriptConditions {
 }
 
 export interface IScriptConditionForm {
+    type: ScriptConditions;
     valid: boolean;
     enabled: boolean;
 }

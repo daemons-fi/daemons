@@ -1,9 +1,9 @@
 import React from 'react';
-import { IFollowConditionForm } from './conditions-interfaces';
 import { Form, Field } from 'react-final-form';
 import { BaseScript } from '../../../../data/script/base-script';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../state';
+import { IFollowConditionForm } from "../../../../data/chains-data/condition-form-interfaces";
 
 const validateForm = (form: IFollowConditionForm) => {
     return form.parentScriptId ? {} : { 'parentScriptId': 'required' };
