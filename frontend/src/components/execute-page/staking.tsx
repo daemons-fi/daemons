@@ -1,14 +1,16 @@
-import { ethers } from 'ethers';
-import React, { useEffect, useState } from 'react';
-import { Field, Form } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { Contracts } from '../../data/contracts';
-import { RootState } from '../../state';
-import { fetchStakingBalance, fetchStakingClaimable } from '../../state/action-creators/staking-action-creators';
-import { AllowanceHelper } from '../../utils/allowance-helper';
-import { getAbiFor } from '../../utils/get-abi';
-import './staking.css';
-
+import { ethers } from "ethers";
+import React, { useEffect, useState } from "react";
+import { Field, Form } from "react-final-form";
+import { useDispatch, useSelector } from "react-redux";
+import { GetCurrentChain } from "../../data/chain-info";
+import { RootState } from "../../state";
+import {
+    fetchStakingBalance,
+    fetchStakingClaimable
+} from "../../state/action-creators/staking-action-creators";
+import { AllowanceHelper } from "../../utils/allowance-helper";
+import { getAbiFor } from "../../utils/get-abi";
+import "./staking.css";
 
 export function Staking() {
     const dispatch = useDispatch();
@@ -18,16 +20,17 @@ export function Staking() {
     const chainId = useSelector((state: RootState) => state.wallet.chainId);
     const [toggleDeposit, setToggleDeposit] = useState<boolean>(true);
     const [needsAllowance, setNeedsAllowance] = useState<boolean>(true);
+    const contracts = GetCurrentChain(chainId!).contracts;
 
     const checkForAllowance = async () => {
         const allowanceHelper = new AllowanceHelper();
         const hasAllowance = await allowanceHelper.checkForAllowance(
             walletAddress!,
-            Contracts[chainId!].DAEMToken,
-            Contracts[chainId!].Treasury,
+            contracts.DAEMToken,
+            contracts.Treasury,
             ethers.utils.parseEther("100000")
         );
-        console.log('hasAllowance', hasAllowance);
+        console.log("hasAllowance", hasAllowance);
         setNeedsAllowance(!hasAllowance);
     };
 
@@ -53,34 +56,31 @@ export function Staking() {
 
     const requestAllowance = async () => {
         const allowanceHelper = new AllowanceHelper();
-        const tx = await allowanceHelper.requestAllowance(
-            Contracts[chainId!].DAEMToken,
-            Contracts[chainId!].Treasury
-        );
+        const tx = await allowanceHelper.requestAllowance(contracts.DAEMToken, contracts.Treasury);
         await tx.wait();
         await checkForAllowance();
     };
 
     const stake = async () => {
-        const amount = parseFloat((document.getElementById('id-amount') as HTMLInputElement).value);
+        const amount = parseFloat((document.getElementById("id-amount") as HTMLInputElement).value);
 
         const treasury = await getTreasuryContract();
         const tx = await treasury.stake(ethers.utils.parseEther(amount.toString()));
         await tx.wait();
 
         dispatch(fetchStakingBalance(walletAddress, chainId));
-        (document.getElementById('id-amount') as HTMLInputElement).value = '';
+        (document.getElementById("id-amount") as HTMLInputElement).value = "";
     };
 
     const withdraw = async () => {
-        const amount = parseFloat((document.getElementById('id-amount') as HTMLInputElement).value);
+        const amount = parseFloat((document.getElementById("id-amount") as HTMLInputElement).value);
 
         const treasury = await getTreasuryContract();
         const tx = await treasury.withdraw(ethers.utils.parseEther(amount.toString()));
         await tx.wait();
 
         dispatch(fetchStakingBalance(walletAddress, chainId));
-        (document.getElementById('id-amount') as HTMLInputElement).value = '';
+        (document.getElementById("id-amount") as HTMLInputElement).value = "";
     };
 
     const claim = async () => {
@@ -97,45 +97,53 @@ export function Staking() {
     };
 
     const getTreasuryContract = async () => {
-        const ethers = require('ethers');
+        const ethers = require("ethers");
         const provider = new ethers.providers.Web3Provider((window as any).ethereum);
         const signer = provider.getSigner();
 
-        const contractAddress = Contracts[chainId!].Treasury;
-        const contractAbi = await getAbiFor('Treasury');
+        const contractAddress = contracts.Treasury;
+        const contractAbi = await getAbiFor("Treasury");
         const treasury = new ethers.Contract(contractAddress, contractAbi, signer);
         return treasury;
     };
 
     const renderLoadingMessage: () => JSX.Element = () => {
-        return (
-            <div className='staking__loading'>
-                Loading...
-            </div>
-        );
+        return <div className="staking__loading">Loading...</div>;
     };
 
     const renderDepositForm: () => JSX.Element = () => {
         return (
             <Form
-                className='staking__form'
-                onSubmit={() => {/* Handled in the buttons */ }}
+                className="staking__form"
+                onSubmit={() => {
+                    /* Handled in the buttons */
+                }}
                 render={({ handleSubmit }) => (
                     <form onSubmit={handleSubmit}>
                         <Field
-                            className='staking__input'
-                            id='id-amount'
+                            className="staking__input"
+                            id="id-amount"
                             name="amount"
                             component="input"
                             type="number"
                             placeholder="0.0"
                         />
-                        <div className='staking__buttons-container'>
-                            {
-                                needsAllowance
-                                    ? <input className='staking__button' type="submit" onClick={requestAllowance} value="Request Allowance" />
-                                    : <input className='staking__button' type="submit" onClick={stake} value="Stake" />
-                            }
+                        <div className="staking__buttons-container">
+                            {needsAllowance ? (
+                                <input
+                                    className="staking__button"
+                                    type="submit"
+                                    onClick={requestAllowance}
+                                    value="Request Allowance"
+                                />
+                            ) : (
+                                <input
+                                    className="staking__button"
+                                    type="submit"
+                                    onClick={stake}
+                                    value="Stake"
+                                />
+                            )}
                         </div>
                     </form>
                 )}
@@ -146,21 +154,35 @@ export function Staking() {
     const renderWithdrawForm: () => JSX.Element = () => {
         return (
             <Form
-                className='staking__form'
-                onSubmit={() => {/* Handled in the buttons */ }}
+                className="staking__form"
+                onSubmit={() => {
+                    /* Handled in the buttons */
+                }}
                 render={({ handleSubmit }) => (
                     <form onSubmit={handleSubmit}>
                         <Field
-                            className='staking__input'
-                            id='id-amount'
+                            className="staking__input"
+                            id="id-amount"
                             name="amount"
                             component="input"
                             type="number"
                             placeholder="0.0"
                         />
-                        <div className='staking__buttons-container'>
-                            <input disabled={!balance} className='staking__button' type="submit" onClick={withdraw} value="Unstake" />
-                            <input disabled={!balance} className='staking__button' type="submit" onClick={exit} value="Unstake &amp; Claim" />
+                        <div className="staking__buttons-container">
+                            <input
+                                disabled={!balance}
+                                className="staking__button"
+                                type="submit"
+                                onClick={withdraw}
+                                value="Unstake"
+                            />
+                            <input
+                                disabled={!balance}
+                                className="staking__button"
+                                type="submit"
+                                onClick={exit}
+                                value="Unstake &amp; Claim"
+                            />
                         </div>
                     </form>
                 )}
@@ -169,12 +191,12 @@ export function Staking() {
     };
 
     return (
-        <div className='card staking'>
-            <div className='card__header'>
-                <div className='card__title'>Stake</div>
+        <div className="card staking">
+            <div className="card__header">
+                <div className="card__title">Stake</div>
 
                 {/* Deposit/Withdraw switch */}
-                <div className='staking__switch'>
+                <div className="staking__switch">
                     Deposit
                     <label className="switch">
                         <input
@@ -189,32 +211,28 @@ export function Staking() {
             </div>
 
             <div>
-                <div className="staking__balance">{balance !== undefined ? balance : '??'} DAEM</div>
+                <div className="staking__balance">
+                    {balance !== undefined ? balance : "??"} DAEM
+                </div>
                 <div className="staking__forms-container">
-                    {
-                        balance === undefined || walletAddress === undefined
-                            ? renderLoadingMessage()
-                            : (
-                                <div>
-                                    {
-                                        toggleDeposit
-                                            ? renderDepositForm()
-                                            : renderWithdrawForm()
-                                    }
-                                </div>
-                            )
-                    }
+                    {balance === undefined || walletAddress === undefined ? (
+                        renderLoadingMessage()
+                    ) : (
+                        <div>{toggleDeposit ? renderDepositForm() : renderWithdrawForm()}</div>
+                    )}
                 </div>
             </div>
-            <div className='staking__reward-info'>
+            <div className="staking__reward-info">
                 <div className="staking__claimable">
-                    {
-                        claimable !== undefined
-                            ? `Claimable: ${claimable} ETH`
-                            : '??'
-                    }
+                    {claimable !== undefined ? `Claimable: ${claimable} ETH` : "??"}
                 </div>
-                <input disabled={!claimable} className='staking__button staking__button--small' type="submit" onClick={claim} value="Claim" />
+                <input
+                    disabled={!claimable}
+                    className="staking__button staking__button--small"
+                    type="submit"
+                    onClick={claim}
+                    value="Claim"
+                />
             </div>
         </div>
     );

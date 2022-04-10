@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Contracts } from '../../data/contracts';
+import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
 import { RootState } from '../../state';
 import { fetchGasTankClaimable } from '../../state/action-creators/gas-tank-action-creators';
 import { fetchStakingBalance, fetchStakingClaimable } from '../../state/action-creators/staking-action-creators';
@@ -40,7 +40,9 @@ export function ClaimRewards() {
         const provider = new ethers.providers.Web3Provider((window as any).ethereum);
         const signer = provider.getSigner();
 
-        const contractAddress = Contracts[chainId!].GasTank;
+        if (!IsChainSupported(chainId!)) throw new Error(`Chain ${chainId} is not supported!`);
+        const contractAddress = GetCurrentChain(chainId!).contracts.GasTank;
+
         const contractAbi = await getAbiFor('GasTank');
         const gasTank = new ethers.Contract(contractAddress, contractAbi, signer);
         return gasTank;

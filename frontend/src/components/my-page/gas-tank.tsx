@@ -1,12 +1,12 @@
 import React, { ReactNode, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Contracts } from '../../data/contracts';
 import { getAbiFor } from '../../utils/get-abi';
 import { RootState } from '../../state';
 import { fetchGasTankBalance } from '../../state/action-creators/gas-tank-action-creators';
 import { Field, Form } from 'react-final-form';
 import './gas-tank.css';
 import '../switch.css';
+import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
 
 
 export function GasTank(): JSX.Element {
@@ -22,7 +22,9 @@ export function GasTank(): JSX.Element {
         const provider = new ethers.providers.Web3Provider((window as any).ethereum);
         const signer = provider.getSigner();
 
-        const contractAddress = Contracts[chainId!].GasTank;
+        if (!IsChainSupported(chainId!)) throw new Error(`Chain ${chainId} is not supported!`);
+        const contractAddress = GetCurrentChain(chainId!).contracts.GasTank;
+
         const contractAbi = await getAbiFor('GasTank');
         const gasTank = new ethers.Contract(contractAddress, contractAbi, signer);
         return gasTank;

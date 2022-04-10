@@ -1,4 +1,18 @@
-import { IChainInfo } from '../interfaces';
+import { IChainInfo, IContractsList } from '../interfaces';
+
+
+const unsupportedContracts: IContractsList = {
+    GasTank: '',
+    DAEMToken: '',
+    Treasury: '',
+    GasPriceFeed: '',
+    PriceRetriever: '',
+
+    SwapExecutor: '',
+    TransferExecutor: '',
+    MmBaseExecutor: '',
+    MmAdvancedExecutor: '',
+};
 
 export const unsupportedChain: IChainInfo = {
     name: "Unsupported",
@@ -12,6 +26,7 @@ export const unsupportedChain: IChainInfo = {
     explorerUrl: 'https://kovan.etherscan.io/',
     explorerTxUrl: 'https://kovan.etherscan.io/tx/',
     tokens: [],
+    contracts: unsupportedContracts,
     moneyMarket: { aTokens: {}, name: "Unsupported", supportedTokens: [], poolAddress: '' },
     actions: [],
 };

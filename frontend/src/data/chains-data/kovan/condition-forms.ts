@@ -6,10 +6,10 @@ import { IFrequencyConditionForm } from "../condition-form-interfaces";
 import { IPriceConditionForm } from "../condition-form-interfaces";
 import { IRepetitionsConditionForm } from "../condition-form-interfaces";
 import { ScriptConditions } from "../condition-form-interfaces";
-import { ICondition } from "../interfaces";
+import { ConditionTitles, ICondition } from "../interfaces";
 
 export const FrequencyCondition: ICondition = {
-    title: "Frequency",
+    title: ConditionTitles.FREQUENCY,
     description: "Execute the scripts with a certain frequency, like every 1 hour or 15 minutes.",
 
     form: {
@@ -23,7 +23,7 @@ export const FrequencyCondition: ICondition = {
 };
 
 export const BalanceCondition: ICondition = {
-    title: "Balance",
+    title: ConditionTitles.BALANCE,
     description:
         "Execute the scripts only when you own a certain quantity of a token in your wallet.",
 
@@ -37,7 +37,7 @@ export const BalanceCondition: ICondition = {
 };
 
 export const PriceCondition: ICondition = {
-    title: "Price",
+    title: ConditionTitles.PRICE,
     description: "Execute the scripts only when the price of a token passes a threshold.",
 
     form: {
@@ -50,7 +50,7 @@ export const PriceCondition: ICondition = {
 };
 
 export const RepetitionsCondition: ICondition = {
-    title: "Repetitions",
+    title: ConditionTitles.REPETITIONS,
     description: "Set a maximum number of times a script should be run.",
 
     form: {
@@ -62,7 +62,7 @@ export const RepetitionsCondition: ICondition = {
 };
 
 export const FollowCondition: ICondition = {
-    title: "Chain Scripts",
+    title: ConditionTitles.FOLLOW,
     description: "Execute this script only after another one is executed",
 
     form: {

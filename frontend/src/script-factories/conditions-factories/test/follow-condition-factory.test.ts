@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import { IFollowCondition } from '@daemons-fi/shared-definitions';
 import { IFollowConditionForm } from '../../../components/new-script-page/blocks/conditions/conditions-interfaces';
 import chai from 'chai';
-import { ZeroAddress, ZeroId } from '../../chain-info';
+import { ZeroAddress, ZeroId } from '../../../data/chain-info';
 import { FollowConditionFactory } from '../follow-condition-factory';
 import Sinon from 'sinon';
 const sinon = require('sinon');

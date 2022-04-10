@@ -2,11 +2,11 @@ import { BigNumber, Contract } from 'ethers';
 import { ITransferAction } from '@daemons-fi/shared-definitions';
 import { getAbiFor } from '../../utils/get-abi';
 import { BaseScript } from './base-script';
-import { BalanceConditionFactory } from '../conditions-factories/balance-condition-factory';
-import { FollowConditionFactory } from '../conditions-factories/follow-condition-factory';
-import { FrequencyConditionFactory } from '../conditions-factories/frequency-condition-factory';
-import { PriceConditionFactory } from '../conditions-factories/price-condition-factory';
-import { RepetitionsConditionFactory } from '../conditions-factories/repetitions-condition-factory';
+import { BalanceConditionFactory } from '../../script-factories/conditions-factories/balance-condition-factory';
+import { FollowConditionFactory } from '../../script-factories/conditions-factories/follow-condition-factory';
+import { FrequencyConditionFactory } from '../../script-factories/conditions-factories/frequency-condition-factory';
+import { PriceConditionFactory } from '../../script-factories/conditions-factories/price-condition-factory';
+import { RepetitionsConditionFactory } from '../../script-factories/conditions-factories/repetitions-condition-factory';
 import { Token } from '../chains-data/interfaces';
 
 export class TransferScript extends BaseScript {

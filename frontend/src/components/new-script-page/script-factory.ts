@@ -1,5 +1,4 @@
 import { BigNumber, utils } from 'ethers';
-import { Contracts } from '../../data/contracts';
 import { BaseScript } from '../../data/script/base-script';
 import { SwapScript } from '../../data/script/swap-script';
 import { TransferScript } from '../../data/script/transfer-script';
@@ -8,14 +7,15 @@ import { ITransferAction, transferDomain, transferTypes } from '@daemons-fi/shar
 import { IMMBaseAction, mmBaseDomain, mmBaseTypes } from '@daemons-fi/shared-definitions';
 import { IBaseMMActionForm, ISwapActionForm, ITransferActionForm, ScriptAction } from './blocks/actions/actions-interfaces';
 import { INewScriptBundle } from './i-new-script-form';
-import { FrequencyConditionFactory } from '../../data/conditions-factories/frequency-condition-factory';
-import { BalanceConditionFactory } from '../../data/conditions-factories/balance-condition-factory';
-import { PriceConditionFactory } from '../../data/conditions-factories/price-condition-factory';
-import { RepetitionsConditionFactory } from '../../data/conditions-factories/repetitions-condition-factory';
-import { FollowConditionFactory } from '../../data/conditions-factories/follow-condition-factory';
+import { FrequencyConditionFactory } from '../../script-factories/conditions-factories/frequency-condition-factory';
+import { BalanceConditionFactory } from '../../script-factories/conditions-factories/balance-condition-factory';
+import { PriceConditionFactory } from '../../script-factories/conditions-factories/price-condition-factory';
+import { RepetitionsConditionFactory } from '../../script-factories/conditions-factories/repetitions-condition-factory';
+import { FollowConditionFactory } from '../../script-factories/conditions-factories/follow-condition-factory';
 import { AmountType } from '@daemons-fi/shared-definitions';
 import { MmBaseScript } from '../../data/script/mm-base-script';
 import { Token } from '../../data/chains-data/interfaces';
+import { GetCurrentChain } from "../../data/chain-info";
 
 type ScriptDefinition = ISwapAction | ITransferAction | IMMBaseAction;
 
@@ -117,7 +117,7 @@ export class ScriptFactory {
             price: priceCondition,
             repetitions: maxRepetitions,
             follow: followCondition,
-            executor: Contracts[this.chainId].SwapExecutor,
+            executor: GetCurrentChain(this.chainId).contracts.SwapExecutor,
             chainId: BigNumber.from(this.chainId),
         };
     }
@@ -154,7 +154,7 @@ export class ScriptFactory {
             price: priceCondition,
             repetitions: maxRepetitions,
             follow: followCondition,
-            executor: Contracts[this.chainId].TransferExecutor,
+            executor: GetCurrentChain(this.chainId).contracts.TransferExecutor,
             chainId: BigNumber.from(this.chainId),
         };
     }
@@ -195,7 +195,7 @@ export class ScriptFactory {
             price: priceCondition,
             repetitions: maxRepetitions,
             follow: followCondition,
-            executor: Contracts[this.chainId].MmBaseExecutor,
+            executor: GetCurrentChain(this.chainId).contracts.MmBaseExecutor,
             chainId: BigNumber.from(this.chainId),
         };
     }

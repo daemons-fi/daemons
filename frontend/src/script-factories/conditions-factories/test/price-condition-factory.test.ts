@@ -3,9 +3,9 @@ import { ethers, utils } from 'ethers';
 import itParam from 'mocha-param';
 import { ComparisonType, IPriceCondition } from '@daemons-fi/shared-definitions';
 import { IPriceConditionForm } from '../../../components/new-script-page/blocks/conditions/conditions-interfaces';
-import { ZeroAddress } from '../../chain-info';
+import { ZeroAddress } from '../../../data/chain-info';
 import { PriceConditionFactory } from '../price-condition-factory';
-import { Token } from '../../chains-data/interfaces';
+import { Token } from '../../../data/chains-data/interfaces';
 
 
 describe('Price Condition Factory', () => {

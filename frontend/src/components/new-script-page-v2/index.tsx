@@ -12,18 +12,10 @@ import "../tooltip.css";
 import { ConditionBlock } from "./blocks/conditions/conditions-block";
 import { IScriptActionForm } from "../../data/chains-data/action-form-interfaces";
 import { IScriptConditionForm } from "../../data/chains-data/condition-form-interfaces";
-import { ScriptFactory } from "../new-script-page/script-factory";
 import { StorageProxy } from "../../data/storage-proxy";
 import { addNewScript } from "../../state/action-creators/script-action-creators";
-
-/**
- * Wrapper containing actions and conditions.
- * --> Used as state <--
- */
-interface ICurrentScript {
-    action: IAction;
-    conditions: { [title: string]: ICondition };
-}
+import { ICurrentScript } from "../../script-factories/i-current-script";
+import { ScriptFactory } from "../../script-factories";
 
 export function ScriptDesignerPage(): JSX.Element {
     // redux
@@ -92,9 +84,10 @@ export function ScriptDesignerPage(): JSX.Element {
 
     const createAndSignScript = async () => {
         if (!chainId) throw new Error("Cannot create the script! The chain is unknown");
+        if (!currentScript) throw new Error("Cannot create the script! Current script is empty");
 
-        // const scriptFactory = new ScriptFactory(chainId, tokens);
-        // const script = await scriptFactory.SubmitScriptsForSignature(bundle);
+        const scriptFactory = new ScriptFactory(chainId, tokens);
+        const script = await scriptFactory.SubmitScriptsForSignature(currentScript);
         // if (!await script.hasAllowance()) {
         //     await script.requestAllowance();
         // }
@@ -181,7 +174,7 @@ export function ScriptDesignerPage(): JSX.Element {
                         <button
                             className="workbench__deploy-button"
                             disabled={buttonDisabled()}
-                            onClick={() => {}}
+                            onClick={createAndSignScript}
                         >
                             {"Sign & Deploy"}
                         </button>

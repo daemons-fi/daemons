@@ -1,14 +1,17 @@
 import { Dispatch } from 'redux';
 import { ActionType } from '../action-types';
 import { getAbiFor } from '../../utils/get-abi';
-import { Contracts } from '../../data/contracts';
 import { GasTankAction } from '../actions/gas-tank-actions';
 import { BigNumber, Contract } from 'ethers';
+import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
 
 const getGasTankContract = async (chainId: string): Promise<Contract> => {
     const ethers = require('ethers');
     const provider = new ethers.providers.Web3Provider((window as any).ethereum);
-    const contractAddress = Contracts[chainId].GasTank;
+
+    if (!IsChainSupported(chainId)) throw new Error(`Chain ${chainId} is not supported!`);
+    const contractAddress = GetCurrentChain(chainId).contracts.GasTank;
+
     const contractAbi = await getAbiFor('GasTank');
     return new ethers.Contract(contractAddress, contractAbi, provider);
 };
