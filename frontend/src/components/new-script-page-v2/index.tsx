@@ -88,11 +88,11 @@ export function ScriptDesignerPage(): JSX.Element {
 
         const scriptFactory = new ScriptFactory(chainId, tokens);
         const script = await scriptFactory.SubmitScriptsForSignature(currentScript);
-        // if (!await script.hasAllowance()) {
-        //     await script.requestAllowance();
-        // }
-        // await StorageProxy.script.saveScript(script);
-        // dispatch(addNewScript(script));
+        if (!await script.hasAllowance()) {
+            await script.requestAllowance();
+        }
+        await StorageProxy.script.saveScript(script);
+        dispatch(addNewScript(script));
         setRedirect(true);
     };
 
@@ -181,7 +181,8 @@ export function ScriptDesignerPage(): JSX.Element {
                     </>
                 )}
             </div>
-            <p> {JSON.stringify(currentScript, null, " ")}</p>
+            {/* ENABLE WHEN DEBUGGING */}
+            {/* <p> {JSON.stringify(currentScript, null, " ")}</p> */}
         </div>
     );
 }
