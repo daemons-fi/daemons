@@ -29,17 +29,17 @@
     cursor: pointer;
 }
 
-.chains-dialog_header {
+.chains-dialog__header {
     display: flex;
     position: relative;
     margin-bottom: 20px;
 }
 
-.chains-dialog_title {
+.chains-dialog__title {
     font-weight: bold;
 }
 
-.chains-dialog_close:after {
+.chains-dialog__close:after {
     position: absolute;
     right: 5px;
     content: "\00d7";
@@ -48,7 +48,7 @@
     top: -5px;
 }
 
-.chains-dialog_body {
+.chains-dialog__body {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     overflow-y: auto;

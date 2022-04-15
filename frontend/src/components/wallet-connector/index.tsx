@@ -117,14 +117,14 @@ function availableChainsDialog(hideDialog: () => void, selectedChainId: string):
     const chains = GetAvailableChains();
     return (
         <div className='chains-dialog'>
-            <div className='chains-dialog_header'>
-                <div className='chains-dialog_title'>Select a network</div>
-                <div className='chains-dialog_close'
+            <div className='chains-dialog__header'>
+                <div className='chains-dialog__title'>Select a network</div>
+                <div className='chains-dialog__close'
                     onClick={() => {
                         hideDialog();
                     }}></div>
             </div>
-            <div className='chains-dialog_body'>
+            <div className='chains-dialog__body'>
                 {chains.map(chainComponent)}
             </div>
         </div>
