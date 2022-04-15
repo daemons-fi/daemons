@@ -3,7 +3,6 @@ import { gasTankReducer } from './gas-tank-reducer';
 import { historyReducer } from './history-reducer';
 import { scriptReducer } from './script-reducer';
 import { stakingReducer } from './staking-reducer';
-import { tokensReducer } from './tokens-reducer';
 import { walletReducer } from './wallet-reducer';
 
 
@@ -12,7 +11,6 @@ const reducers = combineReducers({
     wallet: walletReducer,
     gasTank: gasTankReducer,
     staking: stakingReducer,
-    tokens: tokensReducer,
     history: historyReducer,
 });
 

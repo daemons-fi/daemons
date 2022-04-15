@@ -8,7 +8,6 @@ import { RootState } from './state';
 import { GasIndicator } from './components/gas-indicator';
 import { fetchUserScripts } from './state/action-creators/script-action-creators';
 import { fetchGasTankBalance, fetchGasTankClaimable } from './state/action-creators/gas-tank-action-creators';
-import { fetchChainTokens } from './state/action-creators/tokens-action-creators';
 
 import "./constants.css";
 import "./app.css";
@@ -32,7 +31,6 @@ export const App = ({ children }: { children: any; }) => {
             dispatch(fetchUserScripts(chainId, walletAddress));
             dispatch(fetchGasTankBalance(walletAddress, chainId));
             dispatch(fetchGasTankClaimable(walletAddress, chainId));
-            dispatch(fetchChainTokens(chainId));
             dispatch(fetchUserHistory(chainId, walletAddress));
         }
     }, [chainId, walletAddress, authenticated]);
