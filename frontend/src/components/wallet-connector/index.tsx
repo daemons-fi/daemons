@@ -3,12 +3,26 @@ import { useMetaMask } from "metamask-react";
 import { authenticationCheck, updateWalletAddress } from '../../state/action-creators/wallet-action-creators';
 import { useDispatch, useSelector } from 'react-redux';
 import { BigNumber } from 'ethers';
+import Modal from "react-modal";
 import { RootState } from '../../state';
 import { StorageProxy } from '../../data/storage-proxy';
 import { GetAvailableChains, GetCurrentChain, IsChainSupported } from '../../data/chain-info';
 import './styles.css';
 import { IChainInfo } from '../../data/chains-data/interfaces';
 
+const modalStyles: any = {
+    content: {
+        width: "400px",
+        borderRadius: "32px",
+        transform: "translateX(-50%)",
+        left: "50%",
+        height: "fit-content",
+        maxHeight: "80vh",
+        padding: "25px",
+        boxShadow: "0 6px 4px 0 rgba(0, 0, 0, 0.19)",
+        overflow: "hidden"
+    },
+};
 
 export function ConnectWalletButton() {
     const dispatch = useDispatch();
@@ -56,7 +70,15 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
                     src={chainInfo.iconPath}
                     onClick={() => setDisplayChains(!displayChains)}
                 />
-                {displayChains && availableChainsDialog(() => setDisplayChains(false))}
+                {displayChains &&
+                    <Modal
+                        isOpen={displayChains}
+                        onRequestClose={() => setDisplayChains(false)}
+                        style={modalStyles}
+                        ariaHideApp={false}
+                    >
+                        {availableChainsDialog(() => setDisplayChains(false), chainInfo.id)}
+                    </Modal>}
             </div>
 
             {
@@ -77,10 +99,10 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
 }
 
 
-function availableChainsDialog(hideDialog: () => void): JSX.Element | null {
+function availableChainsDialog(hideDialog: () => void, selectedChainId: string): JSX.Element | null {
     const chainComponent = (chain: IChainInfo): JSX.Element => {
         return (
-            <div key={chain.hex} className='chains-dialog__chain-entry'
+            <div key={chain.hex} className={`chains-dialog__chain-entry ${selectedChainId === chain.id ? 'chains-dialog__chain-entry--selected' : ''}`}
                 onClick={() => {
                     promptChainChange(chain);
                     hideDialog();
@@ -95,7 +117,16 @@ function availableChainsDialog(hideDialog: () => void): JSX.Element | null {
     const chains = GetAvailableChains();
     return (
         <div className='chains-dialog'>
-            {chains.map(chainComponent)}
+            <div className='chains-dialog_header'>
+                <div className='chains-dialog_title'>Select a network</div>
+                <div className='chains-dialog_close'
+                    onClick={() => {
+                        hideDialog();
+                    }}></div>
+            </div>
+            <div className='chains-dialog_body'>
+                {chains.map(chainComponent)}
+            </div>
         </div>
     );
 }
