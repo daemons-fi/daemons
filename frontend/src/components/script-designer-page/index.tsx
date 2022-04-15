@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { RootState } from "../../state";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { IAction, ICondition, IToken } from "../../data/chains-data/interfaces";
+import { IAction, ICondition, Token } from "../../data/chains-data/interfaces";
 import { GetCurrentChain } from "../../data/chain-info";
 import { ActionBlock } from "./blocks/actions/actions-block";
 import "./styles.css";
@@ -23,16 +23,17 @@ export function ScriptDesignerPage(): JSX.Element {
     const chainId: string | undefined = useSelector((state: RootState) => state.wallet.chainId);
     const authenticated: boolean = useSelector((state: RootState) => state.wallet.authenticated);
     const supportedChain: boolean = useSelector((state: RootState) => state.wallet.supportedChain);
-    const tokens: IToken[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
 
     // states
     const [redirect, setRedirect] = useState<boolean>(false);
     const [actions, setActions] = useState<IAction[]>([]);
     const [conditions, setConditions] = useState<ICondition[]>([]);
     const [currentScript, _setCurrentScript] = useState<ICurrentScript | undefined>();
+    const [tokens, setTokens] = useState<Token[]>([]);
 
     useEffect(() => {
         setActions(GetCurrentChain(chainId!).actions);
+        setTokens(GetCurrentChain(chainId!).tokens)
     }, [chainId]);
 
     useEffect(() => {

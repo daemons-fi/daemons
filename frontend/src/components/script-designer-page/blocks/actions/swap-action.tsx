@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ISwapActionForm } from '../../../../data/chains-data/action-form-interfaces';
 import { Form, Field } from 'react-final-form';
 import { useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import { TokensModal } from "../shared/tokens-modal";
 import { AmountType } from '@daemons-fi/shared-definitions/build';
 import { ToggleButtonField } from '../shared/toggle-button';
 import { Token } from '../../../../data/chains-data/interfaces';
+import { GetCurrentChain } from '../../../../data/chain-info';
 
 const validateForm = (values: ISwapActionForm) => {
     const errors: any = {};
@@ -26,7 +27,8 @@ const isFormValid = (values: ISwapActionForm) => {
 };
 
 export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (next: ISwapActionForm) => void; }) => {
-    const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
+    const chainId = useSelector((state: RootState) => state.wallet.chainId);
+    const [tokens, setTokens] = useState<Token[]>([]);
 
     useEffect(() => {
         if (!form.tokenFromAddress || !form.tokenToAddress)
@@ -35,7 +37,12 @@ export const SwapAction = ({ form, update }: { form: ISwapActionForm; update: (n
                 tokenFromAddress: tokens[0]?.address,
                 tokenToAddress: tokens[1]?.address
             });
-    }, []);
+    }, [tokens]);
+
+    useEffect(() => {
+        if (chainId)
+            setTokens(GetCurrentChain(chainId).tokens)
+    }, [chainId]);
 
     return (
         <Form

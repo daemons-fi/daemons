@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ITransferActionForm } from '../../../../data/chains-data/action-form-interfaces';
 import { Form, Field } from 'react-final-form';
 import { ethers } from 'ethers';
@@ -8,6 +8,7 @@ import { TokensModal } from "../shared/tokens-modal";
 import { AmountType } from '@daemons-fi/shared-definitions/build';
 import { ToggleButtonField } from '../shared/toggle-button';
 import { Token } from '../../../../data/chains-data/interfaces';
+import { GetCurrentChain } from '../../../../data/chain-info';
 
 
 const validateForm = (values: ITransferActionForm) => {
@@ -34,12 +35,18 @@ const isFormValid = (values: ITransferActionForm) => {
 };
 
 export const TransferAction = ({ form, update }: { form: ITransferActionForm; update: (next: ITransferActionForm) => void; }) => {
-    const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
+    const chainId = useSelector((state: RootState) => state.wallet.chainId);
+    const [tokens, setTokens] = useState<Token[]>([]);
 
     useEffect(() => {
         if (!form.tokenAddress)
-            update({ ...form, tokenAddress: tokens[0].address });
-    }, []);
+            update({ ...form, tokenAddress: tokens[0]?.address });
+    }, [tokens]);
+
+    useEffect(() => {
+        if (chainId)
+            setTokens(GetCurrentChain(chainId).tokens)
+    }, [chainId]);
 
     return (
         <Form

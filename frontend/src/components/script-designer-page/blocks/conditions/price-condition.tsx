@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Field } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../state';
 import { TokensModal } from "../shared/tokens-modal";
 import { Token } from '../../../../data/chains-data/interfaces';
 import { IPriceConditionForm } from "../../../../data/chains-data/condition-form-interfaces";
+import { GetCurrentChain } from '../../../../data/chain-info';
 
 
 const validateForm = (form: IPriceConditionForm) => {
@@ -25,14 +26,20 @@ const isFormValid = (values: IPriceConditionForm) => {
 };
 
 export const PriceCondition = ({ form, update }: { form: IPriceConditionForm; update: (next: IPriceConditionForm) => void; }) => {
-    const tokens: Token[] = useSelector((state: RootState) => state.tokens.currentChainTokens);
+    const chainId = useSelector((state: RootState) => state.wallet.chainId);
+    const [tokens, setTokens] = useState<Token[]>([]);
 
     useEffect(() => {
         if (!form.tokenAddress) {
             const filteredTokens = tokens.filter(token => token.hasPriceFeed);
             update({ ...form, tokenAddress: filteredTokens[0]?.address });
         }
-    }, []);
+    }, [tokens]);
+
+    useEffect(() => {
+        if (chainId)
+            setTokens(GetCurrentChain(chainId).tokens)
+    }, [chainId]);
 
     return (
         <Form
