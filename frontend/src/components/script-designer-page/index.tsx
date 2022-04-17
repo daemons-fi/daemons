@@ -5,17 +5,17 @@ import { Navigate } from "react-router-dom";
 import { IAction, ICondition, Token } from "../../data/chains-data/interfaces";
 import { GetCurrentChain } from "../../data/chain-info";
 import { ActionBlock } from "./blocks/actions/actions-block";
+import { ConditionBlock } from "./blocks/conditions/conditions-block";
+import { IScriptActionForm } from "../../data/chains-data/action-form-interfaces";
+import { IScriptConditionForm } from "../../data/chains-data/condition-form-interfaces";
+import { ICurrentScript } from "../../script-factories/i-current-script";
 import "./styles.css";
 import "./blocks.css";
 import "./killme-styles.css";
 import "../tooltip.css";
-import { ConditionBlock } from "./blocks/conditions/conditions-block";
-import { IScriptActionForm } from "../../data/chains-data/action-form-interfaces";
-import { IScriptConditionForm } from "../../data/chains-data/condition-form-interfaces";
-import { StorageProxy } from "../../data/storage-proxy";
-import { addNewScript } from "../../state/action-creators/script-action-creators";
-import { ICurrentScript } from "../../script-factories/i-current-script";
-import { ScriptFactory } from "../../script-factories";
+import { ethers } from "ethers";
+import { ScriptDescriptionFactory } from "../../script-factories/script-description-factory";
+import { addScriptToWorkbench } from "../../state/action-creators/workbench-action-creators";
 
 export function ScriptDesignerPage(): JSX.Element {
     // redux
@@ -25,15 +25,13 @@ export function ScriptDesignerPage(): JSX.Element {
     const supportedChain: boolean = useSelector((state: RootState) => state.wallet.supportedChain);
 
     // states
-    const [redirect, setRedirect] = useState<boolean>(false);
+    const [redirectToReview, setRedirectToReview] = useState<boolean>(false);
     const [actions, setActions] = useState<IAction[]>([]);
     const [conditions, setConditions] = useState<ICondition[]>([]);
     const [currentScript, _setCurrentScript] = useState<ICurrentScript | undefined>();
-    const [tokens, setTokens] = useState<Token[]>([]);
 
     useEffect(() => {
         setActions(GetCurrentChain(chainId!).actions);
-        setTokens(GetCurrentChain(chainId!).tokens)
     }, [chainId]);
 
     useEffect(() => {
@@ -46,7 +44,14 @@ export function ScriptDesignerPage(): JSX.Element {
     const setCurrentScript = (action: IAction) => {
         if (currentScript && currentScript.action.title === action.title) return;
         const actionCopy = { ...action };
-        _setCurrentScript({ action: actionCopy, conditions: {} });
+        const newCurrentScript: ICurrentScript = {
+            id: ethers.utils.hexlify(ethers.utils.randomBytes(32)),
+            description: "",
+            action: actionCopy,
+            conditions: {},
+        }
+
+        _setCurrentScript(newCurrentScript);
     };
 
     // Actions handlers
@@ -83,28 +88,29 @@ export function ScriptDesignerPage(): JSX.Element {
         _setCurrentScript({ ...currentScript, conditions: copiedConditions });
     };
 
-    const createAndSignScript = async () => {
-        if (!chainId) throw new Error("Cannot create the script! The chain is unknown");
-        if (!currentScript) throw new Error("Cannot create the script! Current script is empty");
+    const isCurrentScriptValid = () => {
+        if (!currentScript) return false;
+        if (!currentScript.action.form.valid) return false;
 
-        const scriptFactory = new ScriptFactory(chainId, tokens);
-        const script = await scriptFactory.SubmitScriptsForSignature(currentScript);
-        if (!await script.hasAllowance()) {
-            await script.requestAllowance();
-        }
-        await StorageProxy.script.saveScript(script);
-        dispatch(addNewScript(script));
-        setRedirect(true);
+        const conditions = Object.values(currentScript.conditions);
+        if (conditions.some((condition) => !condition.form.valid)) return false;
+
+        return true;
     };
 
-    const buttonDisabled = () => {
-        if (!currentScript) return true;
-        if (!currentScript.action.form.valid) return true;
-        return Object.values(currentScript.conditions).some((condition) => !condition.form.valid);
-    };
+    const storeScriptAndGoToReview = () => {
+        if (!isCurrentScriptValid()) throw new Error("Cannot store invalid script");
+        const tokens = GetCurrentChain(chainId!).tokens;
+        const scriptDescriptionFactory = new ScriptDescriptionFactory(tokens);
+        const script = JSON.parse(JSON.stringify(currentScript))
+        script.description = scriptDescriptionFactory.extractDefaultDescription(script);
 
-    const shouldRedirect = redirect || !authenticated || !supportedChain;
-    if (shouldRedirect) return <Navigate to="/my-page" />;
+        dispatch(addScriptToWorkbench(script));
+        setRedirectToReview(true);
+    }
+
+    if (!authenticated || !supportedChain) return <Navigate to="/my-page" />;
+    if (redirectToReview) return <Navigate to="/review" />;
 
     return (
         <div className="designer">
@@ -116,7 +122,7 @@ export function ScriptDesignerPage(): JSX.Element {
                         {actions.map((action) =>
                             createChoice(
                                 action.title,
-                                action.description,
+                                action.info,
                                 currentScript?.action?.title === action.title,
                                 () => {
                                     setCurrentScript(action);
@@ -135,7 +141,7 @@ export function ScriptDesignerPage(): JSX.Element {
                                     const selected = !!currentScript.conditions[condition.title];
                                     return createChoice(
                                         condition.title,
-                                        condition.description,
+                                        condition.info,
                                         selected,
                                         () => {
                                             selected
@@ -174,10 +180,10 @@ export function ScriptDesignerPage(): JSX.Element {
 
                         <button
                             className="workbench__deploy-button"
-                            disabled={buttonDisabled()}
-                            onClick={createAndSignScript}
+                            disabled={!isCurrentScriptValid()}
+                            onClick={storeScriptAndGoToReview}
                         >
-                            {"Sign & Deploy"}
+                            {"Review and Sign"}
                         </button>
                     </>
                 )}

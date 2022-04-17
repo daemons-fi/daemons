@@ -1,0 +1,40 @@
+.review {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 50px;
+}
+
+.review__scripts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.temporary-script {
+    white-space: pre-wrap;
+    position: relative;
+    border-radius: 5px;
+    padding: 10px 15px;
+    background: var(--secondary-background);
+    box-shadow: 0 1px 15px rgb(0 0 0 / 4%), 0 1px 6px rgb(0 0 0 / 4%);
+    width: 270px;
+}
+
+.review__deploy-button {
+    padding: 8px 15px;
+    border-radius: 10px;
+    color: white;
+    border: none;
+    background-color: var(--primary-colour);
+    font-size: 15px;
+    cursor: pointer;
+    height: fit-content;
+    width: 170px;
+    margin: auto;
+}
+
+.review__deploy-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
