@@ -4,6 +4,7 @@ import { historyReducer } from './history-reducer';
 import { scriptReducer } from './script-reducer';
 import { stakingReducer } from './staking-reducer';
 import { walletReducer } from './wallet-reducer';
+import { workbenchReducer } from "./workbench-reducer";
 
 
 const reducers = combineReducers({
@@ -12,6 +13,7 @@ const reducers = combineReducers({
     gasTank: gasTankReducer,
     staking: stakingReducer,
     history: historyReducer,
+    workbench: workbenchReducer,
 });
 
 export default reducers;
