@@ -6,7 +6,7 @@ import { kovanAaveMM } from './tokens';
 
 export const TransferAction: IAction = {
     title: "Transfer",
-    description: "Transfer some tokens from your wallet to another address.",
+    info: "Transfer some tokens from your wallet to another address.",
 
     form: {
         type: ScriptAction.TRANSFER,
@@ -28,7 +28,7 @@ export const TransferAction: IAction = {
 
 export const SwapAction: IAction = {
     title: "Swap",
-    description: "Swap one token for another using the Sushi DEX.",
+    info: "Swap one token for another using the Sushi DEX.",
 
     form: {
         type: ScriptAction.SWAP,
@@ -50,7 +50,7 @@ export const SwapAction: IAction = {
 
 export const AaveMMBaseAction: IAction = {
     title: "AAVE Base",
-    description: "Deposit and withdraw tokens into Aave.",
+    info: "Deposit and withdraw tokens into Aave.",
 
     form: {
         type: ScriptAction.MMBASE,

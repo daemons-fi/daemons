@@ -36,14 +36,14 @@ export interface IContractsList {
 
 export interface IAction {
     title: string;
-    description: string;
+    info: string;
     conditions: ICondition[];
     form: IScriptActionForm;
 }
 
 export interface ICondition {
     title: string;
-    description: string;
+    info: string;
     form: IScriptConditionForm;
 }
 

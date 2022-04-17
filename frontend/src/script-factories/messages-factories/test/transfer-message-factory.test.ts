@@ -34,9 +34,11 @@ describe("Transfer Message Factory", () => {
     };
 
     const bundle: ICurrentScript = {
+        id: '0x11111111111',
+        description: 'lorem ipsum',
         action: {
             title: "FakeAction",
-            description: "Whatevs",
+            info: "Whatevs",
             conditions: [],
             form
         },
@@ -55,9 +57,11 @@ describe("Transfer Message Factory", () => {
 
     it("throws an error if the action type does not correspond", async () => {
         const bundleWithWrongAction: ICurrentScript = {
+            id: '0x11111111111',
+            description: 'lorem ipsum',
             action: {
                 title: "FakeAction",
-                description: "Whatevs",
+                info: "Whatevs",
                 conditions: [],
                 form: { type: ScriptAction.NONE, valid: true }
             },
@@ -78,9 +82,11 @@ describe("Transfer Message Factory", () => {
         const invalidForm = JSON.parse(JSON.stringify(form));
         invalidForm.valid = false;
         const bundleWithInvalidForm: ICurrentScript = {
+            id: '0x11111111111',
+            description: 'lorem ipsum',
             action: {
                 title: "FakeAction",
-                description: "Whatevs",
+                info: "Whatevs",
                 conditions: [],
                 form: invalidForm
             },

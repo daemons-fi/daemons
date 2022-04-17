@@ -114,16 +114,18 @@ describe('Price Condition Factory', () => {
 
         it('happy flow', async () => {
             const bundle: ICurrentScript = {
+                id: '0x11111111111',
+                description: 'lorem ipsum',
                 action: {
                     title: "FakeAction",
-                    description: "Whatevs",
+                    info: "Whatevs",
                     conditions: [],
                     form: { type: ScriptAction.NONE, valid: true}
                 },
                 conditions: {
                     "Price": {
                         title: "Price",
-                        description: "Whatevs",
+                        info: "Whatevs",
                         form
                     }
                 }
@@ -139,9 +141,11 @@ describe('Price Condition Factory', () => {
 
         it('returns an empty form if the balance condition is missing from the bundle', async () => {
             const emptyBundle: ICurrentScript = {
+                id: '0x11111111111',
+                description: 'lorem ipsum',
                 action: {
                     title: "FakeAction",
-                    description: "Whatevs",
+                    info: "Whatevs",
                     conditions: [],
                     form: { type: ScriptAction.NONE, valid: true}
                 },
