@@ -9,6 +9,7 @@ import { addNewScript } from "../../state/action-creators/script-action-creators
 import { BaseScript } from "../../data/script/base-script";
 import { Navigate } from "react-router-dom";
 import { GetCurrentChain } from "../../data/chain-info";
+import { cleanWorkbench } from "../../state/action-creators/workbench-action-creators";
 
 export function ReviewPage(): JSX.Element {
     // redux
@@ -42,6 +43,8 @@ export function ReviewPage(): JSX.Element {
             await StorageProxy.script.saveScript(signedScript);
             dispatch(addNewScript(signedScript));
         }
+
+        dispatch(cleanWorkbench());
         setRedirect(true);
     };
 
