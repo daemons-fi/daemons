@@ -27,8 +27,7 @@ export function ReviewPage(): JSX.Element {
         if (!workbenchScripts.length)
             throw new Error("Cannot create the script! Current script is empty");
 
-        const tokens = GetCurrentChain(chainId).tokens;
-        const scriptFactory = new ScriptFactory(chainId, tokens);
+        const scriptFactory = new ScriptFactory(chainId);
         const signedScripts: BaseScript[] = [];
         for (const script of workbenchScripts) {
             const signedScript = await scriptFactory.SubmitScriptsForSignature(script);

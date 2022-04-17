@@ -1,4 +1,4 @@
-import { BigNumber, ethers, utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { AmountType, ITransferAction } from "@daemons-fi/shared-definitions";
 import { IChainInfo } from "../../data/chains-data/interfaces";
 import { ICurrentScript } from "../i-current-script";
@@ -48,7 +48,7 @@ export class TransferMessageFactory {
         }
 
         return {
-            scriptId: ethers.utils.hexlify(ethers.utils.randomBytes(32)),
+            scriptId:bundle.id,
             typeAmt: transferActionForm.amountType,
             amount: amount,
             token: token.address,

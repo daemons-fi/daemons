@@ -46,7 +46,7 @@ export class SwapMessageFactory {
         }
 
         return {
-            scriptId: ethers.utils.hexlify(ethers.utils.randomBytes(32)),
+            scriptId: bundle.id,
             typeAmt: swapActionForm.amountType,
             amount: amount,
             tokenFrom: tokenFrom.address,

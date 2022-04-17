@@ -32,11 +32,11 @@ export class ScriptFactory {
     private readonly tokens: Token[];
     private readonly chainId: string;
 
-    public constructor(chainId: string, tokens: Token[]) {
+    public constructor(chainId: string) {
         this.ethers = require("ethers");
         this.provider = new this.ethers.providers.Web3Provider((window as any).ethereum, "any");
         this.signer = this.provider.getSigner();
-        this.tokens = tokens;
+        this.tokens = GetCurrentChain(chainId).tokens;
         this.chainId = chainId;
     }
 

@@ -48,7 +48,7 @@ export class MmBaseMessageFactory {
         }
 
         return {
-            scriptId: ethers.utils.hexlify(ethers.utils.randomBytes(32)),
+            scriptId: bundle.id,
             typeAmt: mmBaseActionForm.amountType,
             amount: amount,
             action: mmBaseActionForm.actionType,
