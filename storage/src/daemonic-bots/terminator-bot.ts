@@ -6,6 +6,7 @@ import {
 } from "@daemons-fi/scripts-definitions";
 import { BrokenScript } from "../models/queues/broken-scripts";
 import { Script } from "../models/scripts/script";
+import { notificationDocumentFactory } from "../test-factories/notification-factories";
 import { getProvider } from "./providers-builder";
 import { parseScript } from "./script-builder";
 
@@ -33,9 +34,15 @@ export class TerminatorBot {
                 const provider = getProvider(parsedScript.getMessage().chainId);
                 const verification = await parsedScript.verify(provider);
 
-                const queue = TerminatorBot.flagForRemoval(verification) ? toBeRemoved : falsePositive;
+                const isToBeRemoved = TerminatorBot.flagForRemoval(verification);
+
+                const queue = isToBeRemoved ? toBeRemoved : falsePositive;
                 queue.push(script.scriptId);
                 processed.push(script.scriptId);
+
+                if (isToBeRemoved) {
+                    pushNotification(script);
+                }
             } catch (error) {
                 console.error(`An error occurred with the script ${script.scriptId}: ${error}`);
             }
@@ -58,4 +65,14 @@ export class TerminatorBot {
     private static flagForRemoval = (verification: ScriptVerification) =>
         verification.state === VerificationState.errorCode &&
         (verification as VerificationFailedScript).code.includes("[FINAL]");
+
 }
+function pushNotification(script: any) {
+    notificationDocumentFactory({
+        title: "Broken script has been removed",
+        description: `Script ${script.scriptId} has been removed as it was no longer executable`,
+        chainId: script.chainId,
+        user: script.user
+    });
+}
+

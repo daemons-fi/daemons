@@ -2,6 +2,7 @@ import { ValidScript, VerificationFailedScript } from "@daemons-fi/scripts-defin
 import { expect } from "chai";
 import { BrokenScript } from "../../models/queues/broken-scripts";
 import { Script } from "../../models/scripts/script";
+import { Notification } from '../../models/notification';
 import { transferScriptDocumentFactory } from "../../test-factories/script-factories";
 import { FakeScript } from "../../test/mocks/fake-script";
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../test/test-db-handler";
@@ -42,6 +43,14 @@ describe("Terminator Bot", () => {
         expect(removedScripts).to.be.equal(1);
         expect(await Script.count({})).to.be.equal(0);
         expect(await BrokenScript.count({})).to.be.equal(0);
+
+        // 1 notification is created
+        const notifications = await Notification.find({})
+        expect(notifications.length).to.equal(1);
+        expect(notifications[0].title).to.equal("Broken script has been removed");
+        expect(notifications[0].description).to.equal(`Script ${script.scriptId} has been removed as it was no longer executable`);
+        expect(notifications[0].chainId).to.equal(script.chainId);
+        expect(notifications[0].user).to.equal(script.user);
     });
 
     it("ignores scripts that were not [FINAL]", async () => {
