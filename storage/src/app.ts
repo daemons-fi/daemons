@@ -7,6 +7,7 @@ import { authenticationRouter } from "./routes/authentication-router";
 import { corsWhitelisting } from "./middlewares/cors-whitelisting";
 import { transactionsRouter } from "./routes/transactions-router";
 import { statisticsRouter } from "./routes/statistics-router";
+import { notificationsRouter } from "./routes/notifications-router";
 
 dotenv.config();
 
@@ -25,3 +26,4 @@ app.use("/api/scripts", scriptsRouter);
 app.use("/api/transactions", transactionsRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/stats", statisticsRouter);
+app.use("/api/notifications", notificationsRouter);
