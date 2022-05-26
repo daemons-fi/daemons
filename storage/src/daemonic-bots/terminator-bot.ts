@@ -4,9 +4,9 @@ import {
     VerificationFailedScript,
     VerificationState
 } from "@daemons-fi/scripts-definitions";
+import { INotification, Notification } from "../models/notification";
 import { BrokenScript } from "../models/queues/broken-scripts";
 import { Script } from "../models/scripts/script";
-import { notificationDocumentFactory } from "../test-factories/notification-factories";
 import { getProvider } from "./providers-builder";
 import { parseScript } from "./script-builder";
 
@@ -27,6 +27,7 @@ export class TerminatorBot {
         const toBeRemoved: string[] = [];
         const processed: string[] = [];
         const notFound: string[] = ids.filter(id => !scriptIds.has(id));
+        const notifications: INotification[] = [];
 
         for (const script of scripts) {
             try {
@@ -41,7 +42,12 @@ export class TerminatorBot {
                 processed.push(script.scriptId);
 
                 if (isToBeRemoved) {
-                    pushNotification(script);
+                    notifications.push({
+                        title: "Broken script has been removed",
+                        description: `Script ${script.scriptId} has been removed as it was no longer executable`,
+                        chainId: script.chainId,
+                        user: script.user
+                    });
                 }
             } catch (error) {
                 console.error(`An error occurred with the script ${script.scriptId}: ${error}`);
@@ -57,6 +63,7 @@ export class TerminatorBot {
         await BrokenScript.deleteMany({ scriptId: { $in: processed } });
         await BrokenScript.deleteMany({ scriptId: { $in: notFound } });
         await Script.deleteMany({ scriptId: { $in: toBeRemoved } });
+        await Notification.insertMany(notifications);
         console.log(`[🤖🪓 Terminator Bot] Deletion completed`);
 
         return toBeRemoved.length;
@@ -66,13 +73,5 @@ export class TerminatorBot {
         verification.state === VerificationState.errorCode &&
         (verification as VerificationFailedScript).code.includes("[FINAL]");
 
-}
-function pushNotification(script: any) {
-    notificationDocumentFactory({
-        title: "Broken script has been removed",
-        description: `Script ${script.scriptId} has been removed as it was no longer executable`,
-        chainId: script.chainId,
-        user: script.user
-    });
 }
 

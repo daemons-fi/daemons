@@ -11,7 +11,7 @@ const notificationSchema = new mongoose.Schema({
 });
 
 export interface INotification {
-    date: string;
+    date?: string;
     title: string;
     description: string;
     chainId: string;

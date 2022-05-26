@@ -1,20 +1,16 @@
 import express, { Request, Response } from "express";
-import { utils } from "ethers";
 import { Notification } from "../models/notification";
 import { authenticate } from "../middlewares/authentication";
 
 export const notificationsRouter = express.Router();
 
-notificationsRouter.get("/:userAddress", authenticate, async (req: Request, res: Response) => {
-    if (!req.params.userAddress) return res.status(400).send({ error: "Missing user" });
-    const userAddress = utils.getAddress(req.params.userAddress);
-    if (req.userAddress !== userAddress) {
+notificationsRouter.get("/", authenticate, async (req: Request, res: Response) => {
+    if (!req.userAddress) {
         return res.sendStatus(403);
     }
-
     try {
         const notifications = await Notification.find({
-            user: userAddress
+            user: req.userAddress
         });
         return res.status(200).send(notifications);
     } catch (error) {
@@ -22,16 +18,14 @@ notificationsRouter.get("/:userAddress", authenticate, async (req: Request, res:
     }
 });
 
-notificationsRouter.delete("/:userAddress", authenticate, async (req: Request, res: Response) => {
-    if (!req.params.userAddress) return res.status(400).send({ error: "Missing user" });
-    const userAddress = utils.getAddress(req.params.userAddress);
-    if (req.userAddress !== userAddress) {
+notificationsRouter.delete("/", authenticate, async (req: Request, res: Response) => {
+    if (!req.userAddress) {
         return res.sendStatus(403);
     }
 
     try {
         await Notification.deleteMany({
-            user: userAddress
+            user: req.userAddress
         });
         return res.send();
     } catch (error) {
