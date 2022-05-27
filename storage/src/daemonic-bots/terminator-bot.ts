@@ -21,12 +21,12 @@ export class TerminatorBot {
         console.log(`[🤖🪓 Terminator Bot] ${ids.length} scripts to be processed`);
 
         const scripts: any[] = await Script.find({ scriptId: { $in: ids } });
-        const scriptIds = new Set(scripts.map(s => s.scriptId));
+        const scriptIds = new Set(scripts.map((s) => s.scriptId));
 
         const falsePositive: string[] = [];
         const toBeRemoved: string[] = [];
         const processed: string[] = [];
-        const notFound: string[] = ids.filter(id => !scriptIds.has(id));
+        const notFound: string[] = ids.filter((id) => !scriptIds.has(id));
         const notifications: INotification[] = [];
 
         for (const script of scripts) {
@@ -43,8 +43,8 @@ export class TerminatorBot {
 
                 if (isToBeRemoved) {
                     notifications.push({
-                        title: "Broken script has been removed",
-                        description: `Script ${script.scriptId} has been removed as it was no longer executable`,
+                        title: "Inexecutable script has been removed",
+                        description: `The following script has been automatically removed as it was no longer executable: '${script.description}'`,
                         chainId: script.chainId,
                         user: script.user
                     });
@@ -72,6 +72,4 @@ export class TerminatorBot {
     private static flagForRemoval = (verification: ScriptVerification) =>
         verification.state === VerificationState.errorCode &&
         (verification as VerificationFailedScript).code.includes("[FINAL]");
-
 }
-
