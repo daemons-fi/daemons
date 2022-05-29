@@ -23,10 +23,22 @@
     padding: 5px;
     text-align: center;
     font-size: 14px;
+    position: relative;
+    cursor: pointer;
 }
 
 .wallet-connector__address--unauthenticated {
     cursor: pointer;
+}
+
+.wallet-connector__address-notification {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    padding: 7px;
+    border-radius: 50%;
+    background-color: var(--toastify-color-error);
+    color: white;
 }
 
 .chains-dialog__header {

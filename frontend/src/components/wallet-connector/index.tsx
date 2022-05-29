@@ -9,6 +9,7 @@ import { StorageProxy } from '../../data/storage-proxy';
 import { GetAvailableChains, GetCurrentChain, IsChainSupported } from '../../data/chain-info';
 import './styles.css';
 import { IChainInfo } from '../../data/chains-data/interfaces';
+import { INotification, NotificationProxy } from '../../data/storage-proxy/notification-proxy';
 
 const modalStyles: any = {
     content: {
@@ -62,6 +63,21 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
     const authenticated: boolean = useSelector((state: RootState) => state.wallet.authenticated);
     const chainInfo = GetCurrentChain(chainId);
     const [displayChains, setDisplayChains] = useState<boolean>(false);
+    const [notifications, setNotifications] = useState<INotification[]>([]);
+    const [displayNotifications, setDisplayNotifications] = useState<boolean>(false);
+
+    const getNotifications = async (): Promise<void> => {
+        const fetchNotificationsRes = await NotificationProxy.fetchNotifications();
+        setNotifications(fetchNotificationsRes)
+    }
+
+    useEffect(() => {
+        getNotifications();
+        setInterval(
+            getNotifications,
+            300000
+        );
+    }, []);
 
     return (
         <div className='wallet-connector'>
@@ -84,7 +100,30 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
             {
                 authenticated
                     ? (
-                        <div className='wallet-connector__address'>{address}</div>
+                        <div className='wallet-connector__address'>
+                            {address}
+                            {
+                                notifications.length > 0 &&
+                                <div
+                                    className='wallet-connector__address-notification'
+                                    onClick={() => setDisplayNotifications(!displayNotifications)}>
+
+                                </div>
+                            }
+                            {displayNotifications &&
+                                <Modal
+                                    isOpen={displayNotifications}
+                                    onRequestClose={() => setDisplayNotifications(false)}
+                                    style={modalStyles}
+                                    ariaHideApp={false}
+                                >
+                                    {availableNotifications(
+                                        () => setDisplayNotifications(false),
+                                        notifications,
+                                        getNotifications
+                                    )}
+                                </Modal>}
+                        </div>
                     )
                     : (
                         <div className='wallet-connector__address wallet-connector__address--unauthenticated'
@@ -126,6 +165,43 @@ function availableChainsDialog(hideDialog: () => void, selectedChainId: string):
             </div>
             <div className='chains-dialog__body'>
                 {chains.map(chainComponent)}
+            </div>
+        </div>
+    );
+}
+
+function availableNotifications(hideDialog: () => void, notifications: INotification[], getNotifications: () => void): JSX.Element {
+    const notificationsComponent = (notification: INotification): JSX.Element => {
+        return (
+            <div key={notification._id} className='notification-dialog__notification-entry'
+                onClick={() => {
+                    hideDialog();
+                }}
+            >
+                <div className='notification-dialog__notification-date'>{notification.date}</div>
+                <div className='notification-dialog__notification-title'>{notification.title}</div>
+                <div className='notification-dialog__notification-name'>{notification.description}</div>
+            </div>
+        );
+    };
+
+    return (
+        <div className='notifications-dialog'>
+            <div className='notifications-dialog__header'>
+                <button className='notifications-dialog__clear'
+                    onClick={async () => {
+                        await NotificationProxy.deleteNotifications();
+                        getNotifications()
+                        hideDialog();
+                    }}
+                >Mark all as read"</button>
+                <div className='notifications-dialog__close'
+                    onClick={() => {
+                        hideDialog();
+                    }}></div>
+            </div>
+            <div className='notifications-dialog__body'>
+                {notifications.map(notificationsComponent)}
             </div>
         </div>
     );
