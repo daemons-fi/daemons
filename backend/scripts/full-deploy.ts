@@ -22,6 +22,9 @@ import { deployMmBaseExecutor } from "./single-deployments/d1-mmbase-executor";
 import { registerMmAdvancedExecutor } from "./single-deployments/e3-register-mmadvanced-in-gas-tank";
 import { initializeMmAdvancedExecutor } from "./single-deployments/e2-initialize-mmadvanced-executor";
 import { deployMmAdvancedExecutor } from "./single-deployments/e1-mmadvanced-executor";
+import { vestTokens } from "./single-deployments/a10-vesting";
+import { createLP } from "./single-deployments/a9-create-LP";
+import { sendEthToTreasury } from "./single-deployments/a8-send-eth-to-treasury";
 
 async function deployDaemons() {
     // display deployer address and its balance
@@ -49,6 +52,10 @@ async function deployDaemons() {
     currentContracts = await deployGasPriceFeed(currentContracts);
     await finalizeGasTank(currentContracts);
     await initializeToken(currentContracts);
+    const amount = ethers.utils.parseEther("0.5");
+    await sendEthToTreasury(currentContracts, owner, amount);
+    await createLP(currentContracts);
+    await vestTokens(currentContracts, owner);
 
     // deploy swapper executor
     currentContracts = await deploySwapperExecutor(currentContracts);
@@ -70,7 +77,6 @@ async function deployDaemons() {
     await initializeMmAdvancedExecutor(currentContracts);
     await registerMmAdvancedExecutor(currentContracts);
 }
-
 
 deployDaemons().catch((error) => {
     console.error(error);

@@ -3,23 +3,36 @@ pragma solidity ^0.8.4;
 
 interface IGasTank {
     /** Gets the amount of ETH the user has deposited in the gas tank */
-    function balanceOf(address user) external view returns (uint256);
+    function gasBalanceOf(address user) external view returns (uint256);
 
     /** Adds ETH to the gas tank */
-    function deposit() external payable;
+    function depositGas() external payable;
 
     /** Removes ETH to the gas tank */
-    function withdraw(uint256 amount) external;
+    function withdrawGas(uint256 amount) external;
 
     /** Removes all ETH to the gas tank */
-    function withdrawAll() external;
+    function withdrawAllGas() external;
+
+    /** Gets the amount of DAEM the user has deposited in the gas tank (tip jar) */
+    function tipBalanceOf(address user) external view returns (uint256);
+
+    /** Adds DAEM to the gas tank (tip jar) */
+    function depositTip(uint256 amount) external;
+
+    /** Removes DAEM to the gas tank (tip jar) */
+    function withdrawTip(uint256 amount) external;
+
+    /** Removes all DAEM to the gas tank (tip jar) */
+    function withdrawAllTip() external;
 
     /** Removes funds from the gas tank of a user,
      * in order to have them employed as payment for the execution of a script.
      * note: only executor contracts can call this function.
      */
     function addReward(
-        uint256 amount,
+        uint256 ethAmount,
+        uint256 tipAmount,
         address user,
         address executor
     ) external;

@@ -1,13 +1,11 @@
 import { fantomTestnetInfo } from "./chains-data/fantom-testnet";
 import { IChainInfo } from './chains-data/interfaces';
 import { kovanInfo } from './chains-data/kovan';
-import { rinkebyInfo } from "./chains-data/rinkeby";
 import { unsupportedChain } from './chains-data/unsupported';
 
 
 export const ChainInfo: { [chainId: string]: IChainInfo; } = {
     "42": kovanInfo,
-    "4": rinkebyInfo,
     "4002": fantomTestnetInfo,
 };
 

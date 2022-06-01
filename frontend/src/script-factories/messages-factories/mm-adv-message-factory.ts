@@ -54,6 +54,8 @@ export class MmAdvMessageFactory {
             amount = BigNumber.from(mmAdvActionForm.floatAmount.toString());
         }
 
+        const tip = utils.parseEther(mmAdvActionForm.floatTip.toString());
+
         return {
             scriptId: bundle.id,
             token: mmAdvActionForm.tokenAddress,
@@ -62,6 +64,7 @@ export class MmAdvMessageFactory {
             typeAmt: mmAdvActionForm.amountType,
             rateMode: mmAdvActionForm.interestType,
             amount: amount,
+            tip: tip,
             user: await provider.getSigner().getAddress(),
             kontract: moneyMarket.poolAddress,
             executor: chain.contracts.MmAdvancedExecutor,

@@ -6,7 +6,6 @@ import "./interfaces/UniswapV2.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 /**
  * Contract taking care of:
  * - rewarding users for the executions of scripts
@@ -22,6 +21,8 @@ contract Treasury is ITreasury, Ownable {
     uint16 public PERCENTAGE_COMMISSION = 100;
     uint16 public PERCENTAGE_POL = 4900;
     // the remaining percentage will be redistributed
+
+    uint16 public override TIPS_AFTER_TAXES_PERCENTAGE = 8000;
 
     uint256 public redistributionPool;
     uint256 public commissionsPool;
@@ -40,7 +41,11 @@ contract Treasury is ITreasury, Ownable {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address _token, address _gasTank, address _lpRouter) {
+    constructor(
+        address _token,
+        address _gasTank,
+        address _lpRouter
+    ) {
         require(_token != address(0));
         token = IERC20(_token);
         gasTank = _gasTank;
@@ -59,8 +64,7 @@ contract Treasury is ITreasury, Ownable {
 
     function earned(address user) public view returns (uint256) {
         return
-            ((balances[user] *
-                (rewardPerToken() - userRewardPerTokenPaid[user])) / 1e18) +
+            ((balances[user] * (rewardPerToken() - userRewardPerTokenPaid[user])) / 1e18) +
             rewards[user];
     }
 
@@ -68,8 +72,7 @@ contract Treasury is ITreasury, Ownable {
         if (stakedAmount == 0) return 0;
         return
             rewardPerTokenStored +
-            (((block.timestamp - lastUpdateTime) * getRewardRate() * 1e18) /
-                stakedAmount);
+            (((block.timestamp - lastUpdateTime) * getRewardRate() * 1e18) / stakedAmount);
     }
 
     /**
@@ -79,6 +82,17 @@ contract Treasury is ITreasury, Ownable {
      */
     function getRewardRate() public view returns (uint256) {
         return redistributionPool / redistributionInterval;
+    }
+
+    /* ========== OTHER VIEWS ========== */
+
+    /** Given an amount of Ethereum, calculates how many DAEM it corresponds to */
+    function ethToDAEM(uint256 ethAmount) public view override returns (uint256) {
+        address[] memory path = new address[](2);
+        path[0] = IUniswapV2Router01(lpRouter).WETH();
+        path[1] = address(token);
+
+        return IUniswapV2Router01(lpRouter).getAmountsOut(ethAmount, path)[1];
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -129,6 +143,7 @@ contract Treasury is ITreasury, Ownable {
     function preliminaryCheck() external view {
         require(address(gasTank) != address(0), "GasTank");
         require(token.balanceOf(address(this)) > 0, "Treasury is empty");
+        require(polIsInitialized, "POL not initialized");
     }
 
     function setCommissionPercentage(uint16 value) external onlyOwner {
@@ -151,12 +166,6 @@ contract Treasury is ITreasury, Ownable {
     /** Creates the Protocol-owned-Liquidity LP */
     function createLP() external onlyOwner {
         require(!polIsInitialized, "PoL already initialized");
-
-        // set allowance
-        token.approve(
-            lpRouter,
-            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        );
 
         // during initialization, we send all the ETH in the treasury to the LP
         // and an equal amount of DAEM to have a 1:1 ratio
@@ -182,14 +191,18 @@ contract Treasury is ITreasury, Ownable {
 
     /* ========== EXTERNAL FUNCTIONS ========== */
 
-    function requestPayout(address user) external payable override {
+    function requestPayout(address user, uint256 dueFromTips) external payable override {
         require(gasTank == _msgSender(), "Unauthorized. Only GasTank");
-        token.transfer(user, calculatePayout());
+        uint256 payoutFromGas = calculatePayout();
+        uint256 payoutFromTips = (dueFromTips * TIPS_AFTER_TAXES_PERCENTAGE) / 10000;
+        token.transfer(user, payoutFromGas + payoutFromTips);
     }
 
-    function stakePayout(address user) external payable override {
+    function stakePayout(address user, uint256 dueFromTips) external payable override {
         require(gasTank == _msgSender(), "Unauthorized. Only GasTank");
-        stakeFor(user, calculatePayout());
+        uint256 payoutFromGas = calculatePayout();
+        uint256 payoutFromTips = (dueFromTips * TIPS_AFTER_TAXES_PERCENTAGE) / 10000;
+        stakeFor(user, payoutFromGas + payoutFromTips);
     }
 
     receive() external payable {}
@@ -205,11 +218,13 @@ contract Treasury is ITreasury, Ownable {
             10000;
 
         // calculate payout
-        //TODO: currently transferring 1:1
-        return msg.value;
+        return ethToDAEM(msg.value);
     }
 
     function addLiquidity(uint256 amountETH, uint256 amountDAEM) private {
+        if (token.allowance(address(this), lpRouter) < 0xffffffffffffffffffff)
+            token.approve(lpRouter, 0xffffffffffffffffffffffffffffff);
+
         IUniswapV2Router01(lpRouter).addLiquidityETH{value: amountETH}(
             address(token),
             amountDAEM,

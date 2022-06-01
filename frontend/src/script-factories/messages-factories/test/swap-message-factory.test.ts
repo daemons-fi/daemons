@@ -40,6 +40,7 @@ describe("Swap Message Factory", () => {
         valid: true,
         amountType: AmountType.Absolute,
         floatAmount: 12.22,
+        floatTip: 1,
         tokenFromAddress: tokens[0].address,
         tokenToAddress: tokens[1].address,
         dex: fakeDEX,
@@ -119,6 +120,7 @@ describe("Swap Message Factory", () => {
             scriptId: result.scriptId, // <- taken from real object as it is randomly generated
             typeAmt: form.amountType,
             amount: ethers.utils.parseUnits("12.22", 18), // <- token has 18 decimals
+            tip: ethers.utils.parseEther("1"),
             tokenFrom: "0x123",
             tokenTo: "0x987",
             user: "0x1234567890",

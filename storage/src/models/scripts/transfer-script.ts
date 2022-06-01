@@ -22,6 +22,7 @@ const transferScriptSchema = new mongoose.Schema({
     destination: { type: String, required: true },
     typeAmt: { type: Number, required: true },
     amount: { type: String, required: true, set: stringifyBigNumber },
+    tip: { type: String, required: true, set: stringifyBigNumber },
     executor: { type: String, required: true, set: utils.getAddress },
     balance: { type: balanceCondition, set: removeIfEmpty },
     frequency: { type: frequencyCondition, set: removeIfEmpty },

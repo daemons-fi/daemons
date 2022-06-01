@@ -82,7 +82,7 @@ describe("ScriptExecutor - Money Market Base", function () {
         // GasTank contract
         const GasTankContract = await ethers.getContractFactory("GasTank");
         gasTank = await GasTankContract.deploy();
-        await gasTank.deposit({ value: ethers.utils.parseEther("2.0") });
+        await gasTank.depositGas({ value: ethers.utils.parseEther("2.0") });
 
         // Price retriever contract
         const PriceRetrieverContract = await ethers.getContractFactory("PriceRetriever");
@@ -113,7 +113,6 @@ describe("ScriptExecutor - Money Market Base", function () {
         await executor.setGasTank(gasTank.address);
         await executor.setPriceRetriever(priceRetriever.address);
         await executor.setGasFeed(gasPriceFeed.address);
-        await executor.setDAEMToken(DAEMToken.address);
 
         // Grant allowance
         await DAEMToken.approve(executor.address, ethers.utils.parseEther("1000000"));
@@ -126,6 +125,7 @@ describe("ScriptExecutor - Money Market Base", function () {
 
         // register executor in gas tank
         await gasTank.addExecutor(executor.address);
+        await gasTank.setDAEMToken(DAEMToken.address);
 
         // Mock router contract
         const MockRouterContract = await ethers.getContractFactory("MockRouter");
@@ -141,6 +141,11 @@ describe("ScriptExecutor - Money Market Base", function () {
 
         // add some tokens to treasury
         DAEMToken.mint(treasury.address, ethers.utils.parseEther("100"));
+
+        // create token LP
+        const ethAmount = ethers.utils.parseEther("5");
+        await owner.sendTransaction({ to: treasury.address, value: ethAmount })
+        await treasury.createLP();
 
         // set treasury address in gas tank
         await gasTank.setTreasury(treasury.address);
@@ -579,7 +584,7 @@ describe("ScriptExecutor - Money Market Base", function () {
         const message = await initialize(baseMessage);
 
         // empty the gas tank and try to verify the message
-        await gasTank.withdrawAll();
+        await gasTank.withdrawAllGas();
         await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith("[GAS][TMP]");
     });
 
@@ -594,35 +599,22 @@ describe("ScriptExecutor - Money Market Base", function () {
         await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith("[TIP][TMP]");
     });
 
-    it("fails if the user set a tip but didn't grant the allowance", async () => {
-        let message: IMMBaseAction = JSON.parse(JSON.stringify(baseMessage));
-        message.tip = ethers.utils.parseEther("5");
-        message = await initialize(message);
-
-        // revoke the allowance for the token to the executor contract
-        await DAEMToken.approve(executor.address, ethers.utils.parseEther("0"));
-
-        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
-            "[TIP_ALLOWANCE][ACTION]"
-        );
-    });
-
     it("Pays the tip to the executor", async () => {
         let message: IMMBaseAction = JSON.parse(JSON.stringify(baseMessage));
         message.tip = ethers.utils.parseEther("5");
         message = await initialize(message);
 
+        // deposit DAEM in the Tip Jar
+        await DAEMToken.approve(gasTank.address, ethers.utils.parseEther("10000"));
+        await gasTank.connect(owner).depositTip(ethers.utils.parseEther("10"));
+        let tipBalance = await gasTank.tipBalanceOf(owner.address);
+        expect(tipBalance).to.be.equal(ethers.utils.parseEther("10"));
+
         await executor.connect(otherWallet).execute(message, sigR, sigS, sigV);
 
-        // check DAEM post-balance
-        expect(await DAEMToken.balanceOf(owner.address)).to.equal(
-            ethers.utils.parseEther("245") // 250 - 5
-        );
-
-        // the destination got their tip
-        expect(await DAEMToken.balanceOf(otherWallet.address)).to.equal(
-            ethers.utils.parseEther("5")
-        );
+        // tokens have been removed from the user's tip jar
+        tipBalance = await gasTank.tipBalanceOf(owner.address);
+        expect(tipBalance).to.be.equal(ethers.utils.parseEther("5"));
     });
 
     /* ========== ALLOWANCE CONDITION CHECK ========== */

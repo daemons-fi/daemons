@@ -47,10 +47,13 @@ export class TransferMessageFactory {
             amount = BigNumber.from(transferActionForm.floatAmount.toString());
         }
 
+        const tip = utils.parseEther(transferActionForm.floatTip.toString());
+
         return {
             scriptId:bundle.id,
             typeAmt: transferActionForm.amountType,
             amount: amount,
+            tip: tip,
             token: token.address,
             destination: transferActionForm.destinationAddress,
             user: await provider.getSigner().getAddress(),

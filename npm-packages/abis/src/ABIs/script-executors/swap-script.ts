@@ -1,6 +1,6 @@
 import { ContractInterface } from "ethers";
 
-export const swapScriptAbi: ContractInterface =  [
+export const swapScriptAbi: ContractInterface = [
   {
     anonymous: false,
     inputs: [
@@ -41,7 +41,7 @@ export const swapScriptAbi: ContractInterface =  [
   },
   {
     inputs: [],
-    name: "GAS_COST",
+    name: "GAS_LIMIT",
     outputs: [
       {
         internalType: "uint256",
@@ -112,6 +112,11 @@ export const swapScriptAbi: ContractInterface =  [
           {
             internalType: "uint256",
             name: "chainId",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "tip",
             type: "uint256",
           },
           {
@@ -434,6 +439,11 @@ export const swapScriptAbi: ContractInterface =  [
             type: "uint256",
           },
           {
+            internalType: "uint256",
+            name: "tip",
+            type: "uint256",
+          },
+          {
             components: [
               {
                 internalType: "bool",
@@ -606,6 +616,24 @@ export const swapScriptAbi: ContractInterface =  [
       },
     ],
     name: "verifyRevocation",
+    outputs: [],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tip",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "verifyTip",
     outputs: [],
     stateMutability: "view",
     type: "function",

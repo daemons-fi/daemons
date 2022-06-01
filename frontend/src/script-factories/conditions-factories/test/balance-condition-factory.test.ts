@@ -40,14 +40,14 @@ describe('Balance Condition Factory', () => {
     it('restores condition from json object', async () => {
         const originalCondition: IBalanceCondition = {
             enabled: true,
-            token: '0x123',
-            comparison: ComparisonType.GreaterThan,
             amount: ethers.utils.parseEther('1.255'),
+            comparison: ComparisonType.GreaterThan,
+            token: '0x123',
         };
         const jsonCondition = JSON.parse(JSON.stringify(originalCondition));
         const condition = BalanceConditionFactory.fromJson(jsonCondition);
 
-        assert.deepEqual(condition, originalCondition);
+        assert.equal(JSON.stringify(condition), JSON.stringify(originalCondition));
     });
 
 

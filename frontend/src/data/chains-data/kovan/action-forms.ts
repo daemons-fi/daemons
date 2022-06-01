@@ -15,6 +15,7 @@ export const TransferAction: IAction = {
         destinationAddress: '',
         amountType: AmountType.Absolute,
         floatAmount: 0,
+        floatTip: 0,
     } as ITransferActionForm,
 
     conditions: [
@@ -36,6 +37,7 @@ export const SwapAction: IAction = {
         tokenToAddress: '',
         amountType: AmountType.Absolute,
         floatAmount: 0,
+        floatTip: 0,
         dex: kovanSushiDEX,
     } as ISwapActionForm,
 
@@ -57,6 +59,7 @@ export const AaveMMBaseAction: IAction = {
         tokenAddress: '',
         amountType: AmountType.Absolute,
         floatAmount: 0,
+        floatTip: 0,
         actionType: BaseMoneyMarketActionType.Deposit,
         moneyMarket: kovanAaveMM,
     }as IBaseMMActionForm,
@@ -81,6 +84,7 @@ export const AaveMMAdvancedAction: IAction = {
         interestType: InterestRateMode.Variable,
         amountType: AmountType.Absolute,
         floatAmount: 0,
+        floatTip: 0,
         actionType: AdvancedMoneyMarketActionType.Borrow,
         moneyMarket: kovanAaveMM,
     }as IAdvancedMMActionForm,

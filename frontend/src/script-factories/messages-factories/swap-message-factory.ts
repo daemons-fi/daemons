@@ -45,10 +45,13 @@ export class SwapMessageFactory {
             amount = BigNumber.from(swapActionForm.floatAmount.toString());
         }
 
+        const tip = utils.parseEther(swapActionForm.floatTip.toString());
+
         return {
             scriptId: bundle.id,
             typeAmt: swapActionForm.amountType,
             amount: amount,
+            tip: tip,
             tokenFrom: tokenFrom.address,
             tokenTo: swapActionForm.tokenToAddress,
             user: await provider.getSigner().getAddress(),

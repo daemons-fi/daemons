@@ -46,6 +46,7 @@ export class MmBaseScript extends BaseScript {
     // complex objects are broken down and need to be recreated. Sigh.
     message.chainId = BigNumber.from(object.chainId);
     message.amount = BigNumber.from(object.amount);
+    message.tip = BigNumber.from(object.tip);
 
     message.balance = BalanceFactory.fromJson(message.balance);
     message.frequency = FrequencyFactory.fromJson(message.frequency);

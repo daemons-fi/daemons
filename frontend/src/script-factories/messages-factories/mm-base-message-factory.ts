@@ -49,10 +49,13 @@ export class MmBaseMessageFactory {
             amount = BigNumber.from(mmBaseActionForm.floatAmount.toString());
         }
 
+        const tip = utils.parseEther(mmBaseActionForm.floatTip.toString());
+
         return {
             scriptId: bundle.id,
             typeAmt: mmBaseActionForm.amountType,
             amount: amount,
+            tip: tip,
             action: mmBaseActionForm.actionType,
             token: mmBaseActionForm.tokenAddress,
             aToken: aTokenAddress,

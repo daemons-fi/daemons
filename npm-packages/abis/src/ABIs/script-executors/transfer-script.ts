@@ -41,7 +41,7 @@ export const transferScriptAbi: ContractInterface = [
   },
   {
     inputs: [],
-    name: "GAS_COST",
+    name: "GAS_LIMIT",
     outputs: [
       {
         internalType: "uint256",
@@ -107,6 +107,11 @@ export const transferScriptAbi: ContractInterface = [
           {
             internalType: "uint256",
             name: "chainId",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "tip",
             type: "uint256",
           },
           {
@@ -424,6 +429,11 @@ export const transferScriptAbi: ContractInterface = [
             type: "uint256",
           },
           {
+            internalType: "uint256",
+            name: "tip",
+            type: "uint256",
+          },
+          {
             components: [
               {
                 internalType: "bool",
@@ -596,6 +606,24 @@ export const transferScriptAbi: ContractInterface = [
       },
     ],
     name: "verifyRevocation",
+    outputs: [],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tip",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "verifyTip",
     outputs: [],
     stateMutability: "view",
     type: "function",

@@ -68,6 +68,19 @@ export const treasuryABI: ContractInterface = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "TIPS_AFTER_TAXES_PERCENTAGE",
+    outputs: [
+      {
+        internalType: "uint16",
+        name: "",
+        type: "uint16",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -135,6 +148,25 @@ export const treasuryABI: ContractInterface = [
       },
     ],
     name: "earned",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "ethAmount",
+        type: "uint256",
+      },
+    ],
+    name: "ethToDAEM",
     outputs: [
       {
         internalType: "uint256",
@@ -252,6 +284,11 @@ export const treasuryABI: ContractInterface = [
         name: "user",
         type: "address",
       },
+      {
+        internalType: "uint256",
+        name: "dueFromTips",
+        type: "uint256",
+      },
     ],
     name: "requestPayout",
     outputs: [],
@@ -342,6 +379,11 @@ export const treasuryABI: ContractInterface = [
         internalType: "address",
         name: "user",
         type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "dueFromTips",
+        type: "uint256",
       },
     ],
     name: "stakePayout",

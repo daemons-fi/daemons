@@ -7,25 +7,29 @@ import {
     rinkebyContracts
 } from "@daemons-fi/addresses/build";
 
-interface IChainWithContracts {
-    chainName: string;
+export interface IChainWithContracts {
+    id: string;
+    name: string;
     rpc_url: () => string;
     contracts: IContractsList;
 }
 
 export const supportedChains: { [chain: string]: IChainWithContracts } = {
     "42": {
-        chainName: "kovan",
+        id: "42",
+        name: "kovan",
         rpc_url: () => process.env.KOVAN_RPC!,
         contracts: kovanContracts
     },
     "4": {
-        chainName: "rinkeby",
+        id: "4",
+        name: "rinkeby",
         rpc_url: () => process.env.RINKEBY_RPC!,
         contracts: rinkebyContracts
     },
     "4002": {
-        chainName: "Fantom Testnet",
+        id: "4002",
+        name: "Fantom Testnet",
         rpc_url: () => process.env.FANTOM_TESTNET_RPC!,
         contracts: fantomTestnetContracts
     }

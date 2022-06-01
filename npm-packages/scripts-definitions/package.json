@@ -1,6 +1,6 @@
 {
   "name": "@daemons-fi/scripts-definitions",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Verifiable scripts for Storage and Frontend",
   "main": "./build/index.js",
   "types": "./build/index.d.js",
@@ -21,8 +21,8 @@
   "author": "Daemons Finance",
   "license": "ISC",
   "dependencies": {
-    "@daemons-fi/abis": "0.0.1",
-    "@daemons-fi/shared-definitions": "2.0.0",
+    "@daemons-fi/abis": "0.0.2",
+    "@daemons-fi/shared-definitions": "2.1.0",
     "ethers": "^5.5.2"
   },
   "devDependencies": {

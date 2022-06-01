@@ -1,6 +1,6 @@
 {
   "name": "@daemons-fi/addresses",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Addresses of contracts on various chains for Daemons dapp",
   "main": "./build/index.js",
   "types": "./build/index.d.js",

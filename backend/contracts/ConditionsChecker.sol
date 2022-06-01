@@ -14,7 +14,6 @@ abstract contract ConditionsChecker is Ownable {
     mapping(address => mapping(bytes32 => bool)) private revocations;
 
     uint256 internal chainId;
-    IERC20 internal DAEMToken;
     IGasTank internal gasTank;
     GasPriceFeed internal gasPriceFeed;
     IPriceRetriever private priceRetriever;
@@ -39,11 +38,6 @@ abstract contract ConditionsChecker is Ownable {
 
     /* ========== RESTRICTED FUNCTIONS ========== */
 
-    function setDAEMToken(address _token) external onlyOwner {
-        require(_token != address(0));
-        DAEMToken = IERC20(_token);
-    }
-
     function setGasTank(address _gasTank) external onlyOwner {
         require(_gasTank != address(0));
         gasTank = IGasTank(_gasTank);
@@ -66,7 +60,6 @@ abstract contract ConditionsChecker is Ownable {
 
     /** Checks whether the contract is ready to operate */
     function preliminaryCheck() external view {
-        require(address(DAEMToken) != address(0), "DAEMToken");
         require(address(gasTank) != address(0), "GasTank");
         require(address(priceRetriever) != address(0), "PricesRetriever");
         require(address(gasPriceFeed) != address(0), "GasPriceFeed");
@@ -148,21 +141,19 @@ abstract contract ConditionsChecker is Ownable {
 
     /** Checks whether the user has enough funds in the GasTank to cover a script execution */
     function verifyGasTank(address user) public view {
-        require(gasTank.balanceOf(user) >= MINIMUM_GAS_FOR_SCRIPT_EXECUTION, "[GAS][TMP]");
+        require(gasTank.gasBalanceOf(user) >= MINIMUM_GAS_FOR_SCRIPT_EXECUTION, "[GAS][TMP]");
     }
 
     /** Checks whether the user has enough funds to pay the tip to the executor */
     function verifyTip(uint256 tip, address user) public view {
-        if (tip == 0) return;
-        require(DAEMToken.balanceOf(user) >= tip, "[TIP][TMP]");
-        require(DAEMToken.allowance(user, address(this)) >= tip, "[TIP_ALLOWANCE][ACTION]");
+        require(tip == 0 || gasTank.tipBalanceOf(user) >= tip, "[TIP][TMP]");
     }
 
     /** If the balance condition is enabled, it checks the user balance for it */
     function verifyBalance(Balance calldata balance, address user) internal view {
         if (!balance.enabled) return;
 
-        ERC20 token = ERC20(balance.token);
+        IERC20 token = IERC20(balance.token);
         uint256 userBalance = token.balanceOf(user);
 
         if (balance.comparison == 0x00)

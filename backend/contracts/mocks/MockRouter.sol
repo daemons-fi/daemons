@@ -51,7 +51,7 @@ contract MockRouter is IUniswapV2Router01 {
             uint256 liquidity
         )
     {
-        return (0, 0, 0);
+        MockToken(token).transferFrom(msg.sender, address(this), amountToken);
     }
 
     function removeLiquidity(
@@ -201,7 +201,10 @@ contract MockRouter is IUniswapV2Router01 {
         override
         returns (uint256[] memory amounts)
     {
-        return new uint256[](2);
+        uint256[] memory result = new uint256[](2);
+        result[0] = amountIn;
+        result[1] = amountIn;
+        return result;
     }
 
     function getAmountsIn(uint256 amountOut, address[] calldata path)

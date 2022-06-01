@@ -24,6 +24,7 @@ export interface ISwapActionForm extends IScriptActionForm {
     tokenToAddress: string;
     amountType: AmountType;
     floatAmount: number;
+    floatTip: number;
     dex: DEX;
 }
 
@@ -33,6 +34,7 @@ export interface ITransferActionForm extends IScriptActionForm {
     destinationAddress: string;
     amountType: AmountType;
     floatAmount: number;
+    floatTip: number;
 }
 
 export interface IBaseMMActionForm extends IScriptActionForm {
@@ -41,6 +43,7 @@ export interface IBaseMMActionForm extends IScriptActionForm {
     actionType: BaseMoneyMarketActionType;
     amountType: AmountType;
     floatAmount: number;
+    floatTip: number;
     moneyMarket: MoneyMarket;
 }
 
@@ -51,6 +54,7 @@ export interface IAdvancedMMActionForm extends IScriptActionForm {
     interestType: InterestRateMode;
     amountType: AmountType;
     floatAmount: number;
+    floatTip: number;
     moneyMarket: MoneyMarket;
 }
 

@@ -44,7 +44,7 @@ describe('Follow Condition Factory', () => {
         const jsonCondition = JSON.parse(JSON.stringify(originalCondition));
         const condition = FollowConditionFactory.fromJson(jsonCondition);
 
-        assert.deepEqual(condition, originalCondition);
+        assert.equal(JSON.stringify(condition), JSON.stringify(originalCondition));
     });
 
     it('throws error if form is enabled but not valid', async () => {

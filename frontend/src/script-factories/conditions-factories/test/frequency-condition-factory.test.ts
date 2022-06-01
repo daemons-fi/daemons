@@ -44,7 +44,7 @@ describe("Frequency Condition Factory", () => {
         const jsonCondition = JSON.parse(JSON.stringify(originalCondition));
         const condition = FrequencyConditionFactory.fromJson(jsonCondition);
 
-        assert.deepEqual(condition, originalCondition);
+        assert.equal(JSON.stringify(condition), JSON.stringify(originalCondition));
     });
 
 

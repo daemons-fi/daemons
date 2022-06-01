@@ -29,6 +29,7 @@ describe("Transfer Message Factory", () => {
         valid: true,
         amountType: AmountType.Absolute,
         floatAmount: 12.22,
+        floatTip: 1,
         tokenAddress: tokens[0].address,
         destinationAddress: ZeroAddress
     };
@@ -107,6 +108,7 @@ describe("Transfer Message Factory", () => {
             scriptId: result.scriptId, // <- taken from real object as it is randomly generated
             typeAmt: form.amountType,
             amount: ethers.utils.parseUnits("12.22", 18), // <- token has 18 decimals
+            tip: ethers.utils.parseEther("1"),
             token: "0x123",
             destination: ZeroAddress,
             user: "0x1234567890",

@@ -8,8 +8,5 @@ export const initializeToken = async (contracts: DaemonsContracts): Promise<void
     const token = await getContract(contracts, "DaemonsToken");
     await token.initialize(treasury.address, vesting.address);
 
-    // treasury's state will be invalid until the token has been initialized
-    await treasury.preliminaryCheck();
-
     console.log(`Token initialized`);
 };

@@ -1,7 +1,6 @@
-import { IContractsList } from "@daemons-fi/addresses/build";
 import { BigNumber, ethers } from "ethers";
 import { treasuryABI } from "@daemons-fi/abis";
-import { getProvider, supportedChains } from "./providers-builder";
+import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
 
 interface ITreasuryStat {
     apr: number;
@@ -14,24 +13,16 @@ interface ITreasuryStat {
 
 export const getTreasuryStats = async (): Promise<ITreasuryStat[]> => {
     const stats: ITreasuryStat[] = [];
-    for (const chainId of Object.keys(supportedChains)) {
-        const chainStat = await getTreasuryStatsForChain(
-            chainId,
-            supportedChains[chainId].chainName,
-            supportedChains[chainId].contracts
-        );
+    for (const chain of Object.values(supportedChains)) {
+        const chainStat = await getTreasuryStatsForChain(chain);
         stats.push(chainStat);
     }
     return stats;
 };
 
-async function getTreasuryStatsForChain(
-    chainId: string,
-    chainName: string,
-    chainContracts: IContractsList
-): Promise<ITreasuryStat> {
-    const provider = getProvider(chainId);
-    const treasuryContract = new ethers.Contract(chainContracts.Treasury, treasuryABI, provider);
+async function getTreasuryStatsForChain(chain: IChainWithContracts): Promise<ITreasuryStat> {
+    const provider = getProvider(chain.id);
+    const treasuryContract = new ethers.Contract(chain.contracts.Treasury, treasuryABI, provider);
 
     const convertToDecimal = (bn: BigNumber) =>
         bn.div(BigNumber.from(10).pow(13)).toNumber() / 100000;
@@ -47,7 +38,7 @@ async function getTreasuryStatsForChain(
         staked,
         distributed: 0,
         pol: 0,
-        chain: chainName
+        chain: chain.name
     };
 }
 

@@ -40,14 +40,14 @@ describe('Price Condition Factory', () => {
     it('restores condition from json object', async () => {
         const originalCondition: IPriceCondition = {
             enabled: true,
-            token: '0x123',
-            comparison: ComparisonType.GreaterThan,
             value: ethers.utils.parseEther('1.255'),
+            comparison: ComparisonType.GreaterThan,
+            token: '0x123',
         };
         const jsonCondition = JSON.parse(JSON.stringify(originalCondition));
         const condition = PriceConditionFactory.fromJson(jsonCondition);
 
-        assert.deepEqual(condition, originalCondition);
+        assert.equal(JSON.stringify(condition), JSON.stringify(originalCondition));
     });
 
     it('throws error if form is enabled but not valid', async () => {

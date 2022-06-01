@@ -12,8 +12,8 @@
   "author": "Daemons Finance",
   "license": "ISC",
   "dependencies": {
-    "@daemons-fi/scripts-definitions": "0.1.9",
-    "@daemons-fi/shared-definitions": "2.0.0",
+    "@daemons-fi/scripts-definitions": "0.1.15",
+    "@daemons-fi/shared-definitions": "2.1.0",
     "body-parser": "^1.19.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

@@ -35,6 +35,7 @@ describe("MM Base Message Factory", () => {
         valid: true,
         amountType: AmountType.Absolute,
         floatAmount: 12.22,
+        floatTip: 1,
         tokenAddress: FooToken.address,
         moneyMarket: fakeMM,
         actionType: BaseMoneyMarketActionType.Deposit
@@ -113,6 +114,7 @@ describe("MM Base Message Factory", () => {
             scriptId: result.scriptId, // <- taken from real object as it is randomly generated
             typeAmt: form.amountType,
             amount: ethers.utils.parseUnits("12.22", 18), // <- token has 18 decimals
+            tip: ethers.utils.parseEther("1"),
             action: BaseMoneyMarketActionType.Deposit,
             token: "0x123",
             aToken: "0x987",

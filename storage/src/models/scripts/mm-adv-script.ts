@@ -27,6 +27,7 @@ const mmAdvancedScriptSchema = new mongoose.Schema({
     typeAmt: { type: Number, required: true },
     rateMode: { type: Number, required: true },
     amount: { type: String, required: true, set: stringifyBigNumber },
+    tip: { type: String, required: true, set: stringifyBigNumber },
     kontract: { type: String, required: true, set: utils.getAddress },
     executor: { type: String, required: true, set: utils.getAddress },
     balance: { type: balanceCondition, set: removeIfEmpty },

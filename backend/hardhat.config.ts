@@ -25,9 +25,9 @@ const config: HardhatUserConfig = {
       chainId: 42,
       accounts: [PRIVATE_KEY]
     },
-    rinkeby_testnet: {
-      url: "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
-      chainId: 4,
+    arb_rinkeby_testnet: {
+      url: "https://rinkeby.arbitrum.io/rpc",
+      chainId: 421611,
       accounts: [PRIVATE_KEY],
       gas: 2100000,
     },

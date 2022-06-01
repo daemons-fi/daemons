@@ -121,8 +121,12 @@ contract SwapperScriptExecutor is ConditionsChecker {
         );
 
         // step 4: reward executor
-        gasTank.addReward(GAS_LIMIT * gasPriceFeed.lastGasPrice(), message.user, _msgSender());
-        if (message.tip > 0) DAEMToken.transferFrom(message.user, _msgSender(), message.tip);
+        gasTank.addReward(
+            GAS_LIMIT * gasPriceFeed.lastGasPrice(),
+            message.tip,
+            message.user,
+            _msgSender()
+        );
     }
 
     function giveAllowance(IERC20 _token, address _exchange) private {
