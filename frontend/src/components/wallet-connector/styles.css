@@ -33,12 +33,13 @@
 
 .wallet-connector__address-notification {
     position: absolute;
-    top: -7px;
-    right: -7px;
-    padding: 7px;
+    top: -10px;
+    right: -10px;
+    padding: 4px 9px;
     border-radius: 50%;
     background-color: var(--toastify-color-error);
     color: white;
+    font-size: 11px;
 }
 
 .chains-dialog__header {
@@ -81,4 +82,19 @@
 
 .chains-dialog__chain-entry--selected {
     background: #efefef;
+}
+
+.notifications-dialog__clear {
+    text-align: right;
+    cursor: pointer;
+}
+
+.notifications-dialog__separator {
+    border-bottom: 2px solid #000;
+    margin: 10px -5px;
+}
+
+.notification-dialog__notification-name {
+    margin-top: 15px;
+    overflow-wrap: break-word;
 }

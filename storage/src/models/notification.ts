@@ -3,7 +3,7 @@ import { utils } from "ethers";
 import { stringifyBigNumber } from "./utils";
 
 const notificationSchema = new mongoose.Schema({
-    date: { type: String, required: false, set: () => new Date() },
+    date: { type: String, required: false, default: () => new Date() },
     title: { type: String, required: true },
     description: { type: String, required: true },
     chainId: { type: String, required: true, index: true, set: stringifyBigNumber },

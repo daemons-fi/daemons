@@ -1,7 +1,7 @@
 import { storageAddress } from '.';
 
 export interface INotification {
-    _id : string;
+    _id: string;
     date: string;
     title: string;
     description: string;
@@ -20,8 +20,8 @@ export class NotificationProxy {
         return notifications;
     }
 
-    public static async deleteNotifications(): Promise<boolean> {
-        const requestOptions = { method: "DELETE", credentials: "include" };
+    public static async acknowledgeNotifications(ids: string[]): Promise<boolean> {
+        const requestOptions = { method: "POST", credentials: "include", body: JSON.stringify({ ids: ids }) };
         const response = await fetch(`${storageAddress}/notifications`, requestOptions as any);
         if (response.status !== 200) return false;
 

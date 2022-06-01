@@ -18,16 +18,14 @@ notificationsRouter.get("/", authenticate, async (req: Request, res: Response) =
     }
 });
 
-notificationsRouter.delete("/", authenticate, async (req: Request, res: Response) => {
+notificationsRouter.post("/", authenticate, async (req: Request, res: Response) => {
     if (!req.userAddress) {
         return res.sendStatus(403);
     }
 
     try {
-        await Notification.deleteMany({
-            user: req.userAddress
-        });
-        return res.send();
+        await Notification.deleteMany({ id: { $in: req.body.ids }, user: req.userAddress });
+        return res.status(200).send();
     } catch (error) {
         return res.status(500).send(error);
     }

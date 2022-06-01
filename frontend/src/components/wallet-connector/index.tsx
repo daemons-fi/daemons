@@ -107,7 +107,7 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
                                 <div
                                     className='wallet-connector__address-notification'
                                     onClick={() => setDisplayNotifications(!displayNotifications)}>
-
+                                    {notifications.length}
                                 </div>
                             }
                             {displayNotifications &&
@@ -178,7 +178,7 @@ function availableNotifications(hideDialog: () => void, notifications: INotifica
                     hideDialog();
                 }}
             >
-                <div className='notification-dialog__notification-date'>{notification.date}</div>
+                <div className='notifications-dialog__separator'></div>
                 <div className='notification-dialog__notification-title'>{notification.title}</div>
                 <div className='notification-dialog__notification-name'>{notification.description}</div>
             </div>
@@ -188,17 +188,13 @@ function availableNotifications(hideDialog: () => void, notifications: INotifica
     return (
         <div className='notifications-dialog'>
             <div className='notifications-dialog__header'>
-                <button className='notifications-dialog__clear'
+                <div className='notifications-dialog__clear'
                     onClick={async () => {
-                        await NotificationProxy.deleteNotifications();
+                        await NotificationProxy.acknowledgeNotifications(notifications.map((notification) => (notification._id)));
                         getNotifications()
                         hideDialog();
                     }}
-                >Mark all as read"</button>
-                <div className='notifications-dialog__close'
-                    onClick={() => {
-                        hideDialog();
-                    }}></div>
+                >Acknowledge all</div>
             </div>
             <div className='notifications-dialog__body'>
                 {notifications.map(notificationsComponent)}
