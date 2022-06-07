@@ -4,6 +4,7 @@ import { treasuryABI } from "@daemons-fi/abis";
 import { BigNumber, Contract } from 'ethers';
 import { StakingAction } from '../actions/staking-actions';
 import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
+import { bigNumberToFloat } from "../../utils/big-number-to-float";
 
 const getTreasuryContract = async (chainId: string): Promise<Contract> => {
     const ethers = require('ethers');
@@ -31,7 +32,7 @@ export const fetchStakingBalance = (address?: string, chainId?: string) => {
 
         const treasury = await getTreasuryContract(chainId);
         const rawBalance: BigNumber = await treasury.balanceOf(address);
-        const balance = rawBalance.div(BigNumber.from(10).pow(14)).toNumber() / 10000; // let's keep 4 digits precision
+        const balance = bigNumberToFloat(rawBalance);
 
         dispatch({
             type: ActionType.STAKING_BALANCE,
@@ -56,7 +57,7 @@ export const fetchStakingClaimable = (address?: string, chainId?: string) => {
 
         const treasury = await getTreasuryContract(chainId);
         const rawBalance: BigNumber = await treasury.earned(address);
-        const balance = rawBalance.div(BigNumber.from(10).pow(14)).toNumber() / 10000; // let's keep 4 digits precision
+        const balance = bigNumberToFloat(rawBalance);
 
         dispatch({
             type: ActionType.STAKING_CLAIMABLE,

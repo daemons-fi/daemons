@@ -1,6 +1,6 @@
 {
   "name": "@daemons-fi/shared-definitions",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "Shared definitions for Daemons dapp",
   "main": "./build/index.js",
   "types": "./build/index.d.js",

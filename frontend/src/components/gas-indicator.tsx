@@ -12,5 +12,5 @@ export function GasIndicator(): JSX.Element {
     const showBalance = balance !== undefined && walletConnected;
     const currencySymbol = GetCurrentChain(chainId!).coinSymbol;
 
-    return <div>Gas: {showBalance ? balance : '??'} {currencySymbol}</div>;
+    return <div>Gas Tank: {showBalance ? balance : '??'} {currencySymbol}</div>;
 }

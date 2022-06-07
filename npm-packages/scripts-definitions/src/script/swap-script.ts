@@ -24,8 +24,8 @@ export class SwapScript extends BaseScript {
   public getId = () => this.message.scriptId;
   public getUser = () => this.message.user;
   public getDescription = () => this.description;
-  public getAmount = () => this.message.amount;
-  public getTokenForAllowance = () => this.message.tokenFrom;
+  protected getAmount = () => this.message.amount;
+  protected getTokenForAllowance = () => this.message.tokenFrom;
 
   public static async fromStorageJson(object: any) {
     const message: ISwapAction = JSON.parse(JSON.stringify(object));

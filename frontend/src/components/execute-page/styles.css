@@ -46,7 +46,7 @@
     margin: 10px 0;
     padding: 3px 15px;
     display: grid;
-    grid-template-columns: 0.3fr 0.45fr auto;
+    grid-template-columns: 0.2fr 0.3fr 0.3fr 0.4fr;
     width: 500px;
     height: 40px;
     background: #ededed;
@@ -61,4 +61,13 @@
 
 .queue-script__actions {
     margin-left: auto;
+}
+
+.queue-script__reward {
+    border-radius: 20px;
+    background-color: #166165;
+    padding: 5px;
+    color: #fff;
+    text-align: center;
+    font-size: 0.9rem;
 }

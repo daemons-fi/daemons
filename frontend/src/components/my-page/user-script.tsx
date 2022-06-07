@@ -5,20 +5,30 @@ import { VerificationFailedScript, VerificationState } from "@daemons-fi/scripts
 import { RootState } from "../../state";
 import { fetchGasTankClaimable } from "../../state/action-creators/gas-tank-action-creators";
 import { removeUserScript } from "../../state/action-creators/script-action-creators";
-import { ethers } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import { promiseToast } from "../toaster";
 import { StorageProxy } from "../../data/storage-proxy";
 import { ScriptProxy } from "../../data/storage-proxy/scripts-proxy";
+import { getGasLimitForScript } from "../../data/script-gas-limits";
+import { GetCurrentChain } from "../../data/chain-info";
+import { bigNumberToFloat } from "../../utils/big-number-to-float";
+
 
 export const MyPageScript = ({ script }: { script: BaseScript }) => {
     const [verification, setVerification] = useState(script.getVerification());
     const dispatch = useDispatch();
     const walletAddress = useSelector((state: RootState) => state.wallet.address);
     const chainId = useSelector((state: RootState) => state.wallet.chainId);
+    const currencySymbol = GetCurrentChain(chainId!).coinSymbol;
+    const currentGasPrice = useSelector((state: RootState) => state.gasPriceFeed.price) ?? 0;
 
     // wallet signer and provider
     const provider = new ethers.providers.Web3Provider((window as any).ethereum);
     const signer = provider.getSigner();
+
+    // script execution costs
+    const ethCost = bigNumberToFloat(getGasLimitForScript(script.ScriptType).mul(currentGasPrice), 5);
+    const daemCost = bigNumberToFloat(script.getMessage().tip as BigNumber);
 
     const revokeScript = async () => {
         const tx = await script.revoke(signer);
@@ -69,8 +79,24 @@ export const MyPageScript = ({ script }: { script: BaseScript }) => {
 
     return (
         <div className="script">
+            {/* Description */}
             <div className="script__description">{script.getDescription()}</div>
+
+            {/* Verification State */}
             <div className="script__verificationState">{verification.toString()}</div>
+
+            {/* Execution Costs */}
+            <div className="script__execution-costs">
+                <div>Execution costs:</div>
+                <div className="script__execution-costs-table">
+                    <div>
+                        {ethCost} {currencySymbol}
+                    </div>
+                    {daemCost > 0 ? <div>{daemCost} DAEM</div> : null}
+                </div>
+            </div>
+
+            {/* Script Actions */}
             <div className="script__actions">
                 <button onClick={revokeScript} className="script__button">
                     Revoke
@@ -90,6 +116,7 @@ export const MyPageScript = ({ script }: { script: BaseScript }) => {
                     </button>
                 ) : null}
             </div>
+
             <button
                 onClick={() => alert(JSON.stringify(script.getMessage(), null, " "))}
                 className="script__info-button"

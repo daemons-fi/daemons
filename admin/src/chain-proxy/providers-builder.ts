@@ -1,10 +1,8 @@
 import { ethers } from "ethers";
-import { BaseProvider } from "@ethersproject/providers";
 import {
     fantomTestnetContracts,
     IContractsList,
-    kovanContracts,
-    rinkebyContracts
+    kovanContracts
 } from "@daemons-fi/addresses/build";
 
 export interface IChainWithContracts {
@@ -21,12 +19,6 @@ export const supportedChains: { [chain: string]: IChainWithContracts } = {
         rpc_url: () => process.env.KOVAN_RPC!,
         contracts: kovanContracts
     },
-    "4": {
-        id: "4",
-        name: "rinkeby",
-        rpc_url: () => process.env.RINKEBY_RPC!,
-        contracts: rinkebyContracts
-    },
     "4002": {
         id: "4002",
         name: "Fantom Testnet",
@@ -35,15 +27,13 @@ export const supportedChains: { [chain: string]: IChainWithContracts } = {
     }
 };
 
-const providers: { [chainId: string]: ethers.providers.Provider } = {};
-
-export const getProvider = (chainId: string): ethers.providers.Provider => {
+export const getProvider = (chainId: string): ethers.providers.JsonRpcProvider => {
     const chainInfo = supportedChains[chainId];
     if (!chainInfo) throw new Error(`Chain ${chainId} does not seem to be supported`);
     return instantiateProvider(chainInfo.rpc_url());
 };
 
-const instantiateProvider = (rpcUrl: string): BaseProvider => {
+const instantiateProvider = (rpcUrl: string): ethers.providers.JsonRpcProvider => {
     if (rpcUrl.startsWith("wss")) return new ethers.providers.WebSocketProvider(rpcUrl);
     return new ethers.providers.JsonRpcProvider(rpcUrl);
 };

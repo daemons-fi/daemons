@@ -87,8 +87,13 @@ input[type=range] {
     text-decoration: underline;
 }
 
-.menu__entry--gas {
+.menu__entry--tip {
     margin-left: auto;
+}
+
+.menu__entry--tip:hover {
+    text-decoration: none;
+    cursor: auto;
 }
 
 .menu__entry--gas:hover {

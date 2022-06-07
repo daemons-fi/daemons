@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "./interfaces/ITreasury.sol";
-import "./interfaces/UniswapV2.sol";
+import "./interfaces/IUniswapV2Router.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -164,12 +164,11 @@ contract Treasury is ITreasury, Ownable {
     }
 
     /** Creates the Protocol-owned-Liquidity LP */
-    function createLP() external onlyOwner {
+    function createLP(uint256 DAEMAmount) external payable onlyOwner {
         require(!polIsInitialized, "PoL already initialized");
 
-        // during initialization, we send all the ETH in the treasury to the LP
-        // and an equal amount of DAEM to have a 1:1 ratio
-        addLiquidity(address(this).balance, address(this).balance);
+        // during initialization, we specify both ETH and DAEM amounts
+        addLiquidity(msg.value, DAEMAmount);
         polIsInitialized = true;
     }
 
@@ -204,8 +203,6 @@ contract Treasury is ITreasury, Ownable {
         uint256 payoutFromTips = (dueFromTips * TIPS_AFTER_TAXES_PERCENTAGE) / 10000;
         stakeFor(user, payoutFromGas + payoutFromTips);
     }
-
-    receive() external payable {}
 
     /* ========== PRIVATE FUNCTIONS ========== */
 

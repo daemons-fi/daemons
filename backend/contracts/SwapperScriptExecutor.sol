@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "./ConditionsChecker.sol";
 import "./Messages.sol";
-import "./interfaces/UniswapV2.sol";
+import "./interfaces/IUniswapV2Router.sol";
 
 contract SwapperScriptExecutor is ConditionsChecker {
     uint256 public GAS_LIMIT = 300000; // 0.00030 GWEI
@@ -112,9 +112,10 @@ contract SwapperScriptExecutor is ConditionsChecker {
         if (!allowances[message.kontract][tokenFrom]) giveAllowance(tokenFrom, message.kontract);
 
         // step 3: swap
+        uint256 quote = IUniswapV2Router01(message.kontract).getAmountsOut(amount, path)[1];
         IUniswapV2Router01(message.kontract).swapExactTokensForTokens(
             amount,
-            0,
+            quote * 99 / 100,
             path,
             message.user,
             block.timestamp + 600000 // 10 minutes

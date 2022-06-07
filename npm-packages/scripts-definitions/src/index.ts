@@ -4,6 +4,8 @@ export * from './script/mm-adv-script';
 export * from './script/mm-base-script';
 export * from './script/swap-script';
 export * from './script/transfer-script';
+export * from './script/zap-in-script';
+export * from './script/zap-out-script';
 
 // condition factories
 export * from './condition-base-factories/balance-factory';

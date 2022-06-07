@@ -1,5 +1,5 @@
 import { BaseScript, ScriptVerification } from "@daemons-fi/scripts-definitions";
-import { BigNumber, ethers, utils } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 export class FakeScript extends BaseScript {
     public readonly ScriptType = "FakeScript";

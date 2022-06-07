@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "./ConditionsChecker.sol";
 import "./Messages.sol";
-import "./interfaces/UniswapV2.sol";
+import "./interfaces/IUniswapV2Router.sol";
 
 contract TransferScriptExecutor is ConditionsChecker {
     uint256 public GAS_LIMIT = 150000; // 0.00015 GWEI

@@ -17,18 +17,19 @@
     padding: 3px;
 }
 
-.tokens-modal_search input {
+.tokens-modal__search input {
     width: 100%;
     box-sizing: border-box;
 }
 
-.tokens-modal_item {
+.tokens-modal__item {
     display: flex;
     padding: 10px 0px;
     cursor: pointer;
+    align-items: center;
 }
 
-.tokens-modal_list {
+.tokens-modal__list {
     max-height: 70vh;
     overflow-y: auto;
     margin: 20px 0;

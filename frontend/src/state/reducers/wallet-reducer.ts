@@ -8,13 +8,15 @@ export type WalletState = {
     authenticated: boolean;
     supportedChain: boolean;
     DAEMBalance: number;
+    ETHBalance: number;
 };
 
 const initialState: WalletState = {
     connected: false,
     authenticated: false,
     supportedChain: false,
-    DAEMBalance: 0
+    DAEMBalance: 0,
+    ETHBalance: 0
 };
 
 export const walletReducer = (
@@ -39,6 +41,11 @@ export const walletReducer = (
             return {
                 ...state,
                 DAEMBalance: action.balance
+            };
+        case ActionType.FETCH_ETH_BALANCE:
+            return {
+                ...state,
+                ETHBalance: action.balance
             };
         default:
             return state;

@@ -3,6 +3,8 @@ import { IChainInfo } from '../interfaces';
 
 
 const unsupportedContracts: IContractsList = {
+    DEXRouter: '',
+
     GasTank: '',
     DAEMToken: '',
     Treasury: '',

@@ -68,15 +68,15 @@ export const TokensModal = ({ tokens, selectedToken, setSelectedToken }: TokensM
                 ariaHideApp={false}
             >
                 <div className='tokens-modal'>
-                    <div className='tokens-modal_search'>
+                    <div className='tokens-modal__search'>
                         <input
                             autoFocus
                             onChange={(e) => { filterDisplayedTokens(e.target.value); }} />
                     </div>
-                    <div className='tokens-modal_list'>
+                    <div className='tokens-modal__list'>
                         {
                             displayedTokens.map((token, i) => (
-                                <div key={i} className='tokens-modal_item' onClick={(e) => {
+                                <div key={i} className='tokens-modal__item' onClick={(e) => {
                                     setSelectedToken(token);
                                     closeModal();
                                 }}>

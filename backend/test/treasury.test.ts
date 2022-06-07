@@ -2,7 +2,7 @@ import { BaseProvider } from "@ethersproject/providers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import chaiAlmost from "chai-almost";
-import { BigNumber, Contract } from "ethers";
+import { BigNumber, Contract, utils } from "ethers";
 import { ethers, network } from "hardhat";
 const chai = require("chai");
 
@@ -33,7 +33,7 @@ describe("Treasury", function () {
         fooToken = await FooTokenContract.deploy("Foo Token", "FOO");
 
         // Mock router contract
-        const MockRouterContract = await ethers.getContractFactory("MockRouter");
+        const MockRouterContract = await ethers.getContractFactory("MockUniswapV2Router");
         const mockRouter = await MockRouterContract.deploy();
 
         // Treasury contract
@@ -45,7 +45,7 @@ describe("Treasury", function () {
         );
 
         // add some tokens to treasury
-        fooToken.mint(treasury.address, ethers.utils.parseEther("100"));
+        fooToken.mint(treasury.address, ethers.utils.parseEther("10000"));
     });
 
     this.afterEach(async () => {
@@ -259,9 +259,7 @@ describe("Treasury", function () {
             // stake payout for user1 and wait some time
             const amountEth = ethers.utils.parseEther("1.0");
             const zero = ethers.utils.parseEther("0");
-            await treasury
-                .connect(gasTank)
-                .stakePayout(user1.address, zero, { value: amountEth });
+            await treasury.connect(gasTank).stakePayout(user1.address, zero, { value: amountEth });
 
             await network.provider.send("evm_setNextBlockTimestamp", [now() + 60]);
             await network.provider.send("evm_mine");
@@ -296,11 +294,9 @@ describe("Treasury", function () {
         });
 
         it("reward rate depends on the amount of ETH in the treasury and redistributionInterval", async () => {
-          const amountEth = ethers.utils.parseEther("1.0");
-          const zero = ethers.utils.parseEther("0");
-          await treasury
-              .connect(gasTank)
-              .stakePayout(user1.address, zero, { value: amountEth });
+            const amountEth = ethers.utils.parseEther("1.0");
+            const zero = ethers.utils.parseEther("0");
+            await treasury.connect(gasTank).stakePayout(user1.address, zero, { value: amountEth });
 
             const rewardRate = await treasury.getRewardRate();
             const redistributionPool = await treasury.redistributionPool(); // 50% of 1ETH
@@ -308,7 +304,9 @@ describe("Treasury", function () {
             expect(rewardRate).to.be.equal(expectedRate);
 
             // try again, the reward rate should be doubled
-            await treasury.connect(gasTank).requestPayout(user1.address, zero, { value: amountEth });
+            await treasury
+                .connect(gasTank)
+                .requestPayout(user1.address, zero, { value: amountEth });
             expect(await treasury.getRewardRate()).to.be.equal(expectedRate.mul(2));
         });
 
@@ -316,9 +314,7 @@ describe("Treasury", function () {
             // stake payout for user1.
             const amountEth = ethers.utils.parseEther("1.0");
             const zero = ethers.utils.parseEther("0");
-            await treasury
-                .connect(gasTank)
-                .stakePayout(user1.address, zero, { value: amountEth });
+            await treasury.connect(gasTank).stakePayout(user1.address, zero, { value: amountEth });
 
             // current state: 0.5ETH are in the redistribution pool and 1 DAEM staked for the user
             expect(await treasury.redistributionPool()).to.be.equal(ethers.utils.parseEther("0.5"));
@@ -346,9 +342,7 @@ describe("Treasury", function () {
             // stake payout for user1 and wait some time
             const amountEth = ethers.utils.parseEther("1.0");
             const zero = ethers.utils.parseEther("0");
-            await treasury
-                .connect(gasTank)
-                .stakePayout(user1.address, zero, { value: amountEth });
+            await treasury.connect(gasTank).stakePayout(user1.address, zero, { value: amountEth });
 
             await network.provider.send("evm_setNextBlockTimestamp", [now() + oneDay]);
             await network.provider.send("evm_mine");
@@ -377,9 +371,7 @@ describe("Treasury", function () {
             // stake payout for user1 and wait some time
             const amountEth = ethers.utils.parseEther("1.0");
             const zero = ethers.utils.parseEther("0");
-            await treasury
-                .connect(gasTank)
-                .stakePayout(user1.address, zero, { value: amountEth });
+            await treasury.connect(gasTank).stakePayout(user1.address, zero, { value: amountEth });
 
             await network.provider.send("evm_setNextBlockTimestamp", [now() + oneDay]);
             await network.provider.send("evm_mine");
@@ -476,7 +468,9 @@ describe("Treasury", function () {
 
             const amountEth = ethers.utils.parseEther("1.0");
             const zero = ethers.utils.parseEther("0");
-            await treasury.connect(gasTank).requestPayout(user1.address, zero, { value: amountEth });
+            await treasury
+                .connect(gasTank)
+                .requestPayout(user1.address, zero, { value: amountEth });
 
             // anyone else will cause error
             await expect(treasury.connect(user1).claimCommission()).to.be.revertedWith(
@@ -499,12 +493,18 @@ describe("Treasury", function () {
 
     describe("Protocol Owned Liquidity", function () {
         it("LP creation can only be executed by admin", async () => {
-            await expect(treasury.connect(user1).createLP()).to.be.revertedWith(
-                "Ownable: caller is not the owner"
-            );
+            const ETHAmount = utils.parseEther("1.0");
+            const DAEMAmount = utils.parseEther("1500");
+
+            await expect(
+                treasury.connect(user1).createLP(DAEMAmount, { value: ETHAmount })
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("LP funding can only be executed by admin", async () => {
+            const ETHAmount = utils.parseEther("1.0");
+            const DAEMAmount = utils.parseEther("1500");
+
             await expect(treasury.connect(user1).fundLP()).to.be.revertedWith(
                 "Ownable: caller is not the owner"
             );
@@ -512,26 +512,26 @@ describe("Treasury", function () {
 
         it("LP creation can only be executed once", async () => {
             // send some ETH to the treasury for the LP
-            const ETHamount = ethers.utils.parseEther("1.0");
-            await owner.sendTransaction({ to: treasury.address, value: ETHamount });
+            const ETHAmount = utils.parseEther("1.0");
+            const DAEMAmount = utils.parseEther("1500");
 
-            await treasury.connect(owner).createLP();
-            await expect(treasury.connect(owner).createLP()).to.be.revertedWith(
+            await treasury.connect(owner).createLP(DAEMAmount, { value: ETHAmount });
+            await expect(treasury.connect(owner).createLP(DAEMAmount, { value: ETHAmount })).to.be.revertedWith(
                 "PoL already initialized"
             );
         });
 
-        it("LP creation uses all the ETH in the treasury + an equal amount of DAEM", async () => {
+        it("LP creation uses the passed ETH & DAEM", async () => {
             // send some ETH to the treasury for the LP
-            const ETHamount = ethers.utils.parseEther("1.0");
-            await owner.sendTransaction({ to: treasury.address, value: ETHamount });
-            expect(await provider.getBalance(treasury.address)).to.equal(ETHamount);
+            const ETHAmount = utils.parseEther("1.0");
+            const DAEMAmount = utils.parseEther("1500");
 
-            await treasury.connect(owner).createLP();
-            expect(await provider.getBalance(treasury.address)).to.equal(
-                ethers.utils.parseEther("0")
-            );
-            // as we use a mock we can only verify the ETH
+            await treasury.connect(owner).createLP(DAEMAmount, { value: ETHAmount });
+
+            const ETHBalance = await provider.getBalance(treasury.address)
+            const DAEMBalance = await fooToken.balanceOf(treasury.address)
+            expect(ETHBalance).to.equal(ethers.utils.parseEther("0"));
+            expect(DAEMBalance).to.equal(ethers.utils.parseEther("8500")); // 10K - 1.5K
         });
 
         it("LP funding cannot be used before of LP creation", async () => {
@@ -541,15 +541,14 @@ describe("Treasury", function () {
         });
 
         it("LP funding uses all the ETH in the polPool + a proportional amount of DAEM", async () => {
-            const OneEth = ethers.utils.parseEther("1.0");
+            const ETHAmount = utils.parseEther("1.0");
+            const DAEMAmount = utils.parseEther("1500");
 
-            // send some ETH and initialize the LP
-            await owner.sendTransaction({ to: treasury.address, value: OneEth });
-            await treasury.connect(owner).createLP();
+            await treasury.connect(owner).createLP(DAEMAmount, { value: ETHAmount });
 
             // add funds to the polPool by having the gasTank faking a payout
             const zero = ethers.utils.parseEther("0");
-            await treasury.connect(gasTank).stakePayout(user1.address, zero, { value: OneEth });
+            await treasury.connect(gasTank).stakePayout(user1.address, zero, { value: ETHAmount });
             expect(await treasury.polPool()).to.equal(ethers.utils.parseEther("0.49"));
 
             // fund the LP and verify polPool has been emptied

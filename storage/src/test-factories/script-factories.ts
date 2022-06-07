@@ -9,7 +9,10 @@ import {
     IMaxRepetitionsCondition,
     InterestRateMode,
     IPriceCondition,
-    ISignedMMAdvancedAction
+    ISignedMMAdvancedAction,
+    ISignedZapInAction,
+    ISignedZapOutAction,
+    ZapOutputChoice
 } from "@daemons-fi/shared-definitions";
 import { ISignedSwapAction } from "@daemons-fi/shared-definitions";
 import { ISignedTransferAction } from "@daemons-fi/shared-definitions";
@@ -19,6 +22,8 @@ import faker from "@faker-js/faker";
 import { BaseMoneyMarketActionType, ISignedMMBaseAction } from "@daemons-fi/shared-definitions";
 import { MmBaseScript } from "../models/scripts/mm-base-script";
 import { MmAdvancedScript } from "../models/scripts/mm-adv-script";
+import { ZapInScript } from "../models/scripts/zap-in-script";
+import { ZapOutScript } from "../models/scripts/zap-out-script";
 
 const randomEthAmount = () =>
     utils.parseEther(faker.datatype.number({ min: 0.01, max: 10, precision: 0.01 }).toString());
@@ -224,4 +229,77 @@ export async function mmAdvancedScriptDocumentFactory(args: any): Promise<ISigne
     const jsonTransformedScript = JSON.parse(JSON.stringify(signedScript));
 
     return await MmAdvancedScript.build(jsonTransformedScript).save();
+}
+
+/** Returns a randomized signed zapIn action */
+export function signedZapInActionFactory(args: any): ISignedZapInAction & { __type: string } {
+    return {
+        signature: args.signature ?? utils.hexlify(utils.randomBytes(65)),
+        description: args.description ?? faker.random.words(4),
+        scriptId: args.scriptId ?? utils.hexlify(utils.randomBytes(32)),
+        tokenA: args.tokenA ?? faker.finance.ethereumAddress(),
+        tokenB: args.tokenB ?? faker.finance.ethereumAddress(),
+        amountA: args.amountA ?? randomEthAmount(),
+        amountB: args.amountB ?? randomEthAmount(),
+        typeAmtA: args.typeAmtA ?? AmountType.Absolute,
+        typeAmtB: args.typeAmtB ?? AmountType.Absolute,
+        tip: args.amount ?? randomEthAmount(),
+        user: args.user ?? faker.finance.ethereumAddress(),
+        kontract: args.kontract ?? faker.finance.ethereumAddress(),
+        executor: args.executor ?? faker.finance.ethereumAddress(),
+        chainId: args.chainId ?? BigNumber.from("42"),
+        balance: balanceConditionFactory(args.balance ?? {}),
+        frequency: frequencyConditionFactory(args.frequency ?? {}),
+        price: priceConditionFactory(args.price ?? {}),
+        repetitions: repetitionsConditionFactory(args.repetitions ?? {}),
+        follow: followConditionFactory(args.follow ?? {}),
+        __type: "ZapInScript"
+    };
+}
+
+/** Adds a ZapInScript to mongo and returns it */
+export async function zapInScriptDocumentFactory(args: any): Promise<ISignedZapInAction> {
+    const signedScript = signedZapInActionFactory(args);
+
+    // this step simulates the transformation the object goes through when it is passed into
+    // the body of a POST (i.e. BigNumber fields are serialized and not deserialized to the original object)
+    const jsonTransformedScript = JSON.parse(JSON.stringify(signedScript));
+
+    return await ZapInScript.build(jsonTransformedScript).save();
+}
+
+/** Returns a randomized signed zapOut action */
+export function signedZapOutActionFactory(args: any): ISignedZapOutAction & { __type: string } {
+    return {
+        signature: args.signature ?? utils.hexlify(utils.randomBytes(65)),
+        description: args.description ?? faker.random.words(4),
+        scriptId: args.scriptId ?? utils.hexlify(utils.randomBytes(32)),
+        tokenA: args.tokenA ?? faker.finance.ethereumAddress(),
+        tokenB: args.tokenB ?? faker.finance.ethereumAddress(),
+        amount: args.amount ?? randomEthAmount(),
+        typeAmt: args.typeAmt ?? AmountType.Absolute,
+        outputChoice: args.outputChoice ?? ZapOutputChoice.bothTokens,
+        tip: args.amount ?? randomEthAmount(),
+        user: args.user ?? faker.finance.ethereumAddress(),
+        kontract: args.kontract ?? faker.finance.ethereumAddress(),
+        executor: args.executor ?? faker.finance.ethereumAddress(),
+        chainId: args.chainId ?? BigNumber.from("42"),
+        balance: balanceConditionFactory(args.balance ?? {}),
+        frequency: frequencyConditionFactory(args.frequency ?? {}),
+        price: priceConditionFactory(args.price ?? {}),
+        repetitions: repetitionsConditionFactory(args.repetitions ?? {}),
+        follow: followConditionFactory(args.follow ?? {}),
+        __type: "ZapOutScript"
+    };
+}
+
+/** Adds a ZapOutScript to mongo and returns it */
+export async function zapOutScriptDocumentFactory(args: any): Promise<ISignedZapOutAction> {
+    const signedScript = signedZapOutActionFactory(args);
+
+    // this step simulates the transformation the object goes through when it is passed into
+    // the body of a POST (i.e. BigNumber fields are serialized and not deserialized to the original object)
+    const jsonTransformedScript = JSON.parse(JSON.stringify(signedScript));
+
+    return await ZapOutScript.build(jsonTransformedScript).save();
 }

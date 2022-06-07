@@ -3,11 +3,17 @@ import { expect } from "chai";
 import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { AmountType, ComparisonType } from "@daemons-fi/shared-definitions";
-import { swapDomain, ISwapAction, swapTypes } from "@daemons-fi/shared-definitions";
+import {
+    mmAdvDomain,
+    IMMAdvancedAction,
+    AdvancedMoneyMarketActionType,
+    mmAdvTypes,
+    InterestRateMode
+} from "@daemons-fi/shared-definitions";
 
-describe("ScriptExecutor - Swapper", function () {
+describe("ScriptExecutor - Money Market Advanced", function () {
     let owner: SignerWithAddress;
-    let user1: SignerWithAddress;
+    let otherWallet: SignerWithAddress;
 
     // contracts
     let gasTank: Contract;
@@ -15,20 +21,22 @@ describe("ScriptExecutor - Swapper", function () {
     let executor: Contract;
     let DAEMToken: Contract;
     let fooToken: Contract;
-    let barToken: Contract;
-    let mockRouter: Contract;
+    let fooDebtToken: Contract;
+    let mockMoneyMarketPool: Contract;
 
     // signature components
     let sigR: string;
     let sigS: string;
     let sigV: number;
 
-    let baseMessage: ISwapAction = {
+    let baseMessage: IMMAdvancedAction = {
         scriptId: "0x7465737400000000000000000000000000000000000000000000000000000000",
-        tokenFrom: "",
-        tokenTo: "",
+        token: "",
+        debtToken: "",
+        action: AdvancedMoneyMarketActionType.Repay,
         typeAmt: AmountType.Absolute,
-        amount: ethers.utils.parseEther("145"),
+        rateMode: InterestRateMode.Variable,
+        amount: ethers.utils.parseEther("100"),
         user: "",
         kontract: "",
         executor: "",
@@ -60,12 +68,18 @@ describe("ScriptExecutor - Swapper", function () {
             shift: BigNumber.from(0),
             scriptId: "0x0065737400000000000000000000000000000000000000000000000000000000",
             executor: "0x000000000000000000000000000000000000dead"
+        },
+        healthFactor: {
+            enabled: false,
+            kontract: "",
+            comparison: ComparisonType.GreaterThan,
+            amount: ethers.utils.parseEther("0")
         }
     };
 
     this.beforeEach(async () => {
         // get main wallet
-        [owner, user1] = await ethers.getSigners();
+        [owner, otherWallet] = await ethers.getSigners();
 
         // GasTank contract
         const GasTankContract = await ethers.getContractFactory("GasTank");
@@ -80,36 +94,53 @@ describe("ScriptExecutor - Swapper", function () {
         const MockTokenContract = await ethers.getContractFactory("MockToken");
         DAEMToken = await MockTokenContract.deploy("Foo Token", "FOO");
         fooToken = await MockTokenContract.deploy("Foo Token", "FOO");
-        barToken = await MockTokenContract.deploy("Bar Token", "BAR");
-
-        // Mock router contract
-        const MockRouterContract = await ethers.getContractFactory("MockRouter");
-        mockRouter = await MockRouterContract.deploy();
+        const fooAToken = await MockTokenContract.deploy("Foo A Token", "aFOO");
+        fooDebtToken = await MockTokenContract.deploy("Foo DebtToken", "dFOO");
 
         // Gas Price Feed contract
         const GasPriceFeedContract = await ethers.getContractFactory("GasPriceFeed");
         const gasPriceFeed = await GasPriceFeedContract.deploy();
 
-        // Executor contract
-        const SwapperScriptExecutorContract = await ethers.getContractFactory(
-            "SwapperScriptExecutor"
+        // Mock Money Market Pool contract
+        const MockMoneyMarketPoolContract = await ethers.getContractFactory("MockMoneyMarketPool");
+        mockMoneyMarketPool = await MockMoneyMarketPoolContract.deploy(
+            fooToken.address,
+            fooAToken.address,
+            fooDebtToken.address
         );
-        executor = await SwapperScriptExecutorContract.deploy();
+
+        // Mock MoneyMarket Oracle contract
+        const fakePrice = ethers.utils.parseEther("0.01");
+        const MockOracleContract = await ethers.getContractFactory("MockPriceOracleGetter");
+        const mockOracle = await MockOracleContract.deploy(fakePrice);
+
+        // Executor contract
+        const MmScriptExecutorContract = await ethers.getContractFactory(
+            "MmAdvancedScriptExecutor"
+        );
+        executor = await MmScriptExecutorContract.deploy();
         await executor.setGasTank(gasTank.address);
         await executor.setPriceRetriever(priceRetriever.address);
         await executor.setGasFeed(gasPriceFeed.address);
+        await executor.setAavePriceOracle(mockOracle.address);
 
         // Grant allowance
+        await DAEMToken.approve(executor.address, ethers.utils.parseEther("100000"));
         await fooToken.approve(executor.address, ethers.utils.parseEther("1000000"));
-        await DAEMToken.approve(executor.address, ethers.utils.parseEther("1000000"));
+        await fooDebtToken.approve(executor.address, ethers.utils.parseEther("1000000"));
 
-        // Generate balance
-        await fooToken.mint(owner.address, baseMessage.amount);
+        // Generate balance and pre-existing debt
         await DAEMToken.mint(owner.address, ethers.utils.parseEther("250"));
+        await fooToken.mint(owner.address, ethers.utils.parseEther("100"));
+        await fooDebtToken.mint(owner.address, ethers.utils.parseEther("87"));
 
         // register executor in gas tank
         await gasTank.addExecutor(executor.address);
         await gasTank.setDAEMToken(DAEMToken.address);
+
+        // Mock router contract
+        const MockRouterContract = await ethers.getContractFactory("MockUniswapV2Router");
+        const mockRouter = await MockRouterContract.deploy();
 
         // Treasury contract
         const TreasuryContract = await ethers.getContractFactory("Treasury");
@@ -120,12 +151,12 @@ describe("ScriptExecutor - Swapper", function () {
         );
 
         // add some tokens to treasury
-        DAEMToken.mint(treasury.address, ethers.utils.parseEther("100"));
+        DAEMToken.mint(treasury.address, ethers.utils.parseEther("110"));
 
         // create token LP
         const ethAmount = ethers.utils.parseEther("5");
-        await owner.sendTransaction({ to: treasury.address, value: ethAmount })
-        await treasury.createLP();
+        const daemAmount = ethers.utils.parseEther("10");
+        await treasury.createLP(daemAmount, {value: ethAmount});
 
         // set treasury address in gas tank
         await gasTank.setTreasury(treasury.address);
@@ -136,20 +167,21 @@ describe("ScriptExecutor - Swapper", function () {
         await treasury.preliminaryCheck();
     });
 
-    async function initialize(baseMessage: ISwapAction): Promise<ISwapAction> {
+    async function initialize(baseMessage: IMMAdvancedAction): Promise<IMMAdvancedAction> {
         // Create message and fill missing info
         const message = { ...baseMessage };
         message.user = owner.address;
-        message.kontract = mockRouter.address;
         message.executor = executor.address;
-        message.tokenFrom = fooToken.address;
-        message.tokenTo = barToken.address;
+        message.token = fooToken.address;
+        message.debtToken = fooDebtToken.address;
+        message.kontract = mockMoneyMarketPool.address;
+        message.healthFactor.kontract = mockMoneyMarketPool.address;
         message.balance.token = fooToken.address;
         message.price.token = fooToken.address;
         message.follow.executor = executor.address; // following itself, it'll never be executed when condition is enabled
 
         // Sign message
-        const signature = await owner._signTypedData(swapDomain, swapTypes, message);
+        const signature = await owner._signTypedData(mmAdvDomain, mmAdvTypes, message);
         const split = ethers.utils.splitSignature(signature);
         [sigR, sigS, sigV] = [split.r, split.s, split.v];
 
@@ -174,7 +206,7 @@ describe("ScriptExecutor - Swapper", function () {
     });
 
     it("spots a valid message from another chain", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.chainId = BigNumber.from("1"); // message created for the Ethereum chain
         message = await initialize(message);
 
@@ -184,87 +216,165 @@ describe("ScriptExecutor - Swapper", function () {
         );
     });
 
-    it("swaps the tokens - ABS", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+    it("repays the debt - ABS", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = ethers.utils.parseEther("100");
+        message.typeAmt = AmountType.Absolute;
+        message.action = AdvancedMoneyMarketActionType.Repay;
         message = await initialize(message);
-        await fooToken.mint(owner.address, ethers.utils.parseEther("55"));
 
         await executor.execute(message, sigR, sigS, sigV);
 
-        // check final amounts. Note that 145 were generated during initialization
-        expect(await fooToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("55"));
-        expect(await barToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("145"));
+        // Debt is 87, so 13 FOO are given back to the user
+        const tokenBalance = await fooToken.balanceOf(owner.address);
+        expect(tokenBalance).to.equal(ethers.utils.parseEther("13"));
     });
 
-    it("swaps the tokens - PRC", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+    it("repays the debt - PRC", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = BigNumber.from(7500); // 75%
         message.typeAmt = AmountType.Percentage;
-        message.amount = BigNumber.from(5000); // 50%
+        message.action = AdvancedMoneyMarketActionType.Repay;
         message = await initialize(message);
-        await fooToken.mint(owner.address, ethers.utils.parseEther("55"));
 
         await executor.execute(message, sigR, sigS, sigV);
 
-        // check final amounts. Note that 145 were generated during initialization
-        expect(await fooToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("100"));
-        expect(await barToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("100"));
+        // we're paying 75% of the 87ETH debt =>
+        // 65.25 paid, 34.75 remaining in wallet and debt of 21.75
+        const tokenBalance = await fooToken.balanceOf(owner.address);
+        expect(tokenBalance).to.equal(ethers.utils.parseEther("34.75"));
+
+        const debtBalance = await fooDebtToken.balanceOf(owner.address);
+        expect(debtBalance).to.equal(ethers.utils.parseEther("21.75"));
     });
 
-    it("swapping triggers reward in gas tank", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+    it("borrows some tokens - ABS", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = ethers.utils.parseEther("25");
+        message.action = AdvancedMoneyMarketActionType.Borrow;
+        message = await initialize(message);
+
+        await executor.execute(message, sigR, sigS, sigV);
+
+        const tokenBalance = await fooToken.balanceOf(owner.address);
+        expect(tokenBalance).to.equal(ethers.utils.parseEther("125")); // 100 was already there
+    });
+
+    it("borrows some tokens - PRC", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = BigNumber.from("5000"); // Borrow 50% of borrowable
+        message.typeAmt = AmountType.Percentage;
+        message.action = AdvancedMoneyMarketActionType.Borrow;
+        message = await initialize(message);
+
+        await executor.execute(message, sigR, sigS, sigV);
+
+        // a debt of 1750 FOO is created and they are sent to the user
+        // as they already had a debt of 87 FOO, now it becomes 1837
+        const debtBalance = await fooDebtToken.balanceOf(owner.address);
+        expect(debtBalance).to.equal(ethers.utils.parseEther("1837"));
+
+        // now they own 1850 FOO (100 FOO were already in the wallet)
+        const tokenBalance = await fooToken.balanceOf(owner.address);
+        expect(tokenBalance).to.equal(ethers.utils.parseEther("1850")); // 100 was already there
+    });
+
+    it("execution triggers reward in gas tank", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message = await initialize(message);
         await fooToken.mint(owner.address, ethers.utils.parseEther("55"));
 
         // gasTank should NOT have a claimable amount now for user1
-        expect((await gasTank.claimable(user1.address)).toNumber()).to.equal(0);
+        expect((await gasTank.claimable(otherWallet.address)).toNumber()).to.equal(0);
 
-        await executor.connect(user1).execute(message, sigR, sigS, sigV);
+        await executor.connect(otherWallet).execute(message, sigR, sigS, sigV);
 
         // gasTank should have a claimable amount now for user1
-        expect((await gasTank.claimable(user1.address)).toNumber()).to.not.equal(0);
+        expect((await gasTank.claimable(otherWallet.address)).toNumber()).to.not.equal(0);
     });
 
-    it("swapping is cheap - ABS", async () => {
+    it("repaying is cheap - ABS", async () => {
         // At the time this test was last checked, the gas spent to
-        // execute the script was 0.000282913270269640 ETH.
-        // NOTE: the swap contract is mocked, so this measures all the rest.
+        // execute the script was 0.000258426002067408 ETH.
 
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
-        message.typeAmt = AmountType.Percentage;
-        message.amount = BigNumber.from(5000); // 50%
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = ethers.utils.parseEther("100");
+        message.typeAmt = AmountType.Absolute;
+        message.action = AdvancedMoneyMarketActionType.Repay;
         message = await initialize(message);
-        await fooToken.mint(owner.address, ethers.utils.parseEther("200"));
 
         const initialBalance = await owner.getBalance();
         await executor.execute(message, sigR, sigS, sigV);
         const spentAmount = initialBalance.sub(await owner.getBalance());
 
         const threshold = ethers.utils.parseEther("0.0003");
-        console.log("Spent for swapping:", spentAmount.toString());
+        console.log("Spent for repay ABS:", spentAmount.toString());
         expect(spentAmount.lte(threshold)).to.equal(true);
     });
 
-    it("swapping is cheap - PRC", async () => {
+    it("repaying is cheap - PRC", async () => {
         // At the time this test was last checked, the gas spent to
-        // execute the script was 0.000282913270269640 ETH.
-        // NOTE: the swap contract is mocked, so this measures all the rest.
+        // execute the script was 0.000267068002136544 ETH.
 
-        const message = await initialize(baseMessage);
-        await fooToken.mint(owner.address, ethers.utils.parseEther("200"));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = BigNumber.from(7500); // 75%
+        message.typeAmt = AmountType.Percentage;
+        message.action = AdvancedMoneyMarketActionType.Repay;
+        message = await initialize(message);
 
         const initialBalance = await owner.getBalance();
         await executor.execute(message, sigR, sigS, sigV);
         const spentAmount = initialBalance.sub(await owner.getBalance());
 
         const threshold = ethers.utils.parseEther("0.0003");
-        console.log("Spent for swapping:", spentAmount.toString());
+        console.log("Spent for repay PRC:", spentAmount.toString());
         expect(spentAmount.lte(threshold)).to.equal(true);
     });
+
+    it("borrowing is cheap - ABS", async () => {
+        // At the time this test was last checked, the gas spent to
+        // execute the script was 0.000210066001680528 ETH.
+
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = ethers.utils.parseEther("25");
+        message.action = AdvancedMoneyMarketActionType.Borrow;
+        message = await initialize(message);
+
+        const initialBalance = await owner.getBalance();
+        await executor.execute(message, sigR, sigS, sigV);
+        const spentAmount = initialBalance.sub(await owner.getBalance());
+
+        const threshold = ethers.utils.parseEther("0.0003");
+        console.log("Spent for borrow ABS:", spentAmount.toString());
+        expect(spentAmount.lte(threshold)).to.equal(true);
+    });
+
+    it("borrowing is cheap - PRC", async () => {
+        // At the time this test was last checked, the gas spent to
+        // execute the script was 0.000215473001723784 ETH.
+
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = BigNumber.from("5000"); // Borrow 50% of borrowable
+        message.typeAmt = AmountType.Percentage;
+        message.action = AdvancedMoneyMarketActionType.Borrow;
+        message = await initialize(message);
+
+        const initialBalance = await owner.getBalance();
+        await executor.execute(message, sigR, sigS, sigV);
+        const spentAmount = initialBalance.sub(await owner.getBalance());
+
+        const threshold = ethers.utils.parseEther("0.0003");
+        console.log("Spent for borrow PRC:", spentAmount.toString());
+        expect(spentAmount.lte(threshold)).to.equal(true);
+    });
+
     it("sets the lastExecution value during execution", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
 
         // enable frequency condition so 2 consecutive executions should fail
         message.frequency.enabled = true;
+        message.typeAmt = AmountType.Percentage;
+        message.amount = BigNumber.from(2500); //25%
         message = await initialize(message);
         await fooToken.mint(owner.address, ethers.utils.parseEther("2000"));
 
@@ -279,13 +389,66 @@ describe("ScriptExecutor - Swapper", function () {
 
     /* ========== ACTION INTRINSIC CHECK ========== */
 
-    it("fails if the user doesn't have enough balance, even tho the balance condition was not set", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+    it("fails if the user wants to repay but there is no debt", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = BigNumber.from(10000); // 100%
+        message.typeAmt = AmountType.Percentage;
+        message.action = AdvancedMoneyMarketActionType.Repay;
+        message = await initialize(message);
+
+        // repaying 100% of the debt
+        await executor.execute(message, sigR, sigS, sigV);
+
+        // trying again will fail
+        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
+            "[NO_DEBT][TMP]"
+        );
+    });
+
+    it("fails if the user doesn't have enough balance, even tho the balance condition was not set - ABS", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.amount = ethers.utils.parseEther("9999"); // setting an amount higher than the user's balance
         message = await initialize(message);
 
         await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
             "[SCRIPT_BALANCE][TMP]"
+        );
+    });
+
+    it("fails if the user doesn't have enough balance, even tho the balance condition was not set - PRC", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = BigNumber.from("10000"); // wanna pay 100%
+        message.typeAmt = AmountType.Percentage;
+        message = await initialize(message);
+
+        // let's set a debt much higher than what the user owns
+        await fooDebtToken.mint(owner.address, ethers.utils.parseEther("9999"));
+
+        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
+            "[SCRIPT_BALANCE][TMP]"
+        );
+    });
+
+    it("fails if the user wants to borrow more than the borrowable amount - ABS", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = ethers.utils.parseEther("50000"); // can borrow 3325, this is way too much and will fail
+        message.action = AdvancedMoneyMarketActionType.Borrow;
+        message = await initialize(message);
+
+        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
+            "[BORROW_TOO_HIGH][TMP]"
+        );
+    });
+
+    it("fails if the user wants to borrow more than the borrowable amount - PRC", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amount = BigNumber.from("10000"); // wanna borrow 100% of borrowable
+        message.typeAmt = AmountType.Percentage;
+        message.action = AdvancedMoneyMarketActionType.Borrow;
+        message = await initialize(message);
+
+        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
+            "[BORROW_TOO_HIGH][FINAL]"
         );
     });
 
@@ -307,7 +470,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("fails the verification if frequency is enabled and the start block has not been reached", async () => {
         const timestampNow = Math.floor(Date.now() / 1000);
         // update frequency in message and submit for signature
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.frequency.enabled = true;
         message.frequency.delay = BigNumber.from(0);
         message.frequency.start = BigNumber.from(timestampNow + 5000);
@@ -321,7 +484,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("fails the verification if frequency is enabled and not enough blocks passed since start block", async () => {
         const timestampNow = Math.floor(Date.now() / 1000);
         // update frequency in message and submit for signature
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.frequency.enabled = true;
         message.frequency.delay = BigNumber.from(timestampNow + 5000);
         message.frequency.start = BigNumber.from(0);
@@ -337,7 +500,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("fails the verification if balance is enabled and the user does not own enough tokens", async () => {
         // update balance in message and submit for signature
         // enabling it will be enough as the condition is "FOO_TOKEN>150"
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.balance.enabled = true;
         message = await initialize(message);
 
@@ -349,7 +512,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("fails the verification if balance is enabled and the user owns too many tokens", async () => {
         // update frequency in message and submit for signature
         // we'll change the comparison so it will become "FOO_TOKEN<150"
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.balance.enabled = true;
         message.balance.comparison = ComparisonType.LessThan;
         message = await initialize(message);
@@ -367,7 +530,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("fails the verification if price is enabled, but token is not supported", async () => {
         // update price in message and submit for signature.
         // Condition: FOO > 150
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.price.enabled = true;
         message.price.token = fooToken.address;
         message.price.comparison = ComparisonType.GreaterThan;
@@ -383,7 +546,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("fails the verification if price is enabled with GREATER_THAN condition and tokenPrice < value", async () => {
         // update price in message and submit for signature.
         // Condition: FOO > 150
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.price.enabled = true;
         message.price.token = fooToken.address;
         message.price.comparison = ComparisonType.GreaterThan;
@@ -416,7 +579,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("fails the verification if price is enabled with LESS_THAN condition and tokenPrice > value", async () => {
         // update price in message and submit for signature.
         // Condition: FOO < 150
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.price.enabled = true;
         message.price.token = fooToken.address;
         message.price.comparison = ComparisonType.LessThan;
@@ -449,7 +612,7 @@ describe("ScriptExecutor - Swapper", function () {
     it("passes the price verification if conditions are met", async () => {
         // update price in message and submit for signature.
         // Condition: FOO < 150
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.price.enabled = true;
         message.price.token = fooToken.address;
         message.price.comparison = ComparisonType.GreaterThan;
@@ -490,7 +653,7 @@ describe("ScriptExecutor - Swapper", function () {
     /* ========== TIP CONDITION CHECK ========== */
 
     it("fails if the user sets a tip but doesn't have enough funds to pay for it", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.tip = ethers.utils.parseEther("15000");
         message = await initialize(message);
 
@@ -499,7 +662,7 @@ describe("ScriptExecutor - Swapper", function () {
     });
 
     it("Pays the tip to the executor", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         message.tip = ethers.utils.parseEther("5");
         message = await initialize(message);
 
@@ -509,7 +672,7 @@ describe("ScriptExecutor - Swapper", function () {
         let tipBalance = await gasTank.tipBalanceOf(owner.address);
         expect(tipBalance).to.be.equal(ethers.utils.parseEther("10"));
 
-        await executor.connect(user1).execute(message, sigR, sigS, sigV);
+        await executor.connect(otherWallet).execute(message, sigR, sigS, sigV);
 
         // tokens have been removed from the user's tip jar
         tipBalance = await gasTank.tipBalanceOf(owner.address);
@@ -518,8 +681,10 @@ describe("ScriptExecutor - Swapper", function () {
 
     /* ========== ALLOWANCE CONDITION CHECK ========== */
 
-    it("fails if the user did not grant enough allowance to the executor contract", async () => {
-        const message = await initialize(baseMessage);
+    it("fails if the user did not grant enough allowance to the executor contract - REPAY", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.action = AdvancedMoneyMarketActionType.Repay;
+        message = await initialize(message);
 
         // revoke the allowance for the token to the executor contract
         await fooToken.approve(executor.address, ethers.utils.parseEther("0"));
@@ -529,10 +694,26 @@ describe("ScriptExecutor - Swapper", function () {
         );
     });
 
+    it("fails if the user did not grant enough allowance to the executor contract - BORROW", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.action = AdvancedMoneyMarketActionType.Borrow;
+        message = await initialize(message);
+
+        // revoke the allowance for the token to the executor contract
+        await fooDebtToken.approve(executor.address, ethers.utils.parseEther("0"));
+
+        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
+            "[ALLOWANCE][ACTION]"
+        );
+    });
+
     /* ========== REPETITIONS CONDITION CHECK ========== */
 
     it("fails if the script has been executed more than the allowed repetitions", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        message.action = AdvancedMoneyMarketActionType.Repay;
+        message.typeAmt = AmountType.Percentage;
+        message.amount = BigNumber.from(500); //5%
         message.repetitions.enabled = true;
         message.repetitions.amount = BigNumber.from(2);
         message = await initialize(message);
@@ -553,7 +734,7 @@ describe("ScriptExecutor - Swapper", function () {
     /* ========== FOLLOW CONDITION CHECK ========== */
 
     it("fails if the script should follow a script that has not run yet", async () => {
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         // enabling the follow condition. It now points to a script that never executed (as it does not exist),
         // so it should always fail.
         message.follow.enabled = true;
@@ -570,7 +751,7 @@ describe("ScriptExecutor - Swapper", function () {
         );
         const otherExecutor = await SwapperScriptExecutorContract.deploy();
 
-        let message: ISwapAction = JSON.parse(JSON.stringify(baseMessage));
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
         // setting the follow condition to use another executor, so to test the external calls.
         message.follow.enabled = true;
         message.follow.executor = otherExecutor.address;
@@ -578,6 +759,36 @@ describe("ScriptExecutor - Swapper", function () {
 
         await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
             "[FOLLOW_CONDITION][TMP]"
+        );
+    });
+
+    /* ========== HEALTH FACTOR CONDITION CHECK ========== */
+
+    it("fails if current health factor is lower than threshold when looking for GreaterThan", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        // enabling the health factor condition
+        // the mock MM pool always return current HF:2
+        message.healthFactor.enabled = true;
+        message.healthFactor.amount = ethers.utils.parseEther("2.1");
+        message.healthFactor.comparison = ComparisonType.GreaterThan;
+        message = await initialize(message);
+
+        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
+            "[HEALTH_FACTOR_LOW][TMP]"
+        );
+    });
+
+    it("fails if current health factor is higher than threshold when looking for LessThan", async () => {
+        let message: IMMAdvancedAction = JSON.parse(JSON.stringify(baseMessage));
+        // enabling the health factor condition
+        // the mock MM pool always return current HF:2
+        message.healthFactor.enabled = true;
+        message.healthFactor.amount = ethers.utils.parseEther("1.9");
+        message.healthFactor.comparison = ComparisonType.LessThan;
+        message = await initialize(message);
+
+        await expect(executor.verify(message, sigR, sigS, sigV)).to.be.revertedWith(
+            "[HEALTH_FACTOR_HIGH][TMP]"
         );
     });
 });

@@ -22,7 +22,7 @@ describe("DAEM Token", function () {
     DAEM = await DaemonsTokenContract.deploy();
 
     // Mock router contract
-    const MockRouterContract = await ethers.getContractFactory("MockRouter");
+    const MockRouterContract = await ethers.getContractFactory("MockUniswapV2Router");
     const mockRouter = await MockRouterContract.deploy();
 
     // instantiate treasury

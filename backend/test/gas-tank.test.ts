@@ -29,7 +29,7 @@ describe("GasTank", function () {
         gasTank = await GasTankContract.deploy();
 
         // Mock router contract
-        const MockRouterContract = await ethers.getContractFactory("MockRouter");
+        const MockRouterContract = await ethers.getContractFactory("MockUniswapV2Router");
         const mockRouter = await MockRouterContract.deploy();
 
         // Treasury contract
@@ -43,12 +43,12 @@ describe("GasTank", function () {
         // add some tokens to treasury and users
         fooToken.mint(treasury.address, ethers.utils.parseEther("100"));
         fooToken.mint(owner.address, ethers.utils.parseEther("100"));
-        fooToken.mint(user1.address, ethers.utils.parseEther("100"));
+        fooToken.mint(user1.address, ethers.utils.parseEther("110"));
 
         // create token LP
         const ethAmount = ethers.utils.parseEther("5");
-        await owner.sendTransaction({ to: treasury.address, value: ethAmount })
-        await treasury.createLP();
+        const daemAmount = ethers.utils.parseEther("10");
+        await treasury.createLP(daemAmount, {value: ethAmount});
 
         // have the users give the allowance to the gasTank
         fooToken.connect(owner).approve(gasTank.address, ethers.utils.parseEther("500"));

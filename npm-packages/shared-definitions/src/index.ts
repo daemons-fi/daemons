@@ -3,6 +3,8 @@ export * from './actions/mm-adv-action-messages';
 export * from './actions/mm-base-action-messages';
 export * from './actions/swap-action-messages';
 export * from './actions/transfer-action-messages';
+export * from './actions/zap-in-action-messages';
+export * from './actions/zap-out-action-messages';
 
 // conditions
 export * from './conditions/balance';

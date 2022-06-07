@@ -1,0 +1,71 @@
+.tip-jar__header {
+    margin-bottom: 30px;
+}
+
+.tip-jar__title {
+    display: grid;
+    grid-template-columns: 0.25fr 0.75fr;
+}
+
+.tip-jar__switch {
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+}
+
+.tip-jar__balance {
+    border-radius: 5px;
+    margin: 15px 0;
+    padding: 5px;
+    border: 1px solid #AAA;
+    background-color: #FFF;
+    cursor: not-allowed;
+}
+
+.tip-jar__form {
+    position: relative;
+}
+
+.tip-jar__input {
+    height: 30px;
+    box-sizing: border-box;
+    width: 100%;
+    border-radius: 5px;
+    border-color: #FFF;
+}
+
+.tip-jar__buttons-container {
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0;
+    column-gap: 15px;
+}
+
+.tip-jar__button {
+    width: 100%;
+    height: 30px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    color: white;
+    border: none;
+    background-color: var(--primary-colour);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.tip-jar__button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.tip-jar__max-balance-button {
+    position: absolute;
+    user-select: none;
+    top: 8px;
+    right: 10px;
+    font-size: 0.8rem;
+    color: #aaa;
+    cursor: pointer;
+    text-decoration: underline;
+}

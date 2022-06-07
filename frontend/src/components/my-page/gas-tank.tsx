@@ -11,9 +11,10 @@ import "../switch.css";
 
 export function GasTank(): JSX.Element {
     const dispatch = useDispatch();
-    const balance = useSelector((state: RootState) => state.gasTank.balance);
+    const gasTankBalance = useSelector((state: RootState) => state.gasTank.balance);
     const walletAddress = useSelector((state: RootState) => state.wallet.address);
     const chainId = useSelector((state: RootState) => state.wallet.chainId);
+    const ETHBalance = useSelector((state: RootState) => state.wallet.ETHBalance);
     const [toggleDeposit, setToggleDeposit] = useState<boolean>(true);
     const currencySymbol = GetCurrentChain(chainId!).coinSymbol;
 
@@ -30,12 +31,14 @@ export function GasTank(): JSX.Element {
     };
 
     const deposit = async () => {
-        const amount = parseFloat((document.getElementById("id-amount") as HTMLInputElement).value);
+        const amount = parseFloat(
+            (document.getElementById("id-gas-tank-amount") as HTMLInputElement).value
+        );
 
         const ethers = require("ethers");
         const gasTank = await getGasTankContract();
 
-        const tx = await gasTank.deposit({ value: ethers.utils.parseEther(amount.toString()) });
+        const tx = await gasTank.depositGas({ value: ethers.utils.parseEther(amount.toString()) });
 
         const toastedTransaction = promiseToast(
             tx.wait,
@@ -49,12 +52,14 @@ export function GasTank(): JSX.Element {
     };
 
     const withdraw = async () => {
-        const amount = parseFloat((document.getElementById("id-amount") as HTMLInputElement).value);
+        const amount = parseFloat(
+            (document.getElementById("id-gas-tank-amount") as HTMLInputElement).value
+        );
 
         const ethers = require("ethers");
         const gasTank = await getGasTankContract();
 
-        const tx = await gasTank.withdraw(ethers.utils.parseEther(amount.toString()));
+        const tx = await gasTank.withdrawGas(ethers.utils.parseEther(amount.toString()));
 
         const toastedTransaction = promiseToast(
             tx.wait,
@@ -70,7 +75,7 @@ export function GasTank(): JSX.Element {
     const withdrawAll = async () => {
         const gasTank = await getGasTankContract();
 
-        const tx = await gasTank.withdrawAll();
+        const tx = await gasTank.withdrawAllGas();
 
         const toastedTransaction = promiseToast(
             tx.wait,
@@ -84,7 +89,9 @@ export function GasTank(): JSX.Element {
     };
 
     const buttonDisabled = () => {
-        const amountInput = document.getElementById("id-amount") as HTMLInputElement | undefined;
+        const amountInput = document.getElementById("id-gas-tank-amount") as
+            | HTMLInputElement
+            | undefined;
         return (
             !amountInput ||
             !amountInput.value ||
@@ -100,21 +107,38 @@ export function GasTank(): JSX.Element {
     const renderDepositForm: () => ReactNode = () => {
         return (
             <Form
-                className="gas-tank__form"
                 onSubmit={deposit}
-                render={({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit}>
+                mutators={{
+                    setMaxEthAmount: (args, state, utils) => {
+                        utils.changeValue(state, "amount", () => ETHBalance.toString());
+                        // manually enable submit button
+                        (
+                            document.getElementById("id-gas-tank-submit-button") as HTMLInputElement
+                        ).disabled = ETHBalance === 0;
+                    }
+                }}
+                render={({ form, handleSubmit }) => (
+                    <form className="gas-tank__form" onSubmit={handleSubmit}>
                         <Field
                             className="gas-tank__input"
-                            id="id-amount"
+                            id="id-gas-tank-amount"
                             name="amount"
+                            autoComplete="off"
                             component="input"
                             type="number"
                             placeholder="0.0"
+                            value={""}
                         />
+                        <div
+                            className="tip-jar__max-balance-button"
+                            onClick={form.mutators.setMaxEthAmount}
+                        >
+                            Max: {ETHBalance}
+                        </div>
                         <div className="gas-tank__buttons-container">
                             <input
                                 disabled={buttonDisabled()}
+                                id="id-gas-tank-submit-button"
                                 className="gas-tank__button"
                                 type="submit"
                                 value="Deposit"
@@ -129,23 +153,41 @@ export function GasTank(): JSX.Element {
     const renderWithdrawForm: () => ReactNode = () => {
         return (
             <Form
-                className="gas-tank__form"
                 onSubmit={() => {
                     /* Handled in the buttons */
                 }}
-                render={({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit}>
+                mutators={{
+                    setMaxEthAmount: (args, state, utils) => {
+                        if (gasTankBalance === undefined) return;
+                        utils.changeValue(state, "amount", () => gasTankBalance.toString());
+                        // manually enable submit button
+                        (
+                            document.getElementById("id-gas-tank-submit-button") as HTMLInputElement
+                        ).disabled = gasTankBalance === 0;
+                    }
+                }}
+                render={({ form, handleSubmit }) => (
+                    <form className="gas-tank__form" onSubmit={handleSubmit}>
                         <Field
                             className="gas-tank__input"
-                            id="id-amount"
+                            id="id-gas-tank-amount"
                             name="amount"
+                            autoComplete="off"
                             component="input"
                             type="number"
                             placeholder="0.0"
+                            value={""}
                         />
+                        <div
+                            className="tip-jar__max-balance-button"
+                            onClick={form.mutators.setMaxEthAmount}
+                        >
+                            Max: {gasTankBalance}
+                        </div>
                         <div className="gas-tank__buttons-container">
                             <input
                                 className="gas-tank__button"
+                                id="id-gas-tank-submit-button"
                                 type="submit"
                                 disabled={buttonDisabled()}
                                 onClick={withdraw}
@@ -186,10 +228,10 @@ export function GasTank(): JSX.Element {
 
             <div>
                 <div className="gas-tank__balance">
-                    {balance !== undefined ? balance : "??"} {currencySymbol}
+                    {gasTankBalance !== undefined ? gasTankBalance : "??"} {currencySymbol}
                 </div>
                 <div className="gas-tank__forms-container">
-                    {balance === undefined || walletAddress === undefined ? (
+                    {gasTankBalance === undefined || walletAddress === undefined ? (
                         renderLoadingMessage()
                     ) : (
                         <div>{toggleDeposit ? renderDepositForm() : renderWithdrawForm()}</div>

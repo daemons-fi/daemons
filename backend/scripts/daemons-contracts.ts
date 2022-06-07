@@ -16,7 +16,9 @@ export const contracts: { [chainId: number]: DaemonsContracts } = {
         SwapperScriptExecutor: "0x84e396e9E60A68e90F6D57CC38CB7A56019Ca2e8",
         TransferScriptExecutor: "0xEcA0c2CFF4D7a85974Da1f288A6cef588498D41A",
         MmBaseScriptExecutor: "0x6E8a070c7F8598d155EE3a5da13E5B3CeFd9aE15",
-        MmAdvancedScriptExecutor: "0x2fa5FB3e37C2802ef67823e38C09b1Dfe83A2d68"
+        MmAdvancedScriptExecutor: "0x2fa5FB3e37C2802ef67823e38C09b1Dfe83A2d68",
+        ZapInScriptExecutor: "0xF767b1A5623F001aBe843b0B958d1a4e62100C6D",
+        ZapOutScriptExecutor: "0x422C9642a1f47C016f1E0153dBE83e6B9498EF16"
     },
     // Fantom Testnet
     4002: {
@@ -31,7 +33,9 @@ export const contracts: { [chainId: number]: DaemonsContracts } = {
         SwapperScriptExecutor: "0x0A24c2e6B7939e6C46844609Db88E512CB6a4122",
         TransferScriptExecutor: "0xfD55cbA6E67D374fd1939159153bc1B50e18CCE5",
         MmBaseScriptExecutor: "0xF4210c6bff554B8Ca9eF2c5cbFe33B0d3dfA9Fe7",
-        MmAdvancedScriptExecutor: "0x63486B2296Afb4a9C588B10aA7B210d97aD4F024"
+        MmAdvancedScriptExecutor: "0x63486B2296Afb4a9C588B10aA7B210d97aD4F024",
+        ZapInScriptExecutor: "0xa94413716dCec6A7343E495d963e1bdc7c52945f",
+        ZapOutScriptExecutor: "0x9f82626CaD80b6C87ee681c21F1E46AFD5cE2222"
     }
 };
 

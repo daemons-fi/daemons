@@ -43,6 +43,15 @@
     user-select: none;
 }
 
+.script__execution-costs {
+    margin-top: 10px;
+}
+
+.script__execution-costs-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
 .script__actions {
     margin-top: 15px;
     display: grid;

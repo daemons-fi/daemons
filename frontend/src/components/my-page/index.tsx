@@ -8,6 +8,7 @@ import { GasTank } from './gas-tank';
 import './styles.css';
 import '../shared.css';
 import { History } from './history';
+import { TipJar } from "./tip-jar";
 
 
 export function MyPage(): JSX.Element {
@@ -27,6 +28,7 @@ export function MyPage(): JSX.Element {
                 </div>
                 <div className='my-page__right-panel'>
                     <GasTank />
+                    <TipJar />
                     <History />
                 </div>
             </div>

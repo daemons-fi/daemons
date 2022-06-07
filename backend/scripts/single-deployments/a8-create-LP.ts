@@ -1,15 +1,15 @@
-import { ethers } from "hardhat";
+import { BigNumber } from "ethers";
 import { DaemonsContracts, getContract } from "../daemons-contracts";
 
-export const createLP = async (contracts: DaemonsContracts): Promise<void> => {
-    const provider = ethers.provider;
+export const createLP = async (
+    contracts: DaemonsContracts,
+    amountETH: BigNumber,
+    amountDAEM: BigNumber
+): Promise<void> => {
     const treasury = await getContract(contracts, "Treasury");
 
-    const balance = await provider.getBalance(treasury.address);
-    console.log(`Treasury balance ${balance.toString()}`);
-
     console.log("Creating LP");
-    let tx = await treasury.createLP();
+    let tx = await treasury.createLP(amountDAEM, { value: amountETH });
     await tx.wait();
     console.log(`LP created`);
 

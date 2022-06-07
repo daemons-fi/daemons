@@ -1,6 +1,6 @@
 {
   "name": "@daemons-fi/abis",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "ABIs of the Daemons contracts",
   "main": "./build/index.js",
   "types": "./build/index.d.js",

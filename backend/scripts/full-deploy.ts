@@ -22,9 +22,14 @@ import { deployMmBaseExecutor } from "./single-deployments/d1-mmbase-executor";
 import { registerMmAdvancedExecutor } from "./single-deployments/e3-register-mmadvanced-in-gas-tank";
 import { initializeMmAdvancedExecutor } from "./single-deployments/e2-initialize-mmadvanced-executor";
 import { deployMmAdvancedExecutor } from "./single-deployments/e1-mmadvanced-executor";
-import { vestTokens } from "./single-deployments/a10-vesting";
-import { createLP } from "./single-deployments/a9-create-LP";
-import { sendEthToTreasury } from "./single-deployments/a8-send-eth-to-treasury";
+import { vestTokens } from "./single-deployments/a9-vesting";
+import { createLP } from "./single-deployments/a8-create-LP";
+import { deployZapOutExecutor } from "./single-deployments/g1-zapout-executor";
+import { initializeZapOutExecutor } from "./single-deployments/g2-initialize-zapout-executor";
+import { registerZapOutExecutor } from "./single-deployments/g3-register-zapout-in-gas-tank";
+import { registerZapInExecutor } from "./single-deployments/f3-register-zapin-in-gas-tank";
+import { initializeZapInExecutor } from "./single-deployments/f2-initialize-zapin-executor";
+import { deployZapInExecutor } from "./single-deployments/f1-zapin-executor";
 
 async function deployDaemons() {
     // display deployer address and its balance
@@ -52,9 +57,9 @@ async function deployDaemons() {
     currentContracts = await deployGasPriceFeed(currentContracts);
     await finalizeGasTank(currentContracts);
     await initializeToken(currentContracts);
-    const amount = ethers.utils.parseEther("0.5");
-    await sendEthToTreasury(currentContracts, owner, amount);
-    await createLP(currentContracts);
+    const amountETH = ethers.utils.parseEther("1");
+    const amountDAEM = ethers.utils.parseEther("1500");
+    await createLP(currentContracts, amountETH, amountDAEM);
     await vestTokens(currentContracts, owner);
 
     // deploy swapper executor
@@ -76,6 +81,16 @@ async function deployDaemons() {
     currentContracts = await deployMmAdvancedExecutor(currentContracts);
     await initializeMmAdvancedExecutor(currentContracts);
     await registerMmAdvancedExecutor(currentContracts);
+
+    // deploy ZapIn executor
+    currentContracts = await deployZapInExecutor(currentContracts);
+    await initializeZapInExecutor(currentContracts);
+    await registerZapInExecutor(currentContracts);
+
+    // deploy ZapOut executor
+    currentContracts = await deployZapOutExecutor(currentContracts);
+    await initializeZapOutExecutor(currentContracts);
+    await registerZapOutExecutor(currentContracts);
 }
 
 deployDaemons().catch((error) => {

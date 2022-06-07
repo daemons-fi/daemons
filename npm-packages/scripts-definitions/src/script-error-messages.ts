@@ -22,6 +22,16 @@ export const possibleVerificationErrors: { [code: string]: IVerificationResultDe
     description:
       "The script has reached the max number of repetitions and cannot be executed anymore.",
   },
+  "[ZERO_AMOUNT][FINAL]": {
+    name: "Both token amounts are 0",
+    description:
+      "The script has both amounts set to 0, even though either of them should be set.",
+  },
+  "[UNSUPPORTED_PAIR][FINAL]": {
+    name: "LP not supported by the router",
+    description:
+      "The script has a pair of tokens for which a pair (LP) cannot be found.",
+  },
   "[FOLLOW_CONDITION][TMP]": {
     name: "Waiting for other script",
     description:
