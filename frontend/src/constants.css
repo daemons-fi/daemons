@@ -1,8 +1,8 @@
 :root {
-    --body-background: #efefef;
-    --secondary-background: #f4f4f4;
-    --primary-colour: #206f63;
-
+    --body-background: #191919;
+    --secondary-background: #292929;
+    --primary-colour: #136f63;
+    --white: #ffffff;
     /* Toasts */
     --toastify-color-success: #1B9D51;
     --toastify-color-warning: #FFBA08;
