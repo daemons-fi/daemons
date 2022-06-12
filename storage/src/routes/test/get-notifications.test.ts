@@ -38,7 +38,6 @@ describe('GET api/notifications', () => {
             .set('Cookie', `token=${jwToken}`);
 
         const fetchedNotifications = response.body;
-        console.log(fetchedNotifications)
 
         expect(fetchedNotifications.length).to.equal(1);
         expect(fetchedNotifications[0].user).to.equal(notification.user);
