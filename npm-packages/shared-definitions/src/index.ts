@@ -5,6 +5,7 @@ export * from './actions/swap-action-messages';
 export * from './actions/transfer-action-messages';
 export * from './actions/zap-in-action-messages';
 export * from './actions/zap-out-action-messages';
+export * from './actions/beefy-action-messages';
 
 // conditions
 export * from './conditions/balance';
