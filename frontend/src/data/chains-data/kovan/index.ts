@@ -1,6 +1,6 @@
 import { kovanContracts } from "@daemons-fi/addresses/build";
 import { IChainInfo } from '../interfaces';
-import { AaveMMAdvancedAction, AaveMMBaseAction, SwapAction, TransferAction } from './action-forms';
+import { AaveMMAdvancedAction, AaveMMBaseAction, SwapAction, TransferAction, ZapInAction, ZapOutAction } from './action-forms';
 import { kovanTokens } from './tokens';
 
 
@@ -17,5 +17,5 @@ export const kovanInfo: IChainInfo = {
     explorerTxUrl: 'https://kovan.etherscan.io/tx/',
     tokens: kovanTokens,
     contracts: kovanContracts,
-    actions: [TransferAction, SwapAction, AaveMMBaseAction, AaveMMAdvancedAction],
+    actions: [TransferAction, SwapAction, AaveMMBaseAction, AaveMMAdvancedAction, ZapInAction, ZapOutAction],
 };

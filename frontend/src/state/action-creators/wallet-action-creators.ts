@@ -1,9 +1,10 @@
 import { BigNumber, Contract, ethers } from "ethers";
-import { Dispatch } from 'redux';import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
- import { StorageProxy } from '../../data/storage-proxy';
- import { ERC20Abi } from "@daemons-fi/abis";
-import { ActionType } from '../action-types';
-import { WalletAction } from '../actions/wallet-actions';
+import { Dispatch } from "redux";
+import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
+import { StorageProxy } from "../../data/storage-proxy";
+import { ERC20Abi } from "@daemons-fi/abis";
+import { ActionType } from "../action-types";
+import { WalletAction } from "../actions/wallet-actions";
 import { bigNumberToFloat } from "../../utils/big-number-to-float";
 
 const getDAEMContract = async (chainId: string): Promise<Contract> => {
@@ -19,43 +20,62 @@ export const updateWalletAddress = (
     connected: boolean,
     supportedChain: boolean,
     address?: string,
-    chainId?: string) => {
-
+    chainId?: string
+) => {
     return (dispatch: Dispatch<WalletAction>) => {
         dispatch({
             type: ActionType.WALLET_UPDATE,
             connected,
             address,
             chainId,
-            supportedChain,
+            supportedChain
         });
     };
 };
 
 export const authenticationCheck = (address?: string) => {
-
     return async (dispatch: Dispatch<WalletAction>) => {
+        if (!address) {
+            dispatch({
+                type: ActionType.AUTH_CHECK,
+                authenticated: false,
+                banned: false
+            });
+            return;
+        }
+
+        const user = await StorageProxy.auth.checkAuthentication(address);
+        if (!user) {
+            // not authenticated
+            dispatch({
+                type: ActionType.AUTH_CHECK,
+                authenticated: false,
+                banned: false
+            });
+            return;
+        }
+
+        // authenticated
         dispatch({
             type: ActionType.AUTH_CHECK,
-            // if no address is provided, we don't even bother asking the server
-            authenticated: !!address && await StorageProxy.auth.checkAuthentication(address),
+            authenticated: true,
+            banned: user.banned
         });
     };
 };
 
 export const fetchDaemBalance = (address?: string, chainId?: string) => {
-
     return async (dispatch: Dispatch<WalletAction>) => {
         if (!address || !chainId) {
-            console.log('Address or ChainId missing, DAEM balance check aborted');
+            console.log("Address or ChainId missing, DAEM balance check aborted");
             dispatch({
                 type: ActionType.FETCH_DAEM_BALANCE,
-                balance: 0,
+                balance: 0
             });
             return;
         }
 
-        console.log('Checking DAEM balance for', address);
+        console.log("Checking DAEM balance for", address);
 
         const DAEM = await getDAEMContract(chainId);
         const rawBalance: BigNumber = await DAEM.balanceOf(address);
@@ -63,24 +83,23 @@ export const fetchDaemBalance = (address?: string, chainId?: string) => {
 
         dispatch({
             type: ActionType.FETCH_DAEM_BALANCE,
-            balance,
+            balance
         });
     };
-}
+};
 
 export const fetchEthBalance = (address?: string, chainId?: string) => {
-
     return async (dispatch: Dispatch<WalletAction>) => {
         if (!address || !chainId) {
-            console.log('Address or ChainId missing, ETH balance check aborted');
+            console.log("Address or ChainId missing, ETH balance check aborted");
             dispatch({
                 type: ActionType.FETCH_ETH_BALANCE,
-                balance: 0,
+                balance: 0
             });
             return;
         }
 
-        console.log('Checking ETH balance for', address);
+        console.log("Checking ETH balance for", address);
 
         const provider = new ethers.providers.Web3Provider((window as any).ethereum);
         const rawBalance: BigNumber = await provider.getBalance(address);
@@ -88,7 +107,7 @@ export const fetchEthBalance = (address?: string, chainId?: string) => {
 
         dispatch({
             type: ActionType.FETCH_ETH_BALANCE,
-            balance,
+            balance
         });
     };
-}
+};

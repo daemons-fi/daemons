@@ -58,7 +58,7 @@ contract GasTank is IGasTank, Ownable {
         uint256 dueFromGas = rewardFromGas[user];
         uint256 dueFromTips = rewardFromTips[user];
 
-        uint256 gasConvertedToDAEM = treasury.ethToDAEM(dueFromGas);
+        uint256 gasConvertedToDAEM = dueFromGas > 0 ? treasury.ethToDAEM(dueFromGas) : 0;
         uint256 tipsMinusTaxes = (dueFromTips * treasury.TIPS_AFTER_TAXES_PERCENTAGE()) / 10000;
 
         return gasConvertedToDAEM + tipsMinusTaxes;

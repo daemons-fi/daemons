@@ -20,6 +20,7 @@ export function ScriptDesignerPage(): JSX.Element {
     // redux
     const dispatch = useDispatch();
     const chainId: string | undefined = useSelector((state: RootState) => state.wallet.chainId);
+    const banned: boolean = useSelector((state: RootState) => state.wallet.banned);
     const authenticated: boolean = useSelector((state: RootState) => state.wallet.authenticated);
     const supportedChain: boolean = useSelector((state: RootState) => state.wallet.supportedChain);
     const workbenchScripts = useSelector((state: RootState) => state.workbench.scripts);
@@ -118,7 +119,7 @@ export function ScriptDesignerPage(): JSX.Element {
         dispatch(addScriptToWorkbench(script));
     };
 
-    if (!authenticated || !supportedChain) return <Navigate to="/my-page" />;
+    if (!authenticated || !supportedChain || banned) return <Navigate to="/my-page" />;
     if (redirectToReview) return <Navigate to="/review" />;
 
     return (

@@ -220,7 +220,7 @@ contract Treasury is ITreasury, Ownable {
 
     function addLiquidity(uint256 amountETH, uint256 amountDAEM) private {
         if (token.allowance(address(this), lpRouter) < 0xffffffffffffffffffff)
-            token.approve(lpRouter, 0xffffffffffffffffffffffffffffff);
+            token.approve(lpRouter, type(uint256).max);
 
         IUniswapV2Router01(lpRouter).addLiquidityETH{value: amountETH}(
             address(token),

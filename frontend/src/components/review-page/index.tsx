@@ -23,6 +23,7 @@ export function ReviewPage(): JSX.Element {
     // redux
     const dispatch = useDispatch();
     const chainId: string | undefined = useSelector((state: RootState) => state.wallet.chainId);
+    const banned: boolean = useSelector((state: RootState) => state.wallet.banned);
     const authenticated: boolean = useSelector((state: RootState) => state.wallet.authenticated);
     const supportedChain: boolean = useSelector((state: RootState) => state.wallet.supportedChain);
     const workbenchScripts = useSelector((state: RootState) => state.workbench.scripts);
@@ -133,7 +134,7 @@ export function ReviewPage(): JSX.Element {
         }
     };
 
-    const shouldRedirect = redirect || !authenticated || !supportedChain;
+    const shouldRedirect = redirect || !authenticated || !supportedChain || banned;
     if (shouldRedirect) return <Navigate to="/my-page" />;
 
     return (

@@ -4,6 +4,8 @@ import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { AmountType, ComparisonType } from "@daemons-fi/shared-definitions";
 import { swapDomain, ISwapAction, swapTypes } from "@daemons-fi/shared-definitions";
+import hre from "hardhat";
+const chainId = hre.network.config.chainId;
 
 describe("ScriptExecutor - Swapper", function () {
     let owner: SignerWithAddress;
@@ -32,7 +34,7 @@ describe("ScriptExecutor - Swapper", function () {
         user: "",
         kontract: "",
         executor: "",
-        chainId: BigNumber.from(42),
+        chainId: BigNumber.from(chainId),
         tip: BigNumber.from(0),
         balance: {
             enabled: false,
@@ -125,7 +127,7 @@ describe("ScriptExecutor - Swapper", function () {
         // create token LP
         const ethAmount = ethers.utils.parseEther("5");
         const daemAmount = ethers.utils.parseEther("10");
-        await treasury.createLP(daemAmount, {value: ethAmount});
+        await treasury.createLP(daemAmount, { value: ethAmount });
 
         // set treasury address in gas tank
         await gasTank.setTreasury(treasury.address);

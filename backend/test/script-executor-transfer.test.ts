@@ -4,6 +4,8 @@ import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { AmountType, ComparisonType } from "@daemons-fi/shared-definitions";
 import { transferDomain, ITransferAction, transferTypes } from "@daemons-fi/shared-definitions";
+import hre from "hardhat";
+const chainId = hre.network.config.chainId;
 
 describe("ScriptExecutor - Transfer", function () {
     let owner: SignerWithAddress;
@@ -29,7 +31,7 @@ describe("ScriptExecutor - Transfer", function () {
         amount: ethers.utils.parseEther("145"),
         user: "",
         executor: "",
-        chainId: BigNumber.from(42),
+        chainId: BigNumber.from(chainId),
         tip: BigNumber.from(0),
         balance: {
             enabled: false,

@@ -3,13 +3,16 @@ import {
     AmountType,
     BaseMoneyMarketActionType,
     ComparisonType,
-    InterestRateMode
+    InterestRateMode,
+    ZapOutputChoice
 } from "@daemons-fi/shared-definitions/build";
 import {
     IAdvancedMMActionForm,
     IBaseMMActionForm,
     ISwapActionForm,
     ITransferActionForm,
+    IZapInActionForm,
+    IZapOutActionForm,
     ScriptAction
 } from "../data/chains-data/action-form-interfaces";
 import {
@@ -51,6 +54,10 @@ export class ScriptDescriptionFactory {
                 return this.mmBaseAction(action.form as IBaseMMActionForm);
             case ScriptAction.MM_ADV:
                 return this.mmAdvancedAction(action.form as IAdvancedMMActionForm);
+            case ScriptAction.ZAP_IN:
+                return this.zapInAction(action.form as IZapInActionForm);
+            case ScriptAction.ZAP_OUT:
+                return this.zapOutAction(action.form as IZapOutActionForm);
             default:
                 console.error(`Unknown action ${action.form.type}.`);
                 return `#!@!# Unknown action ${action.form.type}. Please add to factory #!@!#`;
@@ -118,6 +125,57 @@ export class ScriptDescriptionFactory {
 
         // ? `Deposit ${form.floatAmount} ${token.symbol} into ${form.moneyMarket.name}`
         // : `Withdraw ${form.floatAmount} ${token.symbol} from ${form.moneyMarket.name}`;
+    }
+
+    private zapInAction(form: IZapInActionForm): string {
+        const amountA =
+            form.amountTypeA === AmountType.Absolute
+                ? form.floatAmountA.toString()
+                : `${form.floatAmountA / 100}% of the available`;
+        const amountB =
+            form.amountTypeB === AmountType.Absolute
+                ? form.floatAmountB.toString()
+                : `${form.floatAmountB / 100}% of the available`;
+
+        const tokenA = this.tokensDict[form.tokenA];
+        const tokenB = this.tokensDict[form.tokenB];
+        const lp = `${tokenA.symbol}-${tokenB.symbol}-LP`;
+
+        // if one of the two sides is 0, don't mention it in the description
+        const zapped = [];
+        if (form.floatAmountA > 0) zapped.push(`${amountA} ${tokenA.symbol}`);
+        if (form.floatAmountB > 0) zapped.push(`${amountB} ${tokenB.symbol}`);
+        const inputs = zapped.join(' + ');
+
+        return `Zap ${inputs} into ${lp}`;
+    }
+
+    private zapOutAction(form: IZapOutActionForm): string {
+        const amount =
+            form.amountType === AmountType.Absolute
+                ? form.floatAmount.toString()
+                : `${form.floatAmount / 100}% of the available`;
+
+        const tokenA = this.tokensDict[form.tokenA];
+        const tokenB = this.tokensDict[form.tokenB];
+
+        let outcome = "";
+        switch (form.outputChoice) {
+            case ZapOutputChoice.bothTokens:
+                outcome = `${tokenA.symbol}+${tokenB.symbol}`;
+                break;
+            case ZapOutputChoice.tokenA:
+                outcome = tokenA.symbol;
+                break;
+            case ZapOutputChoice.tokenB:
+                outcome = tokenB.symbol;
+                break;
+            default:
+                throw new Error(`Unsupported ZapOutputChoice "${form.outputChoice}"`);
+        }
+        const lp = `${tokenA.symbol}-${tokenB.symbol}-LP`;
+
+        return `Zap ${amount} ${lp} into ${outcome}`;
     }
 
     private extractConditionDescription(condition: ICondition): string {

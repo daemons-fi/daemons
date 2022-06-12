@@ -130,6 +130,12 @@
     text-align: center;
 }
 
+/* ZapOut Block */
+
+.zap-out-block__outcome-radio {
+    display: grid;
+    grid-template-columns: 22px auto;
+}
 
 /* Shared */
 

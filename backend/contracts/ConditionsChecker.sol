@@ -135,17 +135,17 @@ abstract contract ConditionsChecker is Ownable {
     /* ========== VERIFICATION FUNCTIONS ========== */
 
     /** Checks whether the user has revoked the script execution */
-    function verifyRevocation(address user, bytes32 id) public view {
+    function verifyRevocation(address user, bytes32 id) internal view {
         require(!revocations[user][id], "[REVOKED][FINAL]");
     }
 
     /** Checks whether the user has enough funds in the GasTank to cover a script execution */
-    function verifyGasTank(address user) public view {
+    function verifyGasTank(address user) internal view {
         require(gasTank.gasBalanceOf(user) >= MINIMUM_GAS_FOR_SCRIPT_EXECUTION, "[GAS][TMP]");
     }
 
     /** Checks whether the user has enough funds to pay the tip to the executor */
-    function verifyTip(uint256 tip, address user) public view {
+    function verifyTip(uint256 tip, address user) internal view {
         require(tip == 0 || gasTank.tipBalanceOf(user) >= tip, "[TIP][TMP]");
     }
 

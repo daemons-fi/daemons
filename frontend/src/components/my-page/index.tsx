@@ -9,12 +9,15 @@ import './styles.css';
 import '../shared.css';
 import { History } from './history';
 import { TipJar } from "./tip-jar";
+import { BannedPage } from "../error-pages/banned-page";
 
 
 export function MyPage(): JSX.Element {
     const authenticated: boolean = useSelector((state: RootState) => state.wallet.authenticated);
+    const banned: boolean = useSelector((state: RootState) => state.wallet.banned);
     const supportedChain: boolean = useSelector((state: RootState) => state.wallet.supportedChain);
 
+    if (banned) return <BannedPage />;
     if (!authenticated) return <DisconnectedPage />;
     if (!supportedChain) return <UnsupportedChainPage />;
 

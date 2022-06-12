@@ -1,8 +1,28 @@
-import { AdvancedMoneyMarketActionType, AmountType, BaseMoneyMarketActionType, InterestRateMode } from '@daemons-fi/shared-definitions/build';
-import { IAdvancedMMActionForm, IBaseMMActionForm, ISwapActionForm, ITransferActionForm, ScriptAction } from '../action-form-interfaces';
-import { IAction } from '../interfaces';
-import { AaveHealthFactorCondition, BalanceCondition, FrequencyCondition, PriceCondition, RepetitionsCondition } from './condition-forms';
-import { fantomTestnetAaveMM, fantomTestnetSpookyDEX } from './tokens';
+import {
+    AdvancedMoneyMarketActionType,
+    AmountType,
+    BaseMoneyMarketActionType,
+    InterestRateMode,
+    ZapOutputChoice
+} from "@daemons-fi/shared-definitions/build";
+import {
+    IAdvancedMMActionForm,
+    IBaseMMActionForm,
+    ISwapActionForm,
+    ITransferActionForm,
+    IZapInActionForm,
+    IZapOutActionForm,
+    ScriptAction
+} from "../action-form-interfaces";
+import { IAction } from "../interfaces";
+import {
+    AaveHealthFactorCondition,
+    BalanceCondition,
+    FrequencyCondition,
+    PriceCondition,
+    RepetitionsCondition
+} from "./condition-forms";
+import { fantomTestnetAaveMM, fantomTestnetSpookyDEX } from "./tokens";
 
 export const TransferAction: IAction = {
     title: "Transfer",
@@ -11,19 +31,14 @@ export const TransferAction: IAction = {
     form: {
         type: ScriptAction.TRANSFER,
         valid: false,
-        tokenAddress: '',
-        destinationAddress: '',
+        tokenAddress: "",
+        destinationAddress: "",
         amountType: AmountType.Absolute,
         floatAmount: 0,
-        floatTip: 0,
+        floatTip: 0
     } as ITransferActionForm,
 
-    conditions: [
-        FrequencyCondition,
-        BalanceCondition,
-        PriceCondition,
-        RepetitionsCondition,
-    ]
+    conditions: [FrequencyCondition, BalanceCondition, PriceCondition, RepetitionsCondition]
 };
 
 export const SwapAction: IAction = {
@@ -33,20 +48,15 @@ export const SwapAction: IAction = {
     form: {
         type: ScriptAction.SWAP,
         valid: false,
-        tokenFromAddress: '',
-        tokenToAddress: '',
+        tokenFromAddress: "",
+        tokenToAddress: "",
         amountType: AmountType.Absolute,
         floatAmount: 0,
         floatTip: 0,
-        dex: fantomTestnetSpookyDEX,
+        dex: fantomTestnetSpookyDEX
     } as ISwapActionForm,
 
-    conditions: [
-        FrequencyCondition,
-        BalanceCondition,
-        PriceCondition,
-        RepetitionsCondition,
-    ]
+    conditions: [FrequencyCondition, BalanceCondition, PriceCondition, RepetitionsCondition]
 };
 
 export const AaveMMBaseAction: IAction = {
@@ -56,20 +66,20 @@ export const AaveMMBaseAction: IAction = {
     form: {
         type: ScriptAction.MM_BASE,
         valid: false,
-        tokenAddress: '',
+        tokenAddress: "",
         amountType: AmountType.Absolute,
         floatAmount: 0,
         floatTip: 0,
         actionType: BaseMoneyMarketActionType.Deposit,
-        moneyMarket: fantomTestnetAaveMM,
-    }as IBaseMMActionForm,
+        moneyMarket: fantomTestnetAaveMM
+    } as IBaseMMActionForm,
 
     conditions: [
         FrequencyCondition,
         BalanceCondition,
         PriceCondition,
         RepetitionsCondition,
-        AaveHealthFactorCondition,
+        AaveHealthFactorCondition
     ]
 };
 
@@ -80,20 +90,59 @@ export const AaveMMAdvancedAction: IAction = {
     form: {
         type: ScriptAction.MM_ADV,
         valid: false,
-        tokenAddress: '',
+        tokenAddress: "",
         interestType: InterestRateMode.Variable,
         amountType: AmountType.Absolute,
         floatAmount: 0,
         floatTip: 0,
         actionType: AdvancedMoneyMarketActionType.Borrow,
-        moneyMarket: fantomTestnetAaveMM,
-    }as IAdvancedMMActionForm,
+        moneyMarket: fantomTestnetAaveMM
+    } as IAdvancedMMActionForm,
 
     conditions: [
         FrequencyCondition,
         BalanceCondition,
         PriceCondition,
         RepetitionsCondition,
-        AaveHealthFactorCondition,
+        AaveHealthFactorCondition
     ]
+};
+
+export const ZapInAction: IAction = {
+    title: "Zap In",
+    info: "Creates an LP",
+
+    form: {
+        type: ScriptAction.ZAP_IN,
+        valid: false,
+        tokenA: "",
+        tokenB: "",
+        amountTypeA: AmountType.Absolute,
+        amountTypeB: AmountType.Absolute,
+        floatAmountA: 0,
+        floatAmountB: 0,
+        floatTip: 0,
+        dex: fantomTestnetSpookyDEX
+    } as IZapInActionForm,
+
+    conditions: [FrequencyCondition, BalanceCondition, PriceCondition, RepetitionsCondition]
+};
+
+export const ZapOutAction: IAction = {
+    title: "Zap Out",
+    info: "Breaks an LP into it's basic components",
+
+    form: {
+        type: ScriptAction.ZAP_OUT,
+        valid: true,
+        tokenA: "",
+        tokenB: "",
+        amountType: AmountType.Percentage,
+        floatAmount: 50,
+        floatTip: 0,
+        outputChoice: ZapOutputChoice.bothTokens,
+        dex: fantomTestnetSpookyDEX
+    } as IZapOutActionForm,
+
+    conditions: [FrequencyCondition, BalanceCondition, PriceCondition, RepetitionsCondition]
 };

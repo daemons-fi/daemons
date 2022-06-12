@@ -6,6 +6,7 @@ export type WalletState = {
     address?: string;
     chainId?: string;
     authenticated: boolean;
+    banned: boolean;
     supportedChain: boolean;
     DAEMBalance: number;
     ETHBalance: number;
@@ -14,6 +15,7 @@ export type WalletState = {
 const initialState: WalletState = {
     connected: false,
     authenticated: false,
+    banned: false,
     supportedChain: false,
     DAEMBalance: 0,
     ETHBalance: 0
@@ -35,7 +37,8 @@ export const walletReducer = (
         case ActionType.AUTH_CHECK:
             return {
                 ...state,
-                authenticated: action.authenticated
+                authenticated: action.authenticated,
+                banned: action.banned
             };
         case ActionType.FETCH_DAEM_BALANCE:
             return {

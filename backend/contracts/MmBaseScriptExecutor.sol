@@ -113,10 +113,7 @@ contract MmBaseScriptExecutor is ConditionsChecker, ConditionsCheckerForMoneyMar
     }
 
     function giveAllowance(IERC20 _token, address _exchange) private {
-        IERC20(_token).approve(
-            _exchange,
-            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        );
+        IERC20(_token).approve(_exchange, type(uint256).max);
         allowances[_exchange][_token] = true;
     }
 

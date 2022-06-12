@@ -1,4 +1,4 @@
-import { AdvancedMoneyMarketActionType, AmountType, InterestRateMode } from '@daemons-fi/shared-definitions';
+import { AdvancedMoneyMarketActionType, AmountType, InterestRateMode, ZapOutputChoice } from '@daemons-fi/shared-definitions';
 import { BaseMoneyMarketActionType } from '@daemons-fi/shared-definitions';
 import { DEX, MoneyMarket } from './interfaces';
 
@@ -9,6 +9,8 @@ export enum ScriptAction {
     TRANSFER = "TRANSFER",
     MM_BASE = "MM_BASE",
     MM_ADV = "MM_ADV",
+    ZAP_IN = "ZAP_IN",
+    ZAP_OUT = "ZAP_OUT",
     // DAO = "DAO",
     // FARM = "FARM",
 }
@@ -56,6 +58,29 @@ export interface IAdvancedMMActionForm extends IScriptActionForm {
     floatAmount: number;
     floatTip: number;
     moneyMarket: MoneyMarket;
+}
+
+export interface IZapInActionForm extends IScriptActionForm {
+    type: ScriptAction.ZAP_IN,
+    tokenA: string;
+    tokenB: string;
+    floatAmountA: number;
+    floatAmountB: number;
+    amountTypeA: AmountType;
+    amountTypeB: AmountType;
+    floatTip: number;
+    dex: DEX;
+}
+
+export interface IZapOutActionForm extends IScriptActionForm {
+    type: ScriptAction.ZAP_OUT,
+    tokenA: string;
+    tokenB: string;
+    floatAmount: number;
+    amountType: AmountType;
+    outputChoice: ZapOutputChoice;
+    floatTip: number;
+    dex: DEX;
 }
 
 export interface INoActionForm extends IScriptActionForm {

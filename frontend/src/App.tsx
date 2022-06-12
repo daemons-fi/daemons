@@ -48,10 +48,14 @@ export const App = ({ children }: { children: any }) => {
             dispatch(fetchGasTankClaimable(walletAddress, chainId));
             dispatch(fetchTipJarBalance(walletAddress, chainId));
             dispatch(fetchUserHistory(chainId, walletAddress));
-            dispatch(fetchLatestGasPrice(chainId));
-            dispatch(fetchDAEMPriceInEth(chainId));
             dispatch(fetchDaemBalance(walletAddress, chainId));
             dispatch(fetchEthBalance(walletAddress, chainId));
+        }
+
+        // these values do not depend on the user and can be fetched anyway
+        if (supportedChain) {
+            dispatch(fetchDAEMPriceInEth(chainId));
+            dispatch(fetchLatestGasPrice(chainId));
         }
     }, [chainId, walletAddress, authenticated]);
 

@@ -1,6 +1,6 @@
 import { fantomTestnetContracts } from "@daemons-fi/addresses/build";
 import { IChainInfo } from '../interfaces';
-import { AaveMMAdvancedAction, AaveMMBaseAction, SwapAction, TransferAction } from './action-forms';
+import { AaveMMAdvancedAction, AaveMMBaseAction, SwapAction, TransferAction, ZapInAction, ZapOutAction } from './action-forms';
 import { fantomTestnetTokens } from './tokens';
 
 export const fantomTestnetInfo: IChainInfo = {
@@ -16,5 +16,5 @@ export const fantomTestnetInfo: IChainInfo = {
     explorerTxUrl: 'https://testnet.ftmscan.com/tx/',
     tokens: fantomTestnetTokens,
     contracts: fantomTestnetContracts,
-    actions: [TransferAction, SwapAction, AaveMMBaseAction, AaveMMAdvancedAction],
+    actions: [TransferAction, SwapAction, AaveMMBaseAction, AaveMMAdvancedAction, ZapInAction, ZapOutAction],
 };

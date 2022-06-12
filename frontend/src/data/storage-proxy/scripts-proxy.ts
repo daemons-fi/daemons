@@ -1,4 +1,4 @@
-import { BaseScript, SwapScript, TransferScript } from "@daemons-fi/scripts-definitions";
+import { BaseScript, SwapScript, TransferScript, ZapInScript, ZapOutScript } from "@daemons-fi/scripts-definitions";
 import { MmBaseScript, MmAdvancedScript } from "@daemons-fi/scripts-definitions";
 import { storageAddress } from ".";
 
@@ -67,8 +67,12 @@ export class ScriptProxy {
                 return await MmBaseScript.fromStorageJson(script);
             case "MmAdvancedScript":
                 return await MmAdvancedScript.fromStorageJson(script);
+            case "ZapInScript":
+                return await ZapInScript.fromStorageJson(script);
+            case "ZapOutScript":
+                return await ZapOutScript.fromStorageJson(script);
             default:
-                throw new Error("Unsupported script type: " + script.ScriptType);
+                throw new Error("Unsupported script type: " + script.__type);
         }
     }
 

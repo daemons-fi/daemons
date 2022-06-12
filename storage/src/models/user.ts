@@ -1,0 +1,32 @@
+import mongoose from "mongoose";
+import mongooseUniqueValidator from "mongoose-unique-validator";
+
+export interface IUser {
+    address: string;
+    username: string;
+    banned: boolean;
+    creationDate: Date;
+}
+
+const userSchema = new mongoose.Schema({
+    address: { type: String, required: true, index: { unique: true } },
+    username: { type: String, required: true, index: { unique: true } },
+    banned: { type: Boolean, required: false, default: false },
+    creationDate: { type: Date, required: false, default: () => new Date() }
+});
+mongooseUniqueValidator(userSchema);
+
+export interface IUserDocument extends IUser, mongoose.Document {}
+
+interface IUserModelSchema extends mongoose.Model<IUserDocument> {
+    build(address: string): IUserDocument;
+    findOneOrCreate(address: string): Promise<IUserDocument>;
+}
+
+userSchema.statics.build = (address: string) => new User({ address, username: address });
+userSchema.statics.findOneOrCreate = async (address: string): Promise<IUserDocument> => {
+    const user = await User.findOne({ address: address });
+    return user ?? (await User.build(address).save());
+};
+
+export const User = mongoose.model<IUserDocument, IUserModelSchema>("User", userSchema);

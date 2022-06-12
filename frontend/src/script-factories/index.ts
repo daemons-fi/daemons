@@ -1,11 +1,21 @@
-import { ISwapAction, swapDomain, swapTypes } from "@daemons-fi/shared-definitions";
+import {
+    ISwapAction,
+    IZapInAction,
+    IZapOutAction,
+    swapDomain,
+    swapTypes,
+    zapInDomain,
+    zapInTypes,
+    zapOutDomain,
+    zapOutTypes
+} from "@daemons-fi/shared-definitions";
 import { ITransferAction, transferDomain, transferTypes } from "@daemons-fi/shared-definitions";
 import { IMMBaseAction, mmBaseDomain, mmBaseTypes } from "@daemons-fi/shared-definitions";
 import { IMMAdvancedAction, mmAdvDomain, mmAdvTypes } from "@daemons-fi/shared-definitions";
 import { TransferMessageFactory } from "./messages-factories/transfer-message-factory";
 import { GetCurrentChain, IsChainSupported } from "../data/chain-info";
 import { ICurrentScript } from "./i-current-script";
-import { BaseScript } from "@daemons-fi/scripts-definitions";
+import { BaseScript, ZapInScript, ZapOutScript } from "@daemons-fi/scripts-definitions";
 import { ScriptAction } from "../data/chains-data/action-form-interfaces";
 import { SwapScript } from "@daemons-fi/scripts-definitions";
 import { TransferScript } from "@daemons-fi/scripts-definitions";
@@ -14,8 +24,16 @@ import { SwapMessageFactory } from "./messages-factories/swap-message-factory";
 import { MmBaseMessageFactory } from "./messages-factories/mm-base-message-factory";
 import { MmAdvMessageFactory } from "./messages-factories/mm-adv-message-factory";
 import { MmAdvancedScript } from "@daemons-fi/scripts-definitions";
+import { ZapInMessageFactory } from "./messages-factories/zap-in-message-factory";
+import { ZapOutMessageFactory } from "./messages-factories/zap-out-message-factory";
 
-type ScriptDefinition = ISwapAction | ITransferAction | IMMBaseAction | IMMAdvancedAction;
+type ScriptDefinition =
+    | ISwapAction
+    | ITransferAction
+    | IMMBaseAction
+    | IMMAdvancedAction
+    | IZapInAction
+    | IZapOutAction;
 
 interface IMessage {
     script: ScriptDefinition;
@@ -59,11 +77,7 @@ export class ScriptFactory {
                     types: swapTypes
                 };
                 const swapScriptSignature = await getSignature(swapMessage);
-                return new SwapScript(
-                    swapMessage.script,
-                    swapScriptSignature,
-                    bundle.description,
-                );
+                return new SwapScript(swapMessage.script, swapScriptSignature, bundle.description);
 
             case ScriptAction.TRANSFER:
                 const transferMessage = {
@@ -75,7 +89,7 @@ export class ScriptFactory {
                 return new TransferScript(
                     transferMessage.script,
                     transferScriptSignature,
-                    bundle.description,
+                    bundle.description
                 );
 
             case ScriptAction.MM_BASE:
@@ -88,7 +102,7 @@ export class ScriptFactory {
                 return new MmBaseScript(
                     mmBaseMessage.script,
                     mmBaseScriptSignature,
-                    bundle.description,
+                    bundle.description
                 );
 
             case ScriptAction.MM_ADV:
@@ -101,7 +115,33 @@ export class ScriptFactory {
                 return new MmAdvancedScript(
                     mmAdvancedMessage.script,
                     mmAdvancedScriptSignature,
-                    bundle.description,
+                    bundle.description
+                );
+
+            case ScriptAction.ZAP_IN:
+                const zapInMessage = {
+                    script: await ZapInMessageFactory.create(bundle, chain, this.provider),
+                    domain: zapInDomain,
+                    types: zapInTypes
+                };
+                const zapInScriptSignature = await getSignature(zapInMessage);
+                return new ZapInScript(
+                    zapInMessage.script,
+                    zapInScriptSignature,
+                    bundle.description
+                );
+
+            case ScriptAction.ZAP_OUT:
+                const zapOutMessage = {
+                    script: await ZapOutMessageFactory.create(bundle, chain, this.provider),
+                    domain: zapOutDomain,
+                    types: zapOutTypes
+                };
+                const zapOutScriptSignature = await getSignature(zapOutMessage);
+                return new ZapOutScript(
+                    zapOutMessage.script,
+                    zapOutScriptSignature,
+                    bundle.description
                 );
 
             default:

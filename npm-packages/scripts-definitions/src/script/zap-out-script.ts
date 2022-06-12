@@ -66,7 +66,7 @@ export class ZapOutScript extends BaseScript {
     // Override parent hasAllowance, as we need the LP rather than the token.
     public async requestAllowance(signer: ethers.Signer): Promise<TransactionResponse> {
         const lpAddress = await this.getLPAddress(signer);
-        return await AllowanceHelper.requestAAVEDebtTokenAllowance(
+        return await AllowanceHelper.requestERC20Allowance(
             lpAddress,
             this.getExecutorAddress(),
             signer

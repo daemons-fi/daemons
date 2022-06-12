@@ -115,7 +115,7 @@ contract SwapperScriptExecutor is ConditionsChecker {
         uint256 quote = IUniswapV2Router01(message.kontract).getAmountsOut(amount, path)[1];
         IUniswapV2Router01(message.kontract).swapExactTokensForTokens(
             amount,
-            quote * 99 / 100,
+            (quote * 99) / 100,
             path,
             message.user,
             block.timestamp + 600000 // 10 minutes
@@ -131,10 +131,7 @@ contract SwapperScriptExecutor is ConditionsChecker {
     }
 
     function giveAllowance(IERC20 _token, address _exchange) private {
-        IERC20(_token).approve(
-            _exchange,
-            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        );
+        IERC20(_token).approve(_exchange, type(uint256).max);
         allowances[_exchange][_token] = true;
     }
 }

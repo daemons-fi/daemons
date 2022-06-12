@@ -4,7 +4,9 @@ const gasLimits: { [scriptType: string]: number } = {
     SwapScript: 300000,
     TransferScript: 150000,
     MmBaseScript: 300000,
-    MmAdvancedScript: 325000
+    MmAdvancedScript: 325000,
+    ZapInScript: 320000,
+    ZapOutScript: 400000,
 };
 
 export const getGasLimitForScript = (scriptType: string): BigNumber => {

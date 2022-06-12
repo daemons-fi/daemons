@@ -60,6 +60,7 @@
 }
 
 .queue-script__actions {
+    text-align: right;
     margin-left: auto;
 }
 

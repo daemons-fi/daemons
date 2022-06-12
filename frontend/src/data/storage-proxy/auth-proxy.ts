@@ -1,14 +1,25 @@
 import { storageAddress } from '.';
 import fetch from 'cross-fetch';
 
+export interface IUser {
+    address: string;
+    username: string;
+    banned: boolean;
+}
 
 export class AuthProxy {
 
-    public static async checkAuthentication(userAddress: string): Promise<boolean> {
+    public static async checkAuthentication(userAddress: string): Promise<IUser|undefined> {
         const url = `${storageAddress}/auth/is-authenticated/${userAddress}`;
         const requestOptions = { method: 'GET', credentials: 'include' };
         const response = await fetch(url, requestOptions as any);
-        return response.status === 200;
+
+        try {
+            return await response.json();
+        } catch {
+            // user is not authenticated
+            return;
+        }
     }
 
     public static async getLoginMessage(userAddress: string): Promise<string> {

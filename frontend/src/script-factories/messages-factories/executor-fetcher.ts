@@ -12,6 +12,8 @@ export function getExecutorFromScriptAction(action: ScriptAction, chainId: strin
         case ScriptAction.TRANSFER: return contracts.TransferExecutor;
         case ScriptAction.MM_BASE: return contracts.MmBaseExecutor;
         case ScriptAction.MM_ADV: return contracts.MmAdvancedExecutor;
+        case ScriptAction.ZAP_IN: return contracts.ZapInExecutor;
+        case ScriptAction.ZAP_OUT: return contracts.ZapOutExecutor;
         default: throw new Error(`Cannot find executor address for action ${action}`);
     }
 }

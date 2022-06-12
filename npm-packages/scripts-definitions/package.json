@@ -1,6 +1,6 @@
 {
   "name": "@daemons-fi/scripts-definitions",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "Verifiable scripts for Storage and Frontend",
   "main": "./build/index.js",
   "types": "./build/index.d.js",

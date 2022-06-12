@@ -34,7 +34,6 @@ export function TipJar(): JSX.Element {
             ethers.utils.parseEther("10000000000"),
             signer
         );
-        console.log("hasAllowance", hasAllowance);
         setNeedsAllowance(!hasAllowance);
     };
 

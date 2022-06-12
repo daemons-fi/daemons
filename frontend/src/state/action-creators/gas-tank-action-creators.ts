@@ -1,13 +1,13 @@
-import { Dispatch } from 'redux';
-import { ActionType } from '../action-types';
+import { Dispatch } from "redux";
+import { ActionType } from "../action-types";
 import { gasTankABI } from "@daemons-fi/abis";
-import { GasTankAction } from '../actions/gas-tank-actions';
-import { BigNumber, Contract } from 'ethers';
+import { GasTankAction } from "../actions/gas-tank-actions";
+import { BigNumber, Contract } from "ethers";
 import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
 import { bigNumberToFloat } from "../../utils/big-number-to-float";
 
 const getGasTankContract = async (chainId: string): Promise<Contract> => {
-    const ethers = require('ethers');
+    const ethers = require("ethers");
     const provider = new ethers.providers.Web3Provider((window as any).ethereum);
 
     if (!IsChainSupported(chainId)) throw new Error(`Chain ${chainId} is not supported!`);
@@ -17,18 +17,17 @@ const getGasTankContract = async (chainId: string): Promise<Contract> => {
 };
 
 export const fetchGasTankBalance = (address?: string, chainId?: string) => {
-
     return async (dispatch: Dispatch<GasTankAction>) => {
         if (!address || !chainId) {
-            console.log('Address or chainId missing, balance check aborted');
+            console.log("Address or chainId missing, balance check aborted");
             dispatch({
                 type: ActionType.GAS_TANK_BALANCE,
-                balance: undefined,
+                balance: undefined
             });
             return;
         }
 
-        console.log('Checking balance in gas tank for', address);
+        console.log("Checking balance in gas tank for", address);
 
         const gasTank = await getGasTankContract(chainId);
         const rawBalance: BigNumber = await gasTank.gasBalanceOf(address);
@@ -36,24 +35,23 @@ export const fetchGasTankBalance = (address?: string, chainId?: string) => {
 
         dispatch({
             type: ActionType.GAS_TANK_BALANCE,
-            balance,
+            balance
         });
     };
 };
 
 export const fetchGasTankClaimable = (address?: string, chainId?: string) => {
-
     return async (dispatch: Dispatch<GasTankAction>) => {
         if (!address || !chainId) {
-            console.log('Address or chainId missing, balance check aborted');
+            console.log("Address or chainId missing, balance check aborted");
             dispatch({
                 type: ActionType.GAS_TANK_CLAIMABLE,
-                balance: undefined,
+                balance: undefined
             });
             return;
         }
 
-        console.log('Checking claimable DAEM for', address);
+        console.log("Checking claimable DAEM for", address);
 
         const gasTank = await getGasTankContract(chainId);
         const rawBalance: BigNumber = await gasTank.claimable(address);
@@ -61,7 +59,16 @@ export const fetchGasTankClaimable = (address?: string, chainId?: string) => {
 
         dispatch({
             type: ActionType.GAS_TANK_CLAIMABLE,
-            balance,
+            balance
+        });
+    };
+};
+
+export const setGasTankClaimableToZero = () => {
+    return async (dispatch: Dispatch<GasTankAction>) => {
+        dispatch({
+            type: ActionType.GAS_TANK_CLAIMABLE,
+            balance: 0
         });
     };
 };

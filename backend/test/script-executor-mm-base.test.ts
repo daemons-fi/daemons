@@ -9,6 +9,9 @@ import {
     BaseMoneyMarketActionType,
     mmBaseTypes
 } from "@daemons-fi/shared-definitions";
+import hre from "hardhat";
+const chainId = hre.network.config.chainId;
+
 
 describe("ScriptExecutor - Money Market Base", function () {
     let owner: SignerWithAddress;
@@ -38,7 +41,7 @@ describe("ScriptExecutor - Money Market Base", function () {
         user: "",
         kontract: "",
         executor: "",
-        chainId: BigNumber.from(42),
+        chainId: BigNumber.from(chainId),
         tip: BigNumber.from(0),
         balance: {
             enabled: false,

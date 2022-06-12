@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
 import { RootState } from "../../state";
-import { fetchGasTankClaimable } from "../../state/action-creators/gas-tank-action-creators";
+import { fetchGasTankClaimable, setGasTankClaimableToZero } from "../../state/action-creators/gas-tank-action-creators";
 import {
     fetchStakingBalance,
     fetchStakingClaimable
@@ -65,18 +65,16 @@ export function ClaimRewards() {
         if (nothingToClaim) return;
         const gasTank = await getGasTankContract();
         const tx = await gasTank.claimAndStakeReward();
-        const toastedTransaction = promiseToast(
+        await promiseToast(
             tx.wait,
             `Claiming and staking DAEM tokens`,
             "Operation successful 🏦.",
             "Something bad happened. Contact us if the error persists"
         );
-        await toastedTransaction;
 
-        dispatch(fetchGasTankClaimable(walletAddress, chainId));
+        dispatch(setGasTankClaimableToZero());
         dispatch(fetchStakingClaimable(walletAddress, chainId));
         dispatch(fetchStakingBalance(walletAddress, chainId));
-        dispatch(fetchDaemBalance(walletAddress, chainId));
     };
 
     const getGasTankContract = async () => {

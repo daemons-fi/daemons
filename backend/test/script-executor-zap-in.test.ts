@@ -4,6 +4,8 @@ import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { AmountType, ComparisonType, ZapOutputChoice } from "@daemons-fi/shared-definitions";
 import { zapInDomain, IZapInAction, zapInTypes } from "@daemons-fi/shared-definitions";
+import hre from 'hardhat'
+const chainId = hre.network.config.chainId
 
 describe("ScriptExecutor - ZapIn", function () {
     let owner: SignerWithAddress;
@@ -35,7 +37,7 @@ describe("ScriptExecutor - ZapIn", function () {
         user: "",
         kontract: "",
         executor: "",
-        chainId: BigNumber.from(42),
+        chainId: BigNumber.from(chainId),
         tip: BigNumber.from(0),
         balance: {
             enabled: false,
@@ -262,6 +264,42 @@ describe("ScriptExecutor - ZapIn", function () {
         expect(await fooBarLP.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("11.4")); // 27*20% + 16*50%
         expect(await fooToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("21.6")); // 27*80%
         expect(await barToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("6")); // 12*50%
+
+        // the executor should not have leftovers
+        expect(await fooToken.balanceOf(executor.address)).to.equal(ethers.utils.parseEther("0"));
+        expect(await barToken.balanceOf(executor.address)).to.equal(ethers.utils.parseEther("0"));
+    });
+
+    it("zaps the LP with one of the two amounts set to 0 - TokenA", async () => {
+        let message: IZapInAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amountA = ethers.utils.parseEther("0");
+        message.amountB = ethers.utils.parseEther("10");
+        message = await initialize(message);
+
+        await executor.execute(message, sigR, sigS, sigV);
+
+        // now the wallet should contain both the LP and some tokens
+        expect(await fooBarLP.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("10"));
+        expect(await fooToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("27"));
+        expect(await barToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("2"));
+
+        // the executor should not have leftovers
+        expect(await fooToken.balanceOf(executor.address)).to.equal(ethers.utils.parseEther("0"));
+        expect(await barToken.balanceOf(executor.address)).to.equal(ethers.utils.parseEther("0"));
+    });
+
+    it("zaps the LP with one of the two amounts set to 0 - TokenB", async () => {
+        let message: IZapInAction = JSON.parse(JSON.stringify(baseMessage));
+        message.amountA = ethers.utils.parseEther("25");
+        message.amountB = ethers.utils.parseEther("0");
+        message = await initialize(message);
+
+        await executor.execute(message, sigR, sigS, sigV);
+
+        // now the wallet should contain both the LP and some tokens
+        expect(await fooBarLP.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("25"));
+        expect(await fooToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("2"));
+        expect(await barToken.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("12"));
 
         // the executor should not have leftovers
         expect(await fooToken.balanceOf(executor.address)).to.equal(ethers.utils.parseEther("0"));

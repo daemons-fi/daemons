@@ -38,7 +38,6 @@ export function Staking() {
             ethers.utils.parseEther("100000"),
             signer
         );
-        console.log("hasAllowance", hasAllowance);
         setNeedsAllowance(!hasAllowance);
     };
 

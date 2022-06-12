@@ -11,6 +11,7 @@ export interface IUpdateWalletAction {
 export interface IAuthCheck {
     type: ActionType.AUTH_CHECK;
     authenticated: boolean;
+    banned: boolean;
 }
 
 export interface IFetchDaemBalance {

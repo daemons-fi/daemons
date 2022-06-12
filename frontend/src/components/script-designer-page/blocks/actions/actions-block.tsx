@@ -5,6 +5,8 @@ import {
     IScriptActionForm,
     ISwapActionForm,
     ITransferActionForm,
+    IZapInActionForm,
+    IZapOutActionForm,
     ScriptAction
 } from "../../../../data/chains-data/action-form-interfaces";
 import { IAction } from "../../../../data/chains-data/interfaces";
@@ -12,6 +14,8 @@ import { MmAdvAction } from "./mm-adv-action";
 import { MmBaseAction } from "./mm-base-action";
 import { SwapAction } from "./swap-action";
 import { TransferAction } from "./transfer-action";
+import { ZapInAction } from "./zap-in-action";
+import { ZapOutAction } from "./zap-out-action";
 
 interface IActionBlockProps {
     action: IAction;
@@ -35,6 +39,12 @@ export const ActionBlock = ({ action, onUpdate, onRemove }: IActionBlockProps) =
 
             case ScriptAction.MM_ADV:
                 return <MmAdvAction form={actionForm as IAdvancedMMActionForm} update={onUpdate} />;
+
+            case ScriptAction.ZAP_IN:
+                return <ZapInAction form={actionForm as IZapInActionForm} update={onUpdate} />;
+
+            case ScriptAction.ZAP_OUT:
+                return <ZapOutAction form={actionForm as IZapOutActionForm} update={onUpdate} />;
 
             default:
                 throw new Error(`Unrecognized action ${actionForm.type}`);
