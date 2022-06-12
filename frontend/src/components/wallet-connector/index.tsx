@@ -1,4 +1,4 @@
-import React, { Dispatch, useEffect, useState } from 'react';
+import React, { Dispatch, useRef, useEffect, useState } from 'react';
 import { useMetaMask } from "metamask-react";
 import { authenticationCheck, updateWalletAddress } from '../../state/action-creators/wallet-action-creators';
 import { useDispatch, useSelector } from 'react-redux';
@@ -65,6 +65,7 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
     const [displayChains, setDisplayChains] = useState<boolean>(false);
     const [notifications, setNotifications] = useState<INotification[]>([]);
     const [displayNotifications, setDisplayNotifications] = useState<boolean>(false);
+    const notificationsRef = useRef<HTMLInputElement>(null);
 
     const getNotifications = async (): Promise<void> => {
         const fetchNotificationsRes = await NotificationProxy.fetchNotifications();
@@ -79,8 +80,20 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
         );
     }, []);
 
+    const closeNotificationsOnClickOut = (e: any) => {
+        if (
+            notificationsRef.current &&
+            displayNotifications &&
+            !notificationsRef.current.contains(e.target)
+        ) {
+            setDisplayNotifications(false);
+        }
+    };
+
+    document.addEventListener("mousedown", closeNotificationsOnClickOut);
+
     return (
-        <div className='wallet-connector'>
+        <div ref={notificationsRef} className='wallet-connector'>
             <div className='wallet-connector__chain'>
                 <img className='wallet-connector__chain-image'
                     src={chainInfo.iconPath}
@@ -99,7 +112,7 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
 
             {
                 authenticated
-                    ? (
+                    ? (<>
                         <div className='wallet-connector__address'>
                             {address}
                             {
@@ -110,20 +123,15 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
                                     {notifications.length}
                                 </div>
                             }
-                            {displayNotifications &&
-                                <Modal
-                                    isOpen={displayNotifications}
-                                    onRequestClose={() => setDisplayNotifications(false)}
-                                    style={modalStyles}
-                                    ariaHideApp={false}
-                                >
-                                    {availableNotifications(
-                                        () => setDisplayNotifications(false),
-                                        notifications,
-                                        getNotifications
-                                    )}
-                                </Modal>}
                         </div>
+                        {displayNotifications &&
+                            availableNotifications(
+                                () => setDisplayNotifications(false),
+                                notifications,
+                                getNotifications
+                            )
+                        }
+                    </>
                     )
                     : (
                         <div className='wallet-connector__address wallet-connector__address--unauthenticated'

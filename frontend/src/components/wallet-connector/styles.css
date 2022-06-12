@@ -4,6 +4,7 @@
     align-items: center;
     align-content: center;
     column-gap: 15px;
+    position: relative;
 }
 
 .wallet-connector__chain {
@@ -82,6 +83,27 @@
 
 .chains-dialog__chain-entry--selected {
     background: #efefef;
+}
+
+.notifications-dialog {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 500px;
+    border-radius: 5px;
+    padding: 10px 25px;
+    background-color: var(--secondary-background);
+    border: 1px solid var(--greyish-brown);
+    text-align: left;
+}
+
+.notifications-dialog__header {
+    background-color: var(--greyish-brown);
+    width: fit-content;
+    text-align: right;
+    margin-left: auto;
+    padding: 10px;
+    border-radius: 3px;
 }
 
 .notifications-dialog__clear {
