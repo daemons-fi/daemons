@@ -1,15 +1,19 @@
-import React, { Dispatch, useRef, useEffect, useState } from 'react';
+import React, { Dispatch, useRef, useEffect, useState } from "react";
 import { useMetaMask } from "metamask-react";
-import { authenticationCheck, updateWalletAddress } from '../../state/action-creators/wallet-action-creators';
-import { useDispatch, useSelector } from 'react-redux';
-import { BigNumber } from 'ethers';
+import {
+    authenticationCheck,
+    updateWalletAddress
+} from "../../state/action-creators/wallet-action-creators";
+import { useDispatch, useSelector } from "react-redux";
+import { BigNumber } from "ethers";
 import Modal from "react-modal";
-import { RootState } from '../../state';
-import { StorageProxy } from '../../data/storage-proxy';
-import { GetAvailableChains, GetCurrentChain, IsChainSupported } from '../../data/chain-info';
-import './styles.css';
-import { IChainInfo } from '../../data/chains-data/interfaces';
-import { INotification, NotificationProxy } from '../../data/storage-proxy/notification-proxy';
+import { RootState } from "../../state";
+import { StorageProxy } from "../../data/storage-proxy";
+import { GetCurrentChain, IsChainSupported } from "../../data/chain-info";
+import "./styles.css";
+import { INotification, NotificationProxy } from "../../data/storage-proxy/notification-proxy";
+import { notificationsPanel } from "./notification-panel";
+import { availableChainsDialog } from "./chains-dialog";
 
 const modalStyles: any = {
     content: {
@@ -22,14 +26,14 @@ const modalStyles: any = {
         padding: "25px",
         boxShadow: "0 6px 4px 0 rgba(0, 0, 0, 0.19)",
         overflow: "hidden"
-    },
+    }
 };
 
 export function ConnectWalletButton() {
     const dispatch = useDispatch();
     const { status, connect, account, chainId } = useMetaMask();
 
-    const connected = status === 'connected';
+    const connected = status === "connected";
     const walletAddress = connected ? account! : undefined;
     const walletChainId = connected ? BigNumber.from(chainId!).toString() : undefined; // convert from hex to decimal string
     const supportedChain = !!walletChainId && IsChainSupported(walletChainId);
@@ -48,9 +52,15 @@ export function ConnectWalletButton() {
         case "connecting":
             return <div>Connecting...</div>;
         case "notConnected":
-            return <div className="wallet-control__connect-bt" onClick={connect}>Connect to MetaMask</div>;
+            return (
+                <div className="wallet-control__connect-bt" onClick={connect}>
+                    Connect to MetaMask
+                </div>
+            );
         case "connected":
-            return <ConnectedWalletComponent walletAddress={walletAddress} chainId={walletChainId} />;
+            return (
+                <ConnectedWalletComponent walletAddress={walletAddress} chainId={walletChainId} />
+            );
         default:
             console.error(`Unknown state '${status}'`);
             return null;
@@ -69,15 +79,12 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
 
     const getNotifications = async (): Promise<void> => {
         const fetchNotificationsRes = await NotificationProxy.fetchNotifications();
-        setNotifications(fetchNotificationsRes)
-    }
+        setNotifications(fetchNotificationsRes);
+    };
 
     useEffect(() => {
         getNotifications();
-        setInterval(
-            getNotifications,
-            300000
-        );
+        setInterval(getNotifications, 300000);
     }, []);
 
     const closeNotificationsOnClickOut = (e: any) => {
@@ -93,13 +100,14 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
     document.addEventListener("mousedown", closeNotificationsOnClickOut);
 
     return (
-        <div ref={notificationsRef} className='wallet-connector'>
-            <div className='wallet-connector__chain'>
-                <img className='wallet-connector__chain-image'
+        <div ref={notificationsRef} className="wallet-connector">
+            <div className="wallet-connector__chain">
+                <img
+                    className="wallet-connector__chain-image"
                     src={chainInfo.iconPath}
                     onClick={() => setDisplayChains(!displayChains)}
                 />
-                {displayChains &&
+                {displayChains && (
                     <Modal
                         isOpen={displayChains}
                         onRequestClose={() => setDisplayChains(false)}
@@ -107,106 +115,39 @@ function ConnectedWalletComponent({ walletAddress, chainId }: any): JSX.Element 
                         ariaHideApp={false}
                     >
                         {availableChainsDialog(() => setDisplayChains(false), chainInfo.id)}
-                    </Modal>}
+                    </Modal>
+                )}
             </div>
 
-            {
-                authenticated
-                    ? (<>
-                        <div className='wallet-connector__address'>
-                            {address}
-                            {
-                                notifications.length > 0 &&
-                                <div
-                                    className='wallet-connector__address-notification'
-                                    onClick={() => setDisplayNotifications(!displayNotifications)}>
-                                    {notifications.length}
-                                </div>
-                            }
-                        </div>
-                        {displayNotifications &&
-                            availableNotifications(
-                                () => setDisplayNotifications(false),
-                                notifications,
-                                getNotifications
-                            )
-                        }
-                    </>
-                    )
-                    : (
-                        <div className='wallet-connector__address wallet-connector__address--unauthenticated'
-                            onClick={() => triggerLogin(walletAddress, dispatch)}>
-                            <div>{address}</div>
-                            <div>Authenticate</div>
-                        </div>
-                    )
-            }
-        </div >
-    );
-}
-
-
-function availableChainsDialog(hideDialog: () => void, selectedChainId: string): JSX.Element | null {
-    const chainComponent = (chain: IChainInfo): JSX.Element => {
-        return (
-            <div key={chain.hex} className={`chains-dialog__chain-entry ${selectedChainId === chain.id ? 'chains-dialog__chain-entry--selected' : ''}`}
-                onClick={() => {
-                    promptChainChange(chain);
-                    hideDialog();
-                }}
-            >
-                <img className='wallet-connector__chain-image' src={chain.iconPath}></img>
-                <div className='chains-dialog__chain-name'>{chain.name}</div>
-            </div>
-        );
-    };
-
-    const chains = GetAvailableChains();
-    return (
-        <div className='chains-dialog'>
-            <div className='chains-dialog__header'>
-                <div className='chains-dialog__title'>Select a network</div>
-                <div className='chains-dialog__close'
-                    onClick={() => {
-                        hideDialog();
-                    }}></div>
-            </div>
-            <div className='chains-dialog__body'>
-                {chains.map(chainComponent)}
-            </div>
-        </div>
-    );
-}
-
-function availableNotifications(hideDialog: () => void, notifications: INotification[], getNotifications: () => void): JSX.Element {
-    const notificationsComponent = (notification: INotification): JSX.Element => {
-        return (
-            <div key={notification._id} className='notification-dialog__notification-entry'
-                onClick={() => {
-                    hideDialog();
-                }}
-            >
-                <div className='notifications-dialog__separator'></div>
-                <div className='notification-dialog__notification-title'>{notification.title}</div>
-                <div className='notification-dialog__notification-name'>{notification.description}</div>
-            </div>
-        );
-    };
-
-    return (
-        <div className='notifications-dialog'>
-            <div className='notifications-dialog__header'>
-                <div className='notifications-dialog__clear'
-                    onClick={async () => {
-                        await NotificationProxy.acknowledgeNotifications(notifications.map((notification) => (notification._id)));
-                        getNotifications()
-                        hideDialog();
-                    }}
-                >Acknowledge all</div>
-            </div>
-            <div className='notifications-dialog__body'>
-                {notifications.map(notificationsComponent)}
-            </div>
+            {authenticated ? (
+                <>
+                    <div className="wallet-connector__address">
+                        {address}
+                        {notifications.length > 0 && (
+                            <div
+                                className="wallet-connector__address-notification"
+                                onClick={() => setDisplayNotifications(!displayNotifications)}
+                            >
+                                {notifications.length}
+                            </div>
+                        )}
+                    </div>
+                    {displayNotifications &&
+                        notificationsPanel(
+                            () => setDisplayNotifications(false),
+                            notifications,
+                            getNotifications
+                        )}
+                </>
+            ) : (
+                <div
+                    className="wallet-connector__address wallet-connector__address--unauthenticated"
+                    onClick={() => triggerLogin(walletAddress, dispatch)}
+                >
+                    <div>{address}</div>
+                    <div>Authenticate</div>
+                </div>
+            )}
         </div>
     );
 }
@@ -219,45 +160,9 @@ async function triggerLogin(walletAddress: string, dispatch: Dispatch<any>): Pro
 }
 
 async function getSignature(message: string): Promise<any> {
-    const ethers = require('ethers');
+    const ethers = require("ethers");
     const provider = new ethers.providers.Web3Provider((window as any).ethereum);
     const signer = provider.getSigner();
     const signature = await signer.signMessage(message);
     return signature;
-}
-
-async function promptChainChange(chain: IChainInfo): Promise<void> {
-    const switchChain = async () => {
-        await (window as any).ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: chain.hex }]
-        });
-    };
-
-    const addChain = async () => {
-        await (window as any).ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [{
-                chainId: chain.hex,
-                rpcUrls: [chain.defaultRPC],
-                chainName: chain.name,
-                nativeCurrency: {
-                    name: chain.coinName,
-                    symbol: chain.coinSymbol,
-                    decimals: chain.coinDecimals
-                },
-                blockExplorerUrls: [chain.explorerUrl]
-            }]
-        });
-    };
-
-    try {
-        await switchChain();
-    } catch (switchError: any) {
-        if (switchError.code === 4902) {
-            await addChain();
-        } else {
-            throw switchError;
-        }
-    }
 }

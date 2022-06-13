@@ -1,0 +1,41 @@
+.chains-dialog__header {
+    display: flex;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.chains-dialog__title {
+    font-weight: bold;
+}
+
+.chains-dialog__close:after {
+    position: absolute;
+    right: 5px;
+    content: "\00d7";
+    cursor: pointer;
+    font-size: 1.5rem;
+    top: -5px;
+}
+
+.chains-dialog__body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow-y: auto;
+    grid-auto-flow: row dense;
+    gap: 1rem;
+}
+
+.chains-dialog__chain-entry {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 10px;
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid #555;
+    border-radius: 10px;
+}
+
+.chains-dialog__chain-entry--selected {
+    background: #efefef;
+}

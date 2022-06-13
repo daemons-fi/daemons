@@ -43,7 +43,7 @@ export class TerminatorBot {
 
                 if (isToBeRemoved) {
                     notifications.push({
-                        title: "Inexecutable script has been removed",
+                        title: "Removed inexecutable script",
                         description: `The following script has been automatically removed as it was no longer executable: '${script.description}'`,
                         chainId: script.chainId,
                         user: script.user

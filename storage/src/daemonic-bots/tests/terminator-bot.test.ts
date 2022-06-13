@@ -47,7 +47,7 @@ describe("Terminator Bot", () => {
         // 1 notification is created
         const notifications = await Notification.find({})
         expect(notifications.length).to.equal(1);
-        expect(notifications[0].title).to.equal("Inexecutable script has been removed");
+        expect(notifications[0].title).to.equal("Removed inexecutable script");
         expect(notifications[0].description.startsWith('The following script has been automatically removed as it was no longer executable:')).to.be.true;
         expect(notifications[0].chainId).to.equal(script.chainId);
         expect(notifications[0].user).to.equal(script.user);
