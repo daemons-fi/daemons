@@ -31,18 +31,22 @@ export function ExecutableScriptsContainer() {
         <QueueScriptComponent key={script.getId()} script={script} />
     ));
     return (
-        <div className='card'>
+        <>
             <div className='card__header'>
+                <div className='card__title-icon'></div>
                 <div className='card__title'>Executable Scripts</div>
-                <div className={'queue-container__reload-bt ' + (loading ? 'queue-container__reload-bt--loading' : '')}
-                    onClick={reloadScripts}
-                />
+                <div className='card__reload' onClick={reloadScripts}>
+                    Reload list
+                    <div className={'queue-container__reload-bt ' + (loading ? 'queue-container__reload-bt--loading' : '')} />
+                </div>
             </div>
-            <div className='card__subtitle'>Execute scripts and get rewarded in DAEM tokens</div>
+            <div className='card'>
+                <div className='card__subtitle'>Execute scripts and get rewarded in DAEM tokens</div>
 
-            <div className="queue-container">
-                {scripts}
+                <div className="queue-container">
+                    {scripts}
+                </div>
             </div>
-        </div>
+        </>
     );
 }

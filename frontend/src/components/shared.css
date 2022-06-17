@@ -1,7 +1,11 @@
 .title {
-    font-size: 32px;
+    font-size: 55px;
     font-weight: bold;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
+}
+
+.title-dot {
+    color: var(--blue-green);
 }
 
 .card {
@@ -13,14 +17,28 @@
 
 .card__header {
     display: flex;
-    flex-flow: row nowrap;
-    align-content: center;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.card__title-icon {
+    background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iR3JvdXBfMTEiIGRhdGEtbmFtZT0iR3JvdXAgMTEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjMxLjU1NyIgaGVpZ2h0PSIzMS41NTciIHZpZXdCb3g9IjAgMCAzMS41NTcgMzEuNTU3Ij4KICA8cGF0aCBpZD0iUGF0aF83NyIgZGF0YS1uYW1lPSJQYXRoIDc3IiBkPSJNMCwwSDMxLjU1N1YzMS41NTdIMFoiIGZpbGw9Im5vbmUiLz4KICA8cGF0aCBpZD0iUGF0aF83OCIgZGF0YS1uYW1lPSJQYXRoIDc4IiBkPSJNMTAuNTUxLDE5LjhIOS4yMzZhLjk4Ni45ODYsMCwwLDEtLjk4Ni0uOTg2VjEyLjIzNmEuOTg2Ljk4NiwwLDAsMSwuOTg2LS45ODZoMS4zMTVhLjk4Ni45ODYsMCwxLDEsMCwxLjk3MmgtLjMyOXY0LjZoLjMyOWEuOTg2Ljk4NiwwLDEsMSwwLDEuOTcyWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMi41OTggMy41NDIpIiBmaWxsPSIjMDBlNWM3Ii8+CiAgPHBhdGggaWQ9IlBhdGhfNzkiIGRhdGEtbmFtZT0iUGF0aCA3OSIgZD0iTTE1LjU1MSwxOS44SDE0LjIzNmEuOTg2Ljk4NiwwLDEsMSwwLTEuOTcyaC4zMjl2LTQuNmgtLjMyOWEuOTg2Ljk4NiwwLDAsMSwwLTEuOTcyaDEuMzE1YS45ODYuOTg2LDAsMCwxLC45ODYuOTg2djYuNTc0QS45ODYuOTg2LDAsMCwxLDE1LjU1MSwxOS44WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNC4xNzIgMy41NDIpIiBmaWxsPSIjMDBlNWM3Ii8+CiAgPHBhdGggaWQ9IlBhdGhfODAiIGRhdGEtbmFtZT0iUGF0aCA4MCIgZD0iTTIwLjgxMSwxMC44aC01LjI2YTIuMywyLjMsMCwwLDEtMi4zLTIuM1YzLjIzNmEuOTg2Ljk4NiwwLDEsMSwxLjk3MiwwVjguNWEuMzI5LjMyOSwwLDAsMCwuMzI5LjMyOWg1LjI2YS45ODYuOTg2LDAsMSwxLDAsMS45NzJaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0LjE3MiAwLjcwOCkiIGZpbGw9IiMwMGU1YzciLz4KICA8cGF0aCBpZD0iUGF0aF84MSIgZGF0YS1uYW1lPSJQYXRoIDgxIiBkPSJNMjEuMDE1LDI3Ljg5SDcuODY2QTMuNjIsMy42MiwwLDAsMSw0LjI1LDI0LjI3NFY1Ljg2NkEzLjYyLDMuNjIsMCwwLDEsNy44NjYsMi4yNWg5LjJhLjk4Ni45ODYsMCwwLDEsLjcuMjg5bDYuNTc0LDYuNTc0YS45ODYuOTg2LDAsMCwxLC4yODkuN1YyNC4yNzRBMy42MiwzLjYyLDAsMCwxLDIxLjAxNSwyNy44OVpNNy44NjYsNC4yMjJBMS42NDUsMS42NDUsMCwwLDAsNi4yMjIsNS44NjZWMjQuMjc0YTEuNjQ1LDEuNjQ1LDAsMCwwLDEuNjQ0LDEuNjQ0SDIxLjAxNWExLjY0NSwxLjY0NSwwLDAsMCwxLjY0NC0xLjY0NFYxMC4yMTlsLTYtNloiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEuMzM4IDAuNzA4KSIgZmlsbD0iIzAwZTVjNyIvPgo8L3N2Zz4K);
+    width: 50px;
+    height: 45px;
+    border-radius: 9px;
+    background-color: #292929;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-right: 17px;
+    text-transform: uppercase;
 }
 
 .card__title {
-    font-size: large;
     font-weight: bold;
-    color: var(--primary-colour);
+    opacity: 0.75;
+    font-size: 20px;
+    text-align: left;
+    color: var(--white);
 }
 
 .card__subtitle {

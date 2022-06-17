@@ -21,7 +21,7 @@ export function ExecutePage() {
 
     return (
         <div className='execute-page'>
-            <div className='title'>Execute</div>
+            <div className='title'>Execute<span className='title-dot'>.</span></div>
 
             <div className='execute-page__layout'>
                 <div className='execute-page__left-panel'>
