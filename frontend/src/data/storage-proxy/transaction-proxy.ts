@@ -3,6 +3,7 @@ import { ITransaction, TransactionOutcome } from '@daemons-fi/shared-definitions
 import { TransactionResponse, TransactionReceipt } from '@ethersproject/abstract-provider';
 import { utils } from 'ethers';
 import { storageAddress } from '.';
+import { CacheDuration, Cacher } from '../cacher';
 
 
 export class TransactionProxy {
@@ -82,37 +83,44 @@ export class TransactionProxy {
         };
     }
 
-    public static async fetchUserTransactions(chainId?: string, user?: string, page?: number): Promise<ITransaction[]> {
-        if (!user || !chainId) {
-            console.warn("Missing user or chain id. User transactions fetch aborted");
-            return [];
+    public static async fetchUserTransactions(chainId?: string, user?: string, useCache: boolean = true, page?: number): Promise<ITransaction[]> {
+        const f = async () => {
+            if (!user || !chainId) {
+                console.warn("Missing user or chain id. User transactions fetch aborted");
+                return [];
+            }
+
+            console.log(`Fetching user ${user} transactions for chain ${chainId}`);
+            const url = `${storageAddress}/transactions/receiver/${chainId}/${user}`;
+
+            const requestOptions = { method: 'GET', credentials: 'include' };
+            const response = await fetch(url, requestOptions as any);
+            if (response.status !== 200) return [];
+
+            const transactions: ITransaction[] = await response.json();
+            return transactions;
         }
 
-        console.log(`Fetching user ${user} transactions for chain ${chainId}`);
-        const url = `${storageAddress}/transactions/receiver/${chainId}/${user}`;
-
-        const requestOptions = { method: 'GET', credentials: 'include' };
-        const response = await fetch(url, requestOptions as any);
-        if (response.status !== 200) return [];
-
-        const transactions: ITransaction[] = await response.json();
-        return transactions;
+        return await Cacher.fetchData(`transactions/receiver/${chainId}/${user}`, f, CacheDuration.fifteenMinutes, !useCache);
     }
 
-    public static async fetchExecutedTransactions(chainId?: string, user?: string, page?: number): Promise<ITransaction[]> {
-        if (!user || !chainId) {
-            console.warn("Missing user or chain id. Executed transactions fetch aborted");
-            return [];
+    public static async fetchExecutedTransactions(chainId?: string, user?: string, useCache: boolean = true, page?: number): Promise<ITransaction[]> {
+        const f = async () => {
+            if (!user || !chainId) {
+                console.warn("Missing user or chain id. Executed transactions fetch aborted");
+                return [];
+            }
+
+            console.log(`Fetching transactions executed by ${user} on chain ${chainId}`);
+            const url = `${storageAddress}/transactions/executor/${chainId}/${user}`;
+
+            const requestOptions = { method: 'GET', credentials: 'include' };
+            const response = await fetch(url, requestOptions as any);
+            if (response.status !== 200) return [];
+
+            const transactions: ITransaction[] = await response.json();
+            return transactions;
         }
-
-        console.log(`Fetching transactions executed by ${user} on chain ${chainId}`);
-        const url = `${storageAddress}/transactions/executor/${chainId}/${user}`;
-
-        const requestOptions = { method: 'GET', credentials: 'include' };
-        const response = await fetch(url, requestOptions as any);
-        if (response.status !== 200) return [];
-
-        const transactions: ITransaction[] = await response.json();
-        return transactions;
+        return await Cacher.fetchData(`transactions/executor/${chainId}/${user}`, f, CacheDuration.fifteenMinutes, !useCache);
     }
 }

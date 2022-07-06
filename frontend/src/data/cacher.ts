@@ -4,6 +4,7 @@ interface ICachedData {
 }
 
 export enum CacheDuration {
+    fifteenMinutes = 1000 * 60 * 15,
     oneHour = 1000 * 60 * 60,
     sixHours = 1000 * 60 * 60 * 6,
     oneDay = 1000 * 60 * 60 * 24
@@ -23,10 +24,13 @@ export class Cacher {
     public static async fetchData<T>(
         key: string,
         f: () => Promise<T>,
-        cacheDuration: CacheDuration = CacheDuration.sixHours
+        cacheDuration: CacheDuration = CacheDuration.sixHours,
+        refreshCache: boolean = false
     ): Promise<T> {
-        const cachedData = this.fetchCachedData(key, cacheDuration);
-        if (cachedData) return cachedData;
+        if (!refreshCache) {
+            const cachedData = this.fetchCachedData(key, cacheDuration);
+            if (cachedData) return cachedData;
+        }
 
         console.debug(`Cache miss, retrieving data for ${key}`);
         const fetchedData = await f();
