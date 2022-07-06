@@ -22,31 +22,38 @@ export function TransactionsPage(): JSX.Element {
 
     const [userTransactions, setUserTransactions] = useState<ITransaction[]>([]);
     const [userTransactionsLoading, setUserTransactionsLoading] = useState<boolean>(false);
+    const [userTransactionsLocked, setUserTransactionsLocked] = useState<boolean>(false);
+
     const [executedTransactions, setExecutedTransactions] = useState<ITransaction[]>([]);
     const [executedTransactionsLoading, setExecutedTransactionsLoading] = useState<boolean>(false);
+    const [executedTransactionsLocked, setExecutedTransactionsLocked] = useState<boolean>(false);
 
     const fetchUserTransactions = async (useCache: boolean = true): Promise<void> => {
         setUserTransactionsLoading(true);
-        TransactionProxy.fetchUserTransactions(chainId, userWallet, useCache).then((txs) => {
-            setUserTransactions(txs);
-            setUserTransactionsLoading(false);
-        });
+        const txs = await TransactionProxy.fetchUserTransactions(chainId, userWallet, useCache);
+        setUserTransactions(txs);
+        setUserTransactionsLoading(false);
     };
 
     const fetchExecutedTransactions = async (useCache: boolean = true): Promise<void> => {
         setExecutedTransactionsLoading(true);
-        TransactionProxy.fetchExecutedTransactions(chainId, userWallet, useCache).then((txs) => {
-            setExecutedTransactions(txs);
-            setExecutedTransactionsLoading(false);
-        });
+        const txs = await TransactionProxy.fetchExecutedTransactions(chainId, userWallet, useCache);
+        setExecutedTransactions(txs);
+        setExecutedTransactionsLoading(false);
     };
 
     const reloadUserTransactions = async () => {
-        fetchUserTransactions(false);
+        if (userTransactionsLocked) return;
+        await fetchUserTransactions(false);
+        setUserTransactionsLocked(true);
+        setTimeout(() => setUserTransactionsLocked(false), 5000);
     };
 
     const reloadExecutedTransactions = async () => {
-        fetchExecutedTransactions(false);
+        if (executedTransactionsLocked) return;
+        await fetchExecutedTransactions(false);
+        setExecutedTransactionsLocked(true);
+        setTimeout(() => setExecutedTransactionsLocked(false), 5000);
     };
 
     useEffect(() => {
