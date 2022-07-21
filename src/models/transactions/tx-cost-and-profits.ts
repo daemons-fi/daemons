@@ -24,7 +24,7 @@ export async function getTxCostsAndProfits(script: any): Promise<ITxCostsAndProf
     const DAEMpriceInETH = await fetchDAEMPriceInETHWithCache(script.chainId);
     const ethToDaem = bigNumberToFloat(costETH, 6) / bigNumberToFloat(DAEMpriceInETH, 6);
     const tipWithoutTaxes = costDAEM.mul(8).div(10); // 20% TAX
-    const profitDAEM = tipWithoutTaxes.add(utils.parseEther(ethToDaem.toString()));
+    const profitDAEM = tipWithoutTaxes.add(utils.parseEther(ethToDaem.toFixed(12)));
 
     return {
         costDAEM: bigNumberToFloat(costDAEM),
