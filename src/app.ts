@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { wakeyRouter } from "./routes/wakey";
+import { healthRouter } from "./routes/health";
 
 dotenv.config();
 
@@ -13,4 +13,4 @@ if (!process.env.FANTOM_TESTNET_RPC) throw new Error("FANTOM_TESTNET_RPC was not
 
 export const app = express();
 
-app.use(wakeyRouter);
+app.use(healthRouter);
