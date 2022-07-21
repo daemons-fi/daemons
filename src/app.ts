@@ -8,6 +8,7 @@ import { corsWhitelisting } from "./middlewares/cors-whitelisting";
 import { transactionsRouter } from "./routes/transactions-router";
 import { statisticsRouter } from "./routes/statistics-router";
 import { notificationsRouter } from "./routes/notifications-router";
+import { healthRouter } from "./routes/health-router";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(corsWhitelisting);
 app.use(express.json());
 app.use(cookieParser());
 
+app.use(healthRouter);
 app.use("/api/auth", authenticationRouter);
 app.use("/api/scripts", scriptsRouter);
 app.use("/api/transactions", transactionsRouter);
