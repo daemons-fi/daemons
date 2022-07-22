@@ -1,4 +1,4 @@
-import { UniswapV2RouterABI } from "@daemons-fi/abis/build";
+import { UniswapV2RouterABI } from "@daemons-fi/contracts";
 import { BigNumber, ethers, utils } from "ethers";
 import { getProvider, supportedChains } from "./providers-builder";
 import { CacheDuration, ServerCacher } from "./server-cacher";

@@ -4,7 +4,7 @@ import { getTxCostsAndProfits } from "../get-tx-cost-and-profits";
 import { BigNumber, utils } from "ethers";
 import { getGasLimitForScript } from "@daemons-fi/scripts-definitions/build";
 import { swapScriptDocumentFactory } from "@daemons-fi/db-schema/build";
-import { bigNumberToFloat } from "../../utils/big-number-to-float";
+import { bigNumberToFloat } from "@daemons-fi/contracts";
 const sinon = require("sinon");
 const GasPriceRetriever = require("../../utils/gas-price-retriever");
 const DAEMPriceRetriever = require("../../utils/daem-price-retriever");

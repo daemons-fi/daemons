@@ -1,4 +1,4 @@
-import { gasPriceFeedABI } from "@daemons-fi/abis/build";
+import { gasPriceFeedABI } from "@daemons-fi/contracts";
 import { BigNumber, ethers } from "ethers";
 import { getProvider, supportedChains } from "./providers-builder";
 import { CacheDuration, ServerCacher } from "./server-cacher";

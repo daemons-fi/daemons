@@ -1,4 +1,4 @@
-import { gasTankABI } from "@daemons-fi/abis/build";
+import { gasTankABI } from "@daemons-fi/contracts";
 import { ethers } from "ethers";
 import { getProvider, IChainWithContracts, supportedChains } from "../utils/providers-builder";
 import { buildTxFromEvent } from "./build-tx-from-event";

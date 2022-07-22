@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { BaseProvider } from "@ethersproject/providers";
-import { fantomTestnetContracts, kovanContracts } from "@daemons-fi/addresses/build";
-import { IContractsList } from "@daemons-fi/addresses/build";
+import { fantomTestnetContracts, kovanContracts } from "@daemons-fi/contracts";
+import { IContractsList } from "@daemons-fi/contracts";
 
 export interface IChainWithContracts {
     id: string;

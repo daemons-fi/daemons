@@ -1,6 +1,6 @@
 import { getGasLimitForScript } from "@daemons-fi/scripts-definitions/build";
 import { BigNumber, utils } from "ethers";
-import { bigNumberToFloat } from "../utils/big-number-to-float";
+import { bigNumberToFloat } from "@daemons-fi/contracts";
 import { fetchDAEMPriceInETHWithCache } from "../utils/daem-price-retriever";
 import { fetchGasPriceWithCache } from "../utils/gas-price-retriever";
 
