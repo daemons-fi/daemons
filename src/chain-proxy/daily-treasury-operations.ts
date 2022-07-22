@@ -1,6 +1,9 @@
 import { BigNumber, ethers, Wallet } from "ethers";
 import { treasuryABI } from "@daemons-fi/contracts";
 import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
+import { rootLogger } from "../logger";
+
+const logger = rootLogger.child({ source: "DailyTreasuryOperations" });
 
 const convertToDecimal = (bn: BigNumber) => bn.div(BigNumber.from(10).pow(13)).toNumber() / 100000;
 
@@ -17,7 +20,7 @@ const chainThresholds: { [chain: string]: Thresholds } = {
 };
 
 export const performDailyTreasuryOperations = async (): Promise<void> => {
-    console.info({ message: `Performing daily treasury operations for all chains` });
+    logger.debug({ message: `Performing daily treasury operations for all chains` });
 
     for (let chain of Object.values(supportedChains)) {
         await performDailyTreasuryOperationsForChain(chain);
@@ -35,7 +38,8 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
     );
 
     const thresholds: Thresholds = chainThresholds[chain.id];
-    if (!thresholds) console.error(`Couldn't find thresholds for chain ${chain.id}. Skipping`);
+    if (!thresholds)
+        logger.error({ message: `Couldn't find thresholds for chain`, chain: chain.id });
 
     const commissionsRaw = await treasuryContract.commissionsPool();
     const commissions = convertToDecimal(commissionsRaw);
@@ -43,7 +47,7 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
     const polPoolRaw = await treasuryContract.polPool();
     const polPool = convertToDecimal(polPoolRaw);
 
-    console.log({
+    logger.debug({
         message: `Daily treasury operation report`,
         chain: chain.name,
         commissions,
@@ -51,11 +55,11 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
     });
 
     if (commissions > thresholds.minCommission) {
-        console.log("Claiming commission");
+        logger.debug({ message: "Claiming commission" });
         try {
             await treasuryContract.claimCommission();
         } catch (error) {
-            console.error({
+            logger.error({
                 message: `Error while claiming commissions`,
                 chain: chain.name,
                 error
@@ -64,13 +68,13 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
     }
 
     if (polPool > thresholds.minPolPool) {
-        console.log("Funding LP");
+        logger.debug({ message: "Funding LP" });
         try {
             const quoteHalfETHtoDAEM = await treasuryContract.ethToDAEM(polPoolRaw.div(2));
             const minAmountDAEM = quoteHalfETHtoDAEM.mul(99).div(100);
             await treasuryContract.fundLP(minAmountDAEM);
         } catch (error) {
-            console.error({
+            logger.error({
                 message: `Error while funding PoL`,
                 chain: chain.name,
                 error

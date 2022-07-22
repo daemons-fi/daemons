@@ -1,9 +1,12 @@
 import { ethers, Wallet } from "ethers";
 import { gasPriceFeedABI } from "@daemons-fi/contracts";
 import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
+import { rootLogger } from "../logger";
+
+const logger = rootLogger.child({ source: "GasPriceFeedUpdater" });
 
 export const updateGasPrices = async (): Promise<void> => {
-    console.info({ message: `Updating gas prices for all chains` });
+    logger.debug({ message: `Updating gas prices for all chains` });
 
     for (let chain of Object.values(supportedChains)) {
         await updateGasPriceForChain(chain);
@@ -27,7 +30,7 @@ async function updateGasPriceForChain(chain: IChainWithContracts): Promise<void>
         const GAS_UPDATE_THRESHOLD = 1000000;
         const deltaPrice = Math.abs(newGasPrice.toNumber() - oldGasPrice.toNumber());
         if (deltaPrice < GAS_UPDATE_THRESHOLD) {
-            console.info({
+            logger.debug({
                 message: `Gas price update skipped as delta < threshold`,
                 chain: chain.name,
                 gasPriceFeed: chain.contracts.GasPriceFeed,
@@ -38,7 +41,7 @@ async function updateGasPriceForChain(chain: IChainWithContracts): Promise<void>
 
         const tx = await gasPriceFeedContract.setGasPrice(newGasPrice);
         await tx.wait();
-        console.info({
+        logger.debug({
             message: `Updated gas prices`,
             chain: chain.name,
             gasPriceFeed: chain.contracts.GasPriceFeed,
@@ -46,7 +49,7 @@ async function updateGasPriceForChain(chain: IChainWithContracts): Promise<void>
             oldGasPrice: oldGasPrice.toString()
         });
     } catch (error) {
-        console.error({
+        logger.error({
             message: "Error while updating gas price",
             chain: chain.name,
             newGasPrice: newGasPrice.toString(),

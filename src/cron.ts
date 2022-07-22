@@ -1,9 +1,11 @@
 import { CronJob } from "cron";
 import { performDailyTreasuryOperations } from "./chain-proxy/daily-treasury-operations";
 import { updateGasPrices } from "./chain-proxy/gas-price-feed-updater";
+import { rootLogger } from "./logger";
 
 export const scheduler = () => {
-    console.log("Admin scheduler started");
+    const logger = rootLogger.child({source: "scheduler"});
+    logger.debug({message: "scheduler started"})
 
     const cronjobs = [
         // gas prices are updated every 8 hours
@@ -14,7 +16,6 @@ export const scheduler = () => {
     ];
 
     cronjobs.forEach((cronjob) => {
-        console.log("Next job time:", cronjob.nextDates().toISOString());
         cronjob.start();
     });
 };

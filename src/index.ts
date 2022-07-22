@@ -1,8 +1,9 @@
 import { scheduler } from "./cron";
 import { app } from "./app";
+import { rootLogger } from "./logger";
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
-    console.log(`Admin has started! Listening on port ${port}`);
+    rootLogger.debug({message: `Started on port ${port}`});
     scheduler();
 });
