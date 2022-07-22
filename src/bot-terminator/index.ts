@@ -8,7 +8,7 @@ import { INotification, Notification } from "@daemons-fi/db-schema";
 import { BrokenScript } from "@daemons-fi/db-schema";
 import { Script } from "@daemons-fi/db-schema";
 import { getProvider } from "../utils/providers-builder";
-import { parseScript } from "./utils/script-builder";
+import { parseScript } from "./mockable-script-builder";
 
 /**
  * ## Terminator Bot 🤖🪓

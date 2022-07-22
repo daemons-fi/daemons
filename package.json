@@ -15,7 +15,7 @@
   "dependencies": {
     "@daemons-fi/abis": "0.1.5",
     "@daemons-fi/addresses": "0.1.5",
-    "@daemons-fi/scripts-definitions": "0.1.25",
+    "@daemons-fi/scripts-definitions": "0.1.27",
     "@daemons-fi/shared-definitions": "2.1.9",
     "@daemons-fi/db-schema": "0.0.2",
     "express": "^4.17.2",

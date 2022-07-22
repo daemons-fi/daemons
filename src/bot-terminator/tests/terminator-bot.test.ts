@@ -7,7 +7,7 @@ import { FakeScript } from "../../test/mocks/fake-script";
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../test/test-db-handler";
 import { TerminatorBot } from "..";
 const sinon = require("sinon");
-const scriptsBuilder = require("../utils/script-builder");
+const scriptsBuilder = require("../mockable-script-builder");
 
 describe("Terminator Bot", () => {
     before(async () => await connectToTestDb());
