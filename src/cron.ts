@@ -10,9 +10,8 @@ export const scheduler = () => {
         // Bots run every 10 minutes
         new CronJob("*/10 * * * *", () => TerminatorBot.execute(), null, true, "UTC"),
 
-        // stats are updated twice a day, at 7.40 and 19.40
-        new CronJob("40 7 * * *", () => StatisticsBot.execute(), null, true, "UTC"),
-        new CronJob("40 19 * * *", () => StatisticsBot.execute(), null, true, "UTC"),
+        // stats are updated thrice a day
+        new CronJob("0 */8 * * *", () => StatisticsBot.execute(), null, true, "UTC"),
     ];
 
     cronjobs.forEach((cronjob) => {
