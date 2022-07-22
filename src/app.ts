@@ -4,8 +4,6 @@ import { healthRouter } from "./routes/health";
 
 dotenv.config();
 
-if (!process.env.ADMIN_KEY) throw new Error("ADMIN_KEY was not set");
-if (!process.env.STORAGE_ENDPOINT) throw new Error("STORAGE_ENDPOINT was not set");
 if (!process.env.ADMIN_WALLET_PRIVATE_KEY) throw new Error("ADMIN_WALLET_PRIVATE_KEY was not set");
 
 if (!process.env.KOVAN_RPC) throw new Error("KOVAN_RPC was not set");
