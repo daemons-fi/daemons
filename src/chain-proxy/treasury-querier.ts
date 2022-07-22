@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { treasuryABI } from "@daemons-fi/abis";
+import { treasuryABI } from "@daemons-fi/contracts";
 import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
 
 interface ITreasuryStat {

@@ -11,8 +11,7 @@
     "author": "Daemons Finance",
     "license": "ISC",
     "dependencies": {
-        "@daemons-fi/abis": "0.1.5",
-        "@daemons-fi/addresses": "0.1.5",
+        "@daemons-fi/contracts": "0.0.1",
         "cross-fetch": "^3.1.5",
         "dotenv": "^16.0.0",
         "ethers": "^5.5.3",

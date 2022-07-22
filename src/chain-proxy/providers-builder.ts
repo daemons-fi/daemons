@@ -1,9 +1,5 @@
 import { ethers } from "ethers";
-import {
-    fantomTestnetContracts,
-    IContractsList,
-    kovanContracts
-} from "@daemons-fi/addresses/build";
+import { fantomTestnetContracts, IContractsList, kovanContracts } from "@daemons-fi/contracts";
 
 export interface IChainWithContracts {
     id: string;

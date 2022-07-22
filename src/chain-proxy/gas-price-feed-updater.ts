@@ -1,5 +1,5 @@
 import { ethers, Wallet } from "ethers";
-import { gasPriceFeedABI } from "@daemons-fi/abis";
+import { gasPriceFeedABI } from "@daemons-fi/contracts";
 import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
 
 export const updateGasPrices = async (): Promise<void> => {

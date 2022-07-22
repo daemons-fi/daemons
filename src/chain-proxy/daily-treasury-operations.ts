@@ -1,5 +1,5 @@
 import { BigNumber, ethers, Wallet } from "ethers";
-import { treasuryABI } from "@daemons-fi/abis";
+import { treasuryABI } from "@daemons-fi/contracts";
 import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
 
 const convertToDecimal = (bn: BigNumber) => bn.div(BigNumber.from(10).pow(13)).toNumber() / 100000;
