@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { Notification } from "../models/notification";
+import { Notification } from "@daemons-fi/db-schema";
 import { authenticate } from "../middlewares/authentication";
 
 export const notificationsRouter = express.Router();

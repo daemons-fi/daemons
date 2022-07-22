@@ -1,7 +1,7 @@
 import { connectToTestDb, closeTestDb, clearTestDb } from '../../test/test-db-handler';
 import supertest from 'supertest';
 import { app } from '../../app';
-import { mmBaseScriptDocumentFactory, swapScriptDocumentFactory, transferScriptDocumentFactory } from '../../test-factories/script-factories';
+import { mmBaseScriptDocumentFactory, swapScriptDocumentFactory, transferScriptDocumentFactory } from '@daemons-fi/db-schema';
 import { expect } from 'chai';
 import { ISignedSwapAction } from '@daemons-fi/shared-definitions';
 import { BigNumber } from 'ethers';

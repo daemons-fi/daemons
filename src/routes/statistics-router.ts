@@ -1,10 +1,14 @@
 import express, { Request, Response } from "express";
-import { ScriptStats } from "../models/stats/script-stats";
-import { TransactionStats } from "../models/stats/transaction-stats";
-import { UserStats } from "../models/stats/user-stats";
-import { ChainInfo } from "../stats";
+import { ScriptStats } from "@daemons-fi/db-schema";
+import { TransactionStats } from "@daemons-fi/db-schema";
+import { UserStats } from "@daemons-fi/db-schema";
 
 export const statisticsRouter = express.Router();
+
+export const ChainInfo = (): { [chainId: string]: string } => ({
+    "42": "Kovan",
+    "4002": "Fantom Testnet",
+});
 
 statisticsRouter.get("/users/:chainId", async (req: Request, res: Response) => {
     var date = new Date();

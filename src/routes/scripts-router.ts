@@ -1,10 +1,10 @@
 import { utils } from "ethers";
 import express, { Request, Response } from "express";
 import { authenticate } from "../middlewares/authentication";
-import { TransferScript } from "../models/scripts/transfer-script";
-import { Script } from "../models/scripts/script";
-import { SwapScript } from "../models/scripts/swap-script";
-import { MmBaseScript } from "../models/scripts/mm-base-script";
+import { TransferScript } from "@daemons-fi/db-schema";
+import { Script } from "@daemons-fi/db-schema";
+import { SwapScript } from "@daemons-fi/db-schema";
+import { MmBaseScript } from "@daemons-fi/db-schema";
 import {
     ISignedBeefyAction,
     ISignedMMAdvancedAction,
@@ -15,12 +15,12 @@ import {
 import { ISignedMMBaseAction } from "@daemons-fi/shared-definitions";
 import { ISignedSwapAction } from "@daemons-fi/shared-definitions";
 import { ISignedTransferAction } from "@daemons-fi/shared-definitions";
-import { MmAdvancedScript } from "../models/scripts/mm-adv-script";
-import { BrokenScript } from "../models/queues/broken-scripts";
-import { ZapInScript } from "../models/scripts/zap-in-script";
-import { ZapOutScript } from "../models/scripts/zap-out-script";
-import { BeefyScript } from "../models/scripts/beefy-script";
-import { PassScript } from "../models/scripts/pass-script";
+import { MmAdvancedScript } from "@daemons-fi/db-schema";
+import { BrokenScript } from "@daemons-fi/db-schema";
+import { ZapInScript } from "@daemons-fi/db-schema";
+import { ZapOutScript } from "@daemons-fi/db-schema";
+import { BeefyScript } from "@daemons-fi/db-schema";
+import { PassScript } from "@daemons-fi/db-schema";
 
 export const scriptsRouter = express.Router();
 

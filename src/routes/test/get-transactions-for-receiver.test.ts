@@ -3,8 +3,7 @@ import supertest from 'supertest';
 import { app } from '../../app';
 import { expect } from 'chai';
 import jwt from 'jsonwebtoken';
-import { transactionDocumentFactory } from '../../test-factories/transactions-factories';
-import { ITransaction } from '@daemons-fi/shared-definitions';
+import { transactionDocumentFactory } from '@daemons-fi/db-schema';
 import { IFetchedTxs, TRANSACTIONS_PAGE_SIZE } from "../transactions-router";
 
 

@@ -1,7 +1,7 @@
 import { ITransaction } from "@daemons-fi/shared-definitions/build";
 import express, { Request, Response } from "express";
 import { authenticate } from "../middlewares/authentication";
-import { Transaction } from "../models/transactions/transaction";
+import { Transaction } from "@daemons-fi/db-schema";
 
 export const transactionsRouter = express.Router();
 

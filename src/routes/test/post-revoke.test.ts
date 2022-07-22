@@ -1,9 +1,9 @@
 import { connectToTestDb, closeTestDb, clearTestDb } from '../../test/test-db-handler';
 import supertest from 'supertest';
 import { app } from '../../app';
-import { transferScriptDocumentFactory } from '../../test-factories/script-factories';
+import { transferScriptDocumentFactory } from '@daemons-fi/db-schema';
 import { expect } from 'chai';
-import { TransferScript } from '../../models/scripts/transfer-script';
+import { TransferScript } from '@daemons-fi/db-schema';
 import jwt from 'jsonwebtoken';
 
 describe('POST api/scripts/revoke', () => {

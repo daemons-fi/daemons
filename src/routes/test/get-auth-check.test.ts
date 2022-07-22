@@ -3,11 +3,11 @@ import { app } from "../../app";
 import jwt from "jsonwebtoken";
 import faker from "@faker-js/faker";
 import { expect } from "chai";
-import { IUser, User } from "../../models/user";
+import { IUser, User } from "@daemons-fi/db-schema";
 import { clearTestDb, closeTestDb, connectToTestDb } from "../../test/test-db-handler";
 import { ethers } from "ethers";
-import { userDocumentFactory } from "../../test-factories/user-factories";
-import { transactionDocumentFactory } from "../../test-factories/transactions-factories";
+import { userDocumentFactory } from "@daemons-fi/db-schema";
+import { transactionDocumentFactory } from "@daemons-fi/db-schema";
 
 describe("GET api/auth/is-authenticated/:userAddress", () => {
     before(async () => await connectToTestDb());

@@ -1,13 +1,13 @@
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../test/test-db-handler";
 import supertest from "supertest";
 import { app } from "../../app";
-import { signedBeefyActionFactory } from "../../test-factories/script-factories";
+import { signedBeefyActionFactory } from "@daemons-fi/db-schema";
 import { expect } from "chai";
 import { utils } from "ethers";
-import { truncateAndEscapeText } from "../../models/utils";
+import { truncateAndEscapeText } from "@daemons-fi/db-schema";
 import faker from "@faker-js/faker";
 import jwt from "jsonwebtoken";
-import { BeefyScript } from "../../models/scripts/beefy-script";
+import { BeefyScript } from "@daemons-fi/db-schema";
 
 describe("POST api/scripts/    [Beefy]", () => {
     before(async () => await connectToTestDb());

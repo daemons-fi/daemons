@@ -3,8 +3,8 @@ import supertest from 'supertest';
 import { app } from '../../app';
 import { expect } from 'chai';
 import jwt from 'jsonwebtoken';
-import { notificationDocumentFactory } from '../../test-factories/notification-factories';
-import { Notification } from "../../models/notification";
+import { notificationDocumentFactory } from '@daemons-fi/db-schema';
+import { Notification } from "@daemons-fi/db-schema";
 
 
 describe('POST api/notifications', () => {

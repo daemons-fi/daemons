@@ -2,8 +2,8 @@ import { utils } from "ethers";
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { authenticate } from "../middlewares/authentication";
-import { Transaction } from "../models/transactions/transaction";
-import { User } from "../models/user";
+import { Transaction } from "@daemons-fi/db-schema";
+import { User } from "@daemons-fi/db-schema";
 
 export const authenticationRouter = express.Router();
 const OTPs: { [address: string]: number } = {};

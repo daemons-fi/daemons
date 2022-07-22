@@ -1,13 +1,13 @@
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../test/test-db-handler";
 import supertest from "supertest";
 import { app } from "../../app";
-import { signedZapInActionFactory } from "../../test-factories/script-factories";
+import { signedZapInActionFactory } from "@daemons-fi/db-schema";
 import { expect } from "chai";
 import { utils } from "ethers";
-import { truncateAndEscapeText } from "../../models/utils";
+import { truncateAndEscapeText } from "@daemons-fi/db-schema";
 import faker from "@faker-js/faker";
 import jwt from "jsonwebtoken";
-import { ZapInScript } from "../../models/scripts/zap-in-script";
+import { ZapInScript } from "@daemons-fi/db-schema";
 
 describe("POST api/scripts/    [ZapIn]", () => {
     before(async () => await connectToTestDb());

@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
-const corsWhitelist: Set<string> = new Set([
-    "http://localhost:3000",
-    "https://app.daemons.fi",
-]);
+const isProduction = process.env.NODE_ENV === "production";
+
+const devCORS = ["http://localhost:3000"];
+const prodCORS = ["https://app.daemons.fi"];
+
+const corsWhitelist: Set<string> = new Set(isProduction ? prodCORS : devCORS);
 
 /**
  * If the origin is in `corsWhitelist`, we allow CORS in all responses.

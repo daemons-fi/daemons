@@ -1,13 +1,13 @@
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../test/test-db-handler";
 import supertest from "supertest";
 import { app } from "../../app";
-import { signedPassActionFactory } from "../../test-factories/script-factories";
+import { signedPassActionFactory } from "@daemons-fi/db-schema";
 import { expect } from "chai";
 import { utils } from "ethers";
-import { truncateAndEscapeText } from "../../models/utils";
+import { truncateAndEscapeText } from "@daemons-fi/db-schema";
 import faker from "@faker-js/faker";
 import jwt from "jsonwebtoken";
-import { PassScript } from "../../models/scripts/pass-script";
+import { PassScript } from "@daemons-fi/db-schema";
 
 describe("POST api/scripts/    [Pass]", () => {
     before(async () => await connectToTestDb());

@@ -1,13 +1,13 @@
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../test/test-db-handler";
 import supertest from "supertest";
 import { app } from "../../app";
-import { signedMmAdvancedActionFactory } from "../../test-factories/script-factories";
+import { signedMmAdvancedActionFactory } from "@daemons-fi/db-schema";
 import { expect } from "chai";
 import { utils } from "ethers";
 import faker from "@faker-js/faker";
-import { truncateAndEscapeText } from "../../models/utils";
+import { truncateAndEscapeText } from "@daemons-fi/db-schema";
 import jwt from "jsonwebtoken";
-import { MmAdvancedScript } from "../../models/scripts/mm-adv-script";
+import { MmAdvancedScript } from "@daemons-fi/db-schema";
 
 describe("POST api/scripts/    [MmAdvanced]", () => {
     before(async () => await connectToTestDb());
