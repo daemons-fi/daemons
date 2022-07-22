@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { ScriptStats } from "@daemons-fi/db-schema";
 import { TransactionStats } from "@daemons-fi/db-schema";
 import { UserStats } from "@daemons-fi/db-schema";
+import { rootLogger } from "../logger";
 
 export const statisticsRouter = express.Router();
 
