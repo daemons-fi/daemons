@@ -2,6 +2,9 @@ import { Event, utils } from "ethers";
 import { ITransaction } from "@daemons-fi/shared-definitions";
 import { getTxCostsAndProfits } from "./get-tx-cost-and-profits";
 import { Script, Transaction } from "@daemons-fi/db-schema";
+import { rootLogger } from "../logger";
+
+const logger = rootLogger.child({source: "buildTxFromEvent"});
 
 export async function buildTxFromEvent(
         scriptId: string,
@@ -9,8 +12,8 @@ export async function buildTxFromEvent(
         executor: string,
         event: Event
     ): Promise<ITransaction | undefined> {
-        console.log({
-        message: `[Transaction] Building from blockchain event`,
+        logger.debug({
+        message: `Building from blockchain event`,
         scriptOwner,
         executor,
         scriptId
@@ -26,7 +29,7 @@ export async function buildTxFromEvent(
     // otherwise create the transaction!
     const script = await Script.findOne({ scriptId: scriptId });
     if (!script) {
-        console.error({ message: `could not find script`, scriptId });
+        logger.error({ message: `could not find script`, scriptId });
         return;
     }
 
@@ -50,12 +53,12 @@ export async function buildTxFromEvent(
             profitDAEM: costsAndProfits.profitDAEM
         } as ITransaction;
 
-        console.log({
-            message: `[Transaction] transaction added. Saving.`,
+        logger.debug({
+            message: `transaction added. Saving.`,
             tx
         });
         return await Transaction.build(tx).save();
     } catch (error) {
-        console.error({ message: `[Transaction] Tx insertion aborted`, error });
+        logger.error({ message: `Tx insertion aborted`, error });
     }
 }

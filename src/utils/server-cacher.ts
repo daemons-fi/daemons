@@ -1,3 +1,5 @@
+import { rootLogger } from "../logger";
+
 interface ICachedData {
     timestamp: number;
     data: any;
@@ -27,6 +29,7 @@ class LocalStorage {
  */
 export class ServerCacher {
     private static localStorage = new LocalStorage();
+    private static logger = rootLogger.child({source: "ServerCacher"});
 
     /**
      * Fetches the data and caches it locally, so the next time
@@ -42,7 +45,7 @@ export class ServerCacher {
         const cachedData = this.fetchCachedData(key, cacheDuration);
         if (cachedData) return cachedData;
 
-        console.debug(`Cache miss, retrieving data for ${key}`);
+        this.logger.debug({message: `Cache miss`, key });
         const fetchedData = await f();
         this.storeData(key, fetchedData);
         return fetchedData;

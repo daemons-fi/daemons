@@ -8,7 +8,7 @@
     "test:ci": "mocha ./**/*test.ts --exit",
     "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only --exit-child --watch src src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only --exit-child --watch src src/index.ts | pino-pretty -c -i time,hostname,source -S -o '[{source}] {msg}'"
   },
   "author": "Daemons Finance",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "cron": "^1.8.2",
     "dotenv": "^16.0.0",
     "ethers": "^5.5.3",
+    "pino": "^8.3.0",
     "ts-node": "^10.7.0"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "mocha-param": "^2.0.1",
     "mongodb-memory-server": "^8.2.0",
     "prettier": "^2.5.1",
+    "pino-pretty": "^8.1.0",
     "sinon": "^13.0.1",
     "supertest": "^6.2.1",
     "ts-node-dev": "^1.1.8",

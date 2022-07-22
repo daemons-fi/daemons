@@ -1,3 +1,4 @@
+import { rootLogger } from "../logger";
 import { updateScriptStats } from "./stats/script-stats-updater";
 import { updateTransactionStats } from "./stats/transactions-stats-updater";
 import { updateUserStats } from "./stats/user-stats-updater";
@@ -10,15 +11,16 @@ import { updateUserStats } from "./stats/user-stats-updater";
  */
 export class StatisticsBot {
     public static execute = async (): Promise<void> => {
-        console.log({ source: "[🤖📊 Statistics Bot]", message: "starting" });
+        const logger = rootLogger.child({source: "Statistics Bot"});
+        logger.debug({ message: "starting" });
 
         await updateUserStats();
-        console.log({ source: "[🤖📊 Statistics Bot]", message: "User stats updated" });
+        logger.debug({ message: "User stats updated" });
 
         await updateScriptStats();
-        console.log({ source: "[🤖📊 Statistics Bot]", message: "Script stats updated" });
+        logger.debug({ message: "Script stats updated" });
 
         await updateTransactionStats();
-        console.log({ source: "[🤖📊 Statistics Bot]", message: "Transaction stats updated" });
+        logger.debug({ message: "Transaction stats updated" });
     };
 }

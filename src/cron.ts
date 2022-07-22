@@ -2,9 +2,11 @@ import { CronJob } from "cron";
 import { StatisticsBot } from "./bot-stats";
 import { TerminatorBot } from "./bot-terminator";
 import { TxAdderBot } from "./bot-tx-adder";
+import { rootLogger } from "./logger";
 
 export const scheduler = () => {
-    console.log("Storage scheduler started");
+    const logger = rootLogger.child({source: "scheduler"});
+    logger.debug({message: "scheduler started"})
 
     const cronjobs = [
         // Bots run every 10 minutes

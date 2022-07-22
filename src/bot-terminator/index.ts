@@ -9,6 +9,9 @@ import { BrokenScript } from "@daemons-fi/db-schema";
 import { Script } from "@daemons-fi/db-schema";
 import { getProvider } from "../utils/providers-builder";
 import { parseScript } from "./mockable-script-builder";
+import { rootLogger } from "../logger";
+
+const logger = rootLogger.child({ source: "Terminator Bot" });
 
 /**
  * ## Terminator Bot 🤖🪓
@@ -18,13 +21,13 @@ import { parseScript } from "./mockable-script-builder";
  */
 export class TerminatorBot {
     public static execute = async (): Promise<number> => {
-        console.log(`[🤖🪓 Terminator Bot] Starting`);
+        logger.debug({ message: `Starting` });
         const ids = await BrokenScript.distinct("scriptId");
         if (ids.length === 0) {
-            console.log(`[Terminator Bot] No scripts to be processed. Terminating.`);
+            logger.debug({ message: `No scripts to be processed. Terminating.` });
             return 0;
         }
-        console.log(`[🤖🪓 Terminator Bot] ${ids.length} scripts to be processed`);
+        logger.debug({ message: `${ids.length} scripts to be processed` });
 
         const scripts: any[] = await Script.find({ scriptId: { $in: ids } }).lean();
         const scriptIds = new Set(scripts.map((s) => s.scriptId));
@@ -56,21 +59,27 @@ export class TerminatorBot {
                     });
                 }
             } catch (error) {
-                console.error(`An error occurred with the script ${script.scriptId}: ${error}`);
+                logger.error({
+                    message: `An error occurred while terminating a script`,
+                    script: script.scriptId,
+                    error
+                });
             }
         }
 
-        console.log(`[🤖🪓 Terminator Bot] Checks completed`);
-        console.log(`[🤖🪓 Terminator Bot] Processed: ${processed.length}/${ids.length}`);
-        console.log(`[🤖🪓 Terminator Bot] True positive: ${toBeRemoved.length}`);
-        console.log(`[🤖🪓 Terminator Bot] False positive: ${falsePositive.length}`);
-        console.log(`[🤖🪓 Terminator Bot] Not found: ${notFound.length}`);
+        logger.debug({
+            message: "Checks completed",
+            processed: `${processed.length}/${ids.length}`,
+            truePositive: toBeRemoved.length,
+            falsePositive: falsePositive.length,
+            notFound: notFound.length
+        });
 
         await BrokenScript.deleteMany({ scriptId: { $in: processed } });
         await BrokenScript.deleteMany({ scriptId: { $in: notFound } });
         await Script.deleteMany({ scriptId: { $in: toBeRemoved } });
         await Notification.insertMany(notifications);
-        console.log(`[🤖🪓 Terminator Bot] Deletion completed`);
+        logger.debug({ message: `Deletion completed` });
 
         return toBeRemoved.length;
     };
