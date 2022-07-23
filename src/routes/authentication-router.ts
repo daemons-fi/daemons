@@ -4,9 +4,10 @@ import jwt from "jsonwebtoken";
 import { authenticate } from "../middlewares/authentication";
 import { Transaction } from "@daemons-fi/db-schema";
 import { User } from "@daemons-fi/db-schema";
+import { makeOTP } from "../OTP-maker";
+import { SignatureLike } from "@ethersproject/bytes";
 
 export const authenticationRouter = express.Router();
-const OTPs: { [address: string]: number } = {};
 
 authenticationRouter.get(
     "/is-authenticated/:userAddress",
@@ -51,30 +52,34 @@ authenticationRouter.get(
 
 authenticationRouter.get("/message-to-sign/:userAddress", async (req: Request, res: Response) => {
     const userAddress = utils.getAddress(req.params.userAddress);
-
-    // create a one time password and cache it
-    const otp = Math.floor(Math.random() * 1000000);
-    OTPs[userAddress] = otp;
-
+    const otp = makeOTP(userAddress);
     const message = composeMessage(userAddress, otp);
     return res.json({ message });
 });
 
-const composeMessage = (userAddress: string, otp: number): string =>
+const composeMessage = (userAddress: string, otp: string): string =>
     `Sign this message to verify you are the owner of the address ${userAddress}. [OTP: ${otp}]`;
+
+const verifyMessage = (userAddress: string, signedMessage: SignatureLike): boolean => {
+    const otp = makeOTP(userAddress);
+    const message = composeMessage(userAddress, otp);
+    const decodedAddress = utils.verifyMessage(message, signedMessage);
+
+    if (userAddress === decodedAddress) return true;
+
+    // verification failed, let's try with the previous OTP, just in case.
+    const previousOTP = makeOTP(userAddress, true);
+    const messageWithPreviousOTP = composeMessage(userAddress, previousOTP);
+    const decodedAddressWithPreviousOTP = utils.verifyMessage(message, messageWithPreviousOTP);
+
+    return (userAddress === decodedAddressWithPreviousOTP);
+}
 
 authenticationRouter.post("/login", async (req: Request, res: Response) => {
     const signedMessage = req.body.signedMessage;
     const userAddress = utils.getAddress(req.body.userAddress);
 
-    // retrieve and delete the OTP of the user
-    const otp = OTPs[userAddress];
-    delete OTPs[userAddress];
-    const message = composeMessage(userAddress, otp);
-
-    const decodedAddress = utils.verifyMessage(message, signedMessage);
-
-    if (userAddress !== decodedAddress) {
+    if (!verifyMessage(userAddress, signedMessage)) {
         return res.status(403).send("Invalid signature");
     }
 

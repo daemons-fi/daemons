@@ -11,6 +11,7 @@ import { healthRouter } from "./routes/health-router";
 
 dotenv.config();
 
+if (!process.env.OTP_KEY) throw new Error("OTP_KEY was not set");
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET was not set");
 if (!process.env.MONGO_DB_CONN_STRING) throw new Error("MONGO_DB_CONN_STRING was not set");
 
