@@ -22,6 +22,8 @@
 .wallet-connector__address {
     background-color: var(--secondary-background);
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
     height: 45px;
     padding: 0 10px;
@@ -34,6 +36,8 @@
 
 .wallet-connector__address--unauthenticated {
     cursor: pointer;
+    line-height: 17px;
+    padding: 0 20px;
 }
 
 .wallet-connector__address-notification {
@@ -1244,6 +1248,24 @@ select option {
     transform: rotate(180deg);
 }
 
+@keyframes MoveUpDown {
+    0%, 100% {
+      top: 100px;
+    }
+    50% {
+      top: 110px;
+    }
+  }
+
+.disconnected__arrow {
+    animation: MoveUpDown 1.5s cubic-bezier(0.86, 0.01, 0.04, 1) infinite;
+    height: 40px;
+    width: 40px;
+    position: absolute;
+    background-image: url("data:image/svg+xml,%3Csvg version=%271.1%27 id=%27Capa_1%27 xmlns=%27http://www.w3.org/2000/svg%27 xmlns:xlink=%27http://www.w3.org/1999/xlink%27 x=%270px%27 y=%270px%27 viewBox=%270 0 15.304 15.304%27 style=%27enable-background:new 0 0 15.304 15.304;%27 xml:space=%27preserve%27%3E%3Cg%3E%3Cpath style=%27fill:%23fff;%27 d=%27M12.675,5.92L7.954,0.216c0,0-0.387-0.454-0.793-0.047C6.603,0.728,2.587,6.058,2.587,6.058 S1.874,6.766,2.819,6.766c0.948,0,2.457,0,2.457,0s0,0.411,0,1.04c0,1.939,0,5.714,0,7.16c0,0-0.011,0.338,0.428,0.338 c0.437,0,3.129,0,3.743,0c0.611,0,0.506-0.404,0.506-0.404c0-1.484,0-5.135,0-7.144c0-0.701,0-1.16,0-1.16s1.883,0,2.66,0 S12.675,5.92,12.675,5.92z%27/%3E%3C/g%3E%3C/svg%3E");
+    right: 130px;
+    top: 100px;
+}
 
 .dashboard-page__layout {
     display: grid;
