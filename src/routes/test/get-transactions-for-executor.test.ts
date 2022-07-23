@@ -31,8 +31,7 @@ describe("GET api/transactions/executor/:chainId/:userAddress", () => {
 
         const fetchedTransactions = response.body as IFetchedTxs;
 
-        expect(fetchedTransactions.nrPages).to.equal(1);
-        expect(fetchedTransactions.transactions.length).to.equal(2);
+        expect(fetchedTransactions.totalCount).to.equal(2);
         expect(hashes).to.include(fetchedTransactions.transactions[0].hash);
         expect(hashes).to.include(fetchedTransactions.transactions[1].hash);
     });
@@ -54,8 +53,7 @@ describe("GET api/transactions/executor/:chainId/:userAddress", () => {
 
         const fetchedTransactions = response.body as IFetchedTxs;
 
-        expect(fetchedTransactions.nrPages).to.equal(1);
-        expect(fetchedTransactions.transactions.length).to.equal(2);
+        expect(fetchedTransactions.totalCount).to.equal(2);
         expect(hashes).to.include(fetchedTransactions.transactions[0].hash);
         expect(hashes).to.include(fetchedTransactions.transactions[1].hash);
     });
@@ -77,7 +75,7 @@ describe("GET api/transactions/executor/:chainId/:userAddress", () => {
 
         // The first page should contain TRANSACTIONS_PAGE_SIZE elements
         const fetchedTransactionPage1 = response.body as IFetchedTxs;
-        expect(fetchedTransactionPage1.nrPages).to.equal(2);
+        expect(fetchedTransactionPage1.totalCount).to.equal(22);
         expect(fetchedTransactionPage1.transactions.length).to.equal(TRANSACTIONS_PAGE_SIZE);
 
         const response2 = await supertest(app)
@@ -86,7 +84,7 @@ describe("GET api/transactions/executor/:chainId/:userAddress", () => {
 
         // The second page should contain 2 elements
         const fetchedTransactionPage2 = response2.body as IFetchedTxs;
-        expect(fetchedTransactionPage2.nrPages).to.equal(2);
+        expect(fetchedTransactionPage2.totalCount).to.equal(22);
         expect(fetchedTransactionPage2.transactions.length).to.equal(2);
     });
 });
