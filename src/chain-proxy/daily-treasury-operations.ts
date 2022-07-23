@@ -51,7 +51,8 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
         message: `Daily treasury operation report`,
         chain: chain.name,
         commissions,
-        polPool
+        polPool,
+        treasuryAddress: chain.contracts.Treasury
     });
 
     if (commissions > thresholds.minCommission) {
