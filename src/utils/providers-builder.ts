@@ -28,19 +28,14 @@ export const supportedChains: { [chain: string]: IChainWithContracts } = {
     }
 };
 
-const providers: { [chainId: string]: ethers.providers.Provider } = {};
-
 /**
  * Get a provider. If one has already been instantiated for this chain, it will use that.
  * @param chainId The chain the provider should be connected to.
  */
 export const getProvider = (chainId: string): ethers.providers.Provider => {
-    if (!providers[chainId]) {
-        const chainInfo = supportedChains[chainId];
-        if (!chainInfo) throw new Error(`Chain ${chainId} does not seem to be supported`);
-        providers[chainId] = instantiateProvider(chainInfo.rpc_url());
-    }
-    return providers[chainId];
+    const chainInfo = supportedChains[chainId];
+    if (!chainInfo) throw new Error(`Chain ${chainId} does not seem to be supported`);
+    return instantiateProvider(chainInfo.rpc_url());
 };
 
 const instantiateProvider = (rpcUrl: string): BaseProvider => {
