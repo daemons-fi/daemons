@@ -962,18 +962,8 @@ input[type=range] {
     border-bottom: 2px solid var(--primary-colour);
 }
 
-.menu__entry--tip {
+.menu__entry--gas {
     margin-left: auto;
-}
-
-.menu__entry--tip:hover {
-    text-decoration: none;
-    cursor: auto;
-}
-
-.menu__entry--gas:hover {
-    text-decoration: none;
-    cursor: auto;
 }
 
 .menu__notification {
@@ -991,12 +981,33 @@ input[type=range] {
 }
 
 .header-indicator {
-    opacity: 1;
-    background-color: var(--greyish-brown);
-    padding: 5px;
-    border-radius: 5px;
-    text-transform: uppercase;
+    height: 45px;
+    padding-right: 13px;
+    border-radius: 9px;
+    background-color: var(--secondary-background);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--white);
+    text-decoration: none;
 }
+
+.header-indicator__gas-tank-icon {
+    width: 50px;
+    height: 45px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-charging-pile%27 width=%2730%27 height=%2730%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cline x1=%2718%27 y1=%277%27 x2=%2717%27 y2=%278%27 /%3E%3Cpath d=%27M14 11h1a2 2 0 0 1 2 2v3a1.5 1.5 0 0 0 3 0v-7l-3 -3%27 /%3E%3Cpath d=%27M4 20v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v14%27 /%3E%3Cpath d=%27M9 11.5l-1.5 2.5h3l-1.5 2.5%27 /%3E%3Cline x1=%273%27 y1=%2720%27 x2=%2715%27 y2=%2720%27 /%3E%3Cline x1=%274%27 y1=%278%27 x2=%2714%27 y2=%278%27 /%3E%3C/svg%3E");
+}
+
+.header-indicator__tip-jar-icon {
+    width: 50px;
+    height: 45px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-coin%27 width=%2730%27 height=%2730%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%279%27 /%3E%3Cpath d=%27M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1 -1.8 -1%27 /%3E%3Cpath d=%27M12 6v2m0 8v2%27 /%3E%3C/svg%3E")
+}
+
 
 .wallet-control {
     margin-left: 20px;
@@ -1052,7 +1063,7 @@ input[type=range] {
     width: 75px;
     background-color: var(--primary-colour);
     border-radius: 100%;
-    display:flex;
+    display: flex;
     text-align: center;
     align-content: center;
     align-items: center;
