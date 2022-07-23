@@ -21,7 +21,9 @@ import { ZapInScript } from "@daemons-fi/db-schema";
 import { ZapOutScript } from "@daemons-fi/db-schema";
 import { BeefyScript } from "@daemons-fi/db-schema";
 import { PassScript } from "@daemons-fi/db-schema";
+import { rootLogger } from "../logger";
 
+const routerLogger = rootLogger.child({source: "scriptsRouter"});
 export const scriptsRouter = express.Router();
 
 scriptsRouter.get("/:chainId", authenticate, async (req: Request, res: Response) => {
@@ -31,27 +33,34 @@ scriptsRouter.get("/:chainId", authenticate, async (req: Request, res: Response)
 });
 
 scriptsRouter.get("/:chainId/:userAddress", authenticate, async (req: Request, res: Response) => {
-    // adds checksum to address (uppercase characters)
-    const userAddress = utils.getAddress(req.params.userAddress);
-    if (req.userAddress !== userAddress) {
-        return res.sendStatus(403);
-    }
+    try {
+        // adds checksum to address (uppercase characters)
+        const userAddress = utils.getAddress(req.params.userAddress);
+        if (req.userAddress !== userAddress) {
+            return res.sendStatus(403);
+        }
 
-    const chainId = String(req.params.chainId);
-    const scripts = await Script.find({ user: userAddress, chainId: chainId }).lean();
-    return res.send(scripts);
+        const chainId = String(req.params.chainId);
+        const scripts = await Script.find({ user: userAddress, chainId: chainId }).lean();
+        return res.send(scripts);
+    } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/:chainId/:userAddress", error });
+        return res.status(500).send(error);
+    }
 });
 
 scriptsRouter.post("/", authenticate, async (req: Request, res: Response) => {
     const { script, type } = req.body;
-    if (req.userAddress !== utils.getAddress(script.user)) {
-        return res.sendStatus(403);
-    }
 
     try {
+        if (req.userAddress !== utils.getAddress(script.user)) {
+            return res.sendStatus(403);
+        }
+
         await buildScript(script, type);
         return res.send();
     } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/", error });
         return res.status(400).send(error);
     }
 });
@@ -97,6 +106,7 @@ scriptsRouter.post("/update-description", authenticate, async (req: Request, res
         );
         return res.send();
     } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/update-description", error });
         return res.status(400).send(error);
     }
 });
@@ -108,6 +118,7 @@ scriptsRouter.post("/revoke", authenticate, async (req: Request, res: Response) 
         await Script.deleteOne({ user: req.userAddress, scriptId: scriptId });
         return res.send();
     } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/revoke", error });
         return res.status(400).send(error);
     }
 });
@@ -122,6 +133,7 @@ scriptsRouter.post("/mark-as-broken", authenticate, async (req: Request, res: Re
         }).save();
         return res.send();
     } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/mark-as-broken", error });
         return res.status(400).send(error);
     }
 });

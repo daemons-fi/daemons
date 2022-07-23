@@ -2,12 +2,15 @@ import express, { Request, Response } from "express";
 import { ScriptStats } from "@daemons-fi/db-schema";
 import { TransactionStats } from "@daemons-fi/db-schema";
 import { UserStats } from "@daemons-fi/db-schema";
+import { rootLogger } from "../logger";
+
+const routerLogger = rootLogger.child({ source: "statisticsRouter" });
 
 export const statisticsRouter = express.Router();
 
 export const ChainInfo = (): { [chainId: string]: string } => ({
     "42": "Kovan",
-    "4002": "Fantom Testnet",
+    "4002": "Fantom Testnet"
 });
 
 statisticsRouter.get("/users/:chainId", async (req: Request, res: Response) => {
@@ -24,6 +27,7 @@ statisticsRouter.get("/users/:chainId", async (req: Request, res: Response) => {
         }).lean();
         return res.status(200).send(stats);
     } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/users/:chainId", error });
         return res.status(500).send(error);
     }
 });
@@ -42,6 +46,7 @@ statisticsRouter.get("/scripts/:chainId", async (req: Request, res: Response) =>
         }).lean();
         return res.status(200).send(stats);
     } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/scripts/:chainId", error });
         return res.status(500).send(error);
     }
 });
@@ -60,6 +65,11 @@ statisticsRouter.get("/transactions/:chainId", async (req: Request, res: Respons
         }).lean();
         return res.status(200).send(stats);
     } catch (error) {
+        routerLogger.error({
+            message: "endpoint error",
+            endpoint: "/transactions/:chainId",
+            error
+        });
         return res.status(500).send(error);
     }
 });

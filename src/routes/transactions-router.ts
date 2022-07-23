@@ -2,9 +2,11 @@ import { ITransaction } from "@daemons-fi/shared-definitions/build";
 import express, { Request, Response } from "express";
 import { authenticate } from "../middlewares/authentication";
 import { Transaction } from "@daemons-fi/db-schema";
+import { rootLogger } from "../logger";
+
+const routerLogger = rootLogger.child({ source: "transactionsRouter" });
 
 export const transactionsRouter = express.Router();
-
 export const TRANSACTIONS_PAGE_SIZE = 20;
 
 export interface IFetchedTxs {
@@ -14,34 +16,44 @@ export interface IFetchedTxs {
 
 /** Get the transactions for this user */
 transactionsRouter.get("/receiver/:chainId", authenticate, async (req: Request, res: Response) => {
-    const chainId = String(req.params.chainId);
-    const currentPage = (Number(req.query.page) ?? 1) - 1;
+    try {
+        const chainId = String(req.params.chainId);
+        const currentPage = (Number(req.query.page) ?? 1) - 1;
 
-    const query = { chainId, beneficiaryUser: req.userAddress };
-    const countAll = await Transaction.countDocuments(query);
-    const nrPages = Math.ceil(countAll / TRANSACTIONS_PAGE_SIZE);
+        const query = { chainId, beneficiaryUser: req.userAddress };
+        const countAll = await Transaction.countDocuments(query);
+        const nrPages = Math.ceil(countAll / TRANSACTIONS_PAGE_SIZE);
 
-    const transactions = await Transaction.find(query)
-        .lean()
-        .skip(currentPage * TRANSACTIONS_PAGE_SIZE)
-        .limit(TRANSACTIONS_PAGE_SIZE)
-        .sort({ date: "desc" });
-    return res.send({ transactions, nrPages } as IFetchedTxs);
+        const transactions = await Transaction.find(query)
+            .lean()
+            .skip(currentPage * TRANSACTIONS_PAGE_SIZE)
+            .limit(TRANSACTIONS_PAGE_SIZE)
+            .sort({ date: "desc" });
+        return res.send({ transactions, nrPages } as IFetchedTxs);
+    } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/receiver/:chainId", error });
+        return res.status(500).send(error);
+    }
 });
 
 /** Get the transactions for this executor */
 transactionsRouter.get("/executor/:chainId/", authenticate, async (req: Request, res: Response) => {
-    const chainId = String(req.params.chainId);
-    const currentPage = (Number(req.query.page) ?? 1) - 1;
+    try {
+        const chainId = String(req.params.chainId);
+        const currentPage = (Number(req.query.page) ?? 1) - 1;
 
-    const query = { chainId, executingUser: req.userAddress };
-    const countAll = await Transaction.countDocuments(query);
-    const nrPages = Math.ceil(countAll / TRANSACTIONS_PAGE_SIZE);
+        const query = { chainId, executingUser: req.userAddress };
+        const countAll = await Transaction.countDocuments(query);
+        const nrPages = Math.ceil(countAll / TRANSACTIONS_PAGE_SIZE);
 
-    const transactions = await Transaction.find(query)
-        .lean()
-        .skip(currentPage * TRANSACTIONS_PAGE_SIZE)
-        .limit(TRANSACTIONS_PAGE_SIZE)
-        .sort({ date: "desc" });
-    return res.send({ transactions, nrPages } as IFetchedTxs);
+        const transactions = await Transaction.find(query)
+            .lean()
+            .skip(currentPage * TRANSACTIONS_PAGE_SIZE)
+            .limit(TRANSACTIONS_PAGE_SIZE)
+            .sort({ date: "desc" });
+        return res.send({ transactions, nrPages } as IFetchedTxs);
+    } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/executor/:chainId", error });
+        return res.status(500).send(error);
+    }
 });
