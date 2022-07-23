@@ -1818,6 +1818,19 @@ select option {
     width: 120px;
 }
 
+.staking__apy-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.staking__apy {
+    font-size: 2.5rem;
+}
+
 .staking__reward-info {
     display: flex;
     flex-direction: row;
