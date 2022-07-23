@@ -37,6 +37,7 @@ async function updateGasPriceForChain(chain: IChainWithContracts): Promise<void>
                 newGasPrice: newGasPrice.toString(),
                 oldGasPrice: oldGasPrice.toString()
             });
+            return;
         }
 
         const tx = await gasPriceFeedContract.setGasPrice(newGasPrice);
