@@ -20,11 +20,14 @@
 }
 
 .wallet-connector__address {
-    background-color: var(--greyish-brown);
-    padding: 5px;
+    background-color: var(--secondary-background);
+    display: flex;
+    align-items: center;
+    height: 45px;
+    padding: 0 10px;
     text-align: center;
     font-size: 1rem;
-    border-radius: 5px;
+    border-radius: 9px;
     position: relative;
     cursor: pointer;
 }
