@@ -55,6 +55,16 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
         treasuryAddress: chain.contracts.Treasury
     });
 
+    await claimCommissions(commissions, thresholds, chain, treasuryContract);
+    await fundLpOrBuyback(polPool, thresholds, chain, treasuryContract, polPoolRaw);
+}
+
+async function claimCommissions(
+    commissions: number,
+    thresholds: Thresholds,
+    chain: IChainWithContracts,
+    treasuryContract: ethers.Contract
+) {
     if (commissions > thresholds.minCommission) {
         logger.debug({ message: "Claiming commission", chain: chain.name });
         try {
@@ -67,7 +77,15 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
             });
         }
     }
+}
 
+async function fundLpOrBuyback(
+    polPool: number,
+    thresholds: Thresholds,
+    chain: IChainWithContracts,
+    treasuryContract: ethers.Contract,
+    polPoolRaw: any
+) {
     if (polPool > thresholds.minPolPool) {
         logger.debug({ message: "Funding LP", chain: chain.name });
         try {
