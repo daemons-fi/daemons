@@ -13,7 +13,7 @@
   "author": "Daemons Finance",
   "license": "ISC",
   "dependencies": {
-    "@daemons-fi/db-schema": "0.0.2",
+    "@daemons-fi/db-schema": "0.0.3",
     "body-parser": "^1.19.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
