@@ -87,14 +87,31 @@ async function fundLpOrBuyback(
     polPoolRaw: any
 ) {
     if (polPool > thresholds.minPolPool) {
-        logger.debug({ message: "Funding LP", chain: chain.name });
         try {
-            const quoteHalfETHtoDAEM = await treasuryContract.ethToDAEM(polPoolRaw.div(2));
-            const minAmountDAEM = quoteHalfETHtoDAEM.mul(99).div(100);
-            await treasuryContract.fundLP(minAmountDAEM);
+            const shouldFundLp = await treasuryContract.shouldFundLP();
+            const percentageDAEMInLP = await treasuryContract.percentageDAEMTokensStoredInLP();
+
+            if (shouldFundLp) {
+                logger.debug({ message: "Funding LP", chain: chain.name, percentageDAEMInLP });
+
+                // get a quote to calculate minOutAmount.
+                // as only half of the ETH is swapped for DAEM, we divide by 2.
+                const quoteHalfETHtoDAEM = await treasuryContract.ethToDAEM(polPoolRaw.div(2));
+                const minAmountDAEM = quoteHalfETHtoDAEM.mul(995).div(1000);
+
+                await treasuryContract.fundLP(minAmountDAEM);
+            } else {
+                logger.debug({ message: "Buyback DAEM", chain: chain.name, percentageDAEMInLP });
+
+                // get a quote to calculate minOutAmount.
+                // All ETH will be used to buyback, so we use the full amount.
+                const quoteFullETHtoDAEM = await treasuryContract.ethToDAEM(polPoolRaw);
+                const minAmountDAEM = quoteFullETHtoDAEM.mul(995).div(1000);
+                await treasuryContract.buybackDAEM(minAmountDAEM);
+            }
         } catch (error) {
             logger.error({
-                message: `Error while funding PoL`,
+                message: `Error while funding PoL/performing buyback`,
                 chain: chain.name,
                 error
             });
