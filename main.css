@@ -1816,6 +1816,7 @@ select option {
     flex-direction: row;
     margin: 10px 0;
     column-gap: 15px;
+    width: 100%;
 }
 
 .staking__button {
@@ -1828,12 +1829,7 @@ select option {
     font-family: var(--semiBold);
     font-size: 1rem;
     cursor: pointer;
-    margin-left: auto;
     text-decoration: none;
-}
-
-.staking__button--small {
-    width: 120px;
 }
 
 .staking__apy-info {
@@ -1855,8 +1851,8 @@ select option {
     align-items: center;
     align-content: center;
     justify-content: space-between;
+    column-gap: 10px;
 }
-
 
 .staking__button:disabled {
     cursor: not-allowed;
