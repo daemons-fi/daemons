@@ -68,7 +68,7 @@ authenticationRouter.get("/message-to-sign/:userAddress", async (req: Request, r
 });
 
 const composeMessage = (userAddress: string, otp: string): string =>
-    `Sign this message to verify you are the owner of the address ${userAddress}. [OTP: ${otp}]`;
+    `I own this account and I'll use Daemons to secure my degen positions. \n\n[OTP: ${otp}]`;
 
 const verifyMessage = (
     userAddress: string,
