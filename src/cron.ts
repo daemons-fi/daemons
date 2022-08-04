@@ -9,8 +9,11 @@ export const scheduler = () => {
     logger.debug({message: "scheduler started"})
 
     const cronjobs = [
-        // Bots run every 10 minutes
+        // Maintenance bots run every 10 minutes
         new CronJob("*/10 * * * *", () => TerminatorBot.execute(), null, true, "UTC"),
+
+        // Transaction bots run every 5 minutes
+        new CronJob("*/5 * * * *", () => TxAdderBot.execute(), null, true, "UTC"),
 
         // stats are updated thrice a day
         new CronJob("0 */8 * * *", () => StatisticsBot.execute(), null, true, "UTC"),
@@ -20,6 +23,6 @@ export const scheduler = () => {
         cronjob.start();
     });
 
-    // Tx-Adder Bot listens in the background
+    // Tx-Adder Bot is immediately triggered and will be refreshed every 5 minutes
     TxAdderBot.execute();
 };

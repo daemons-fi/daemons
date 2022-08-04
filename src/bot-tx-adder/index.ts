@@ -13,20 +13,34 @@ const logger = rootLogger.child({ source: "Tx-Adder Bot" });
  * a script is executed. With that info, it adds new transactions in the db.
  */
 export class TxAdderBot {
+    private static readonly instance = new TxAdderBot();
+    private gasTanks: ethers.Contract[] = [];
+
     public static execute = (): void => {
         logger.debug({ message: "Starting" });
 
+        // remove current listeners
+        this.instance.removeListeners();
+
+        // and restart
         for (const chain of Object.values(supportedChains)) {
-            TxAdderBot.setupConnectionOnChain(chain);
+            this.instance.setupConnectionOnChain(chain);
         }
     };
 
-    private static setupConnectionOnChain(chain: IChainWithContracts): void {
+    private setupConnectionOnChain(chain: IChainWithContracts): void {
         const provider = getProvider(chain.id);
 
         const gasTank = new ethers.Contract(chain.contracts.GasTank, gasTankABI, provider);
         gasTank.on("ScriptExecuted", buildTxFromEvent);
+        this.gasTanks.push(gasTank);
 
         logger.debug({ message: `setup complete`, chain: chain.name });
+    }
+
+    private removeListeners(): void {
+        this.gasTanks.forEach(gasTank => {gasTank.removeAllListeners()});
+        logger.debug({ message: `removed ${this.gasTanks.length} listeners` });
+        this.gasTanks = [];
     }
 }
