@@ -941,7 +941,6 @@ input[type=range] {
     display: flex;
     flex-direction: row;
     margin: 0 auto;
-    column-gap: 20px;
 }
 
 .menu__entry {
