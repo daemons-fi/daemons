@@ -1280,60 +1280,6 @@ input[type=range] {
     box-shadow: 5px 5px 5px 0 var(--body-background);
 }
 
-.tooltip {
-    position: relative;
-    display: inline-block;
-    font-weight: normal;
-}
-
-.tooltip__content {
-    visibility: hidden;
-    width: 200px;
-    background-color: #000e;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 10px;
-    position: absolute;
-    z-index: 1;
-    top: -5px;
-    left: 110%;
-}
-
-.tooltip__text {
-    border-radius: 100%;
-    background-color: var(--bright-teal);
-    height: 23px;
-    width: 23px;
-    font-family: var(--bold);
-    text-align: center;
-}
-
-.tooltip__content::after {
-    content: "";
-    position: absolute;
-    top: 20%;
-    right: 100%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent black transparent transparent;
-}
-
-.tooltip:hover .tooltip__content {
-    visibility: visible;
-}
-
-/* variations */
-
-.tooltip__content--left {
-    left: -225px;
-}
-.tooltip__content--left::after {
-    left: 100%;
-    transform: rotate(180deg);
-}
-
 
 .dashboard-page__layout {
     display: grid;
@@ -1391,6 +1337,7 @@ input[type=range] {
     align-items: center;
     margin-bottom: 14px;
     font-family: var(--semiBold);
+    column-gap: 15px;
 }
 
 .card__title-icon {
@@ -1401,7 +1348,6 @@ input[type=range] {
     background-color: var(--secondary-background);
     background-repeat: no-repeat;
     background-position: center;
-    margin-right: 17px;
     box-shadow: 5px 5px 15px 0 var(--black);
 }
 
@@ -1503,6 +1449,73 @@ input[type=range] {
 
 .card__title-icon--transactions {
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-switch-horizontal%27 width=%2730%27 height=%2730%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpolyline points=%2716 3 20 7 16 11%27 /%3E%3Cline x1=%2710%27 y1=%277%27 x2=%2720%27 y2=%277%27 /%3E%3Cpolyline points=%278 13 4 17 8 21%27 /%3E%3Cline x1=%274%27 y1=%2717%27 x2=%2713%27 y2=%2717%27 /%3E%3C/svg%3E");
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    font-weight: normal;
+}
+
+.tooltip__content {
+    visibility: hidden;
+    width: 200px;
+    background-color: #000e;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 110%;
+    font-family: var(--regular);
+}
+
+.tooltip__content--medium {
+    width: 300px;
+}
+
+.tooltip__content--large {
+    width: 400px;
+}
+
+.tooltip__content--align-left {
+    text-align: left;
+}
+
+.tooltip__text {
+    border-radius: 100%;
+    background-color: var(--bright-teal);
+    height: 23px;
+    width: 23px;
+    font-family: var(--bold);
+    text-align: center;
+}
+
+.tooltip__content::after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent black transparent transparent;
+}
+
+.tooltip:hover .tooltip__content {
+    visibility: visible;
+}
+
+/* variations */
+
+.tooltip__content--left {
+    left: -225px;
+}
+.tooltip__content--left::after {
+    left: 100%;
+    transform: rotate(180deg);
 }
 
 .my-page__layout {
