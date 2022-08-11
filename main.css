@@ -226,7 +226,6 @@ select option {
     justify-content: space-between;
 }
 
-
 .profile {
     display: grid;
     grid-template-columns: 80px auto;
@@ -251,6 +250,7 @@ select option {
     width: 25px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-pencil%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%23ffffff%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4%27 /%3E%3Cline x1=%2713.5%27 y1=%276.5%27 x2=%2717.5%27 y2=%2710.5%27 /%3E%3C/svg%3E");
 }
+
 .profile__username-button:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-pencil%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4%27 /%3E%3Cline x1=%2713.5%27 y1=%276.5%27 x2=%2717.5%27 y2=%2710.5%27 /%3E%3C/svg%3E");
 }
@@ -261,7 +261,11 @@ select option {
 }
 
 .profile__address {
+    width: 260px;
     font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Dialog */
