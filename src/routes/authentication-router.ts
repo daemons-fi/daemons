@@ -104,3 +104,7 @@ authenticationRouter.post("/login", async (req: Request, res: Response) => {
         return res.status(500).send(error);
     }
 });
+
+authenticationRouter.get("/logout", async (req: Request, res: Response) => {
+    return res.clearCookie("token").sendStatus(200);
+});
