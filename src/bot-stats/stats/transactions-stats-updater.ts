@@ -1,5 +1,5 @@
 import { ITransactionStats, Transaction, TransactionStats } from "@daemons-fi/db-schema";
-import { ChainInfo } from ".";
+import { supportedChains } from "../../utils/providers-builder";
 
 export async function updateTransactionStats(): Promise<void> {
     // add today's partials statistics
@@ -18,15 +18,13 @@ async function updateTransactionsStatsForDate(date: Date): Promise<void> {
     await TransactionStats.deleteMany({ date: yyyymmdd });
 
     // prepare and insert the stats for each chain
-    const chains = Object.keys(ChainInfo());
+    const chains = Object.keys(supportedChains);
     for (let chainId of chains) {
         await updateTransactionsStatsForChainAndDay(chainId, date);
     }
 }
 
 async function updateTransactionsStatsForChainAndDay(chainId: string, date: Date): Promise<void> {
-    const chainName = ChainInfo()[chainId];
-
     var start = new Date(date);
     start.setUTCHours(0, 0, 0, 0);
     var end = new Date(date);
@@ -50,7 +48,7 @@ async function updateTransactionsStatsForChainAndDay(chainId: string, date: Date
     const preppedTransactions = groupedTransactions.map(
         (group) =>
             ({
-                chain: chainName,
+                chainId: chainId,
                 amount: group.count,
                 date: start.toISOString().slice(0, 10),
                 kind: group._id

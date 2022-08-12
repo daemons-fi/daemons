@@ -16,7 +16,7 @@
     "@daemons-fi/contracts": "0.0.4",
     "@daemons-fi/scripts-definitions": "0.1.32",
     "@daemons-fi/shared-definitions": "2.1.10",
-    "@daemons-fi/db-schema": "0.0.3",
+    "@daemons-fi/db-schema": "0.0.6",
     "express": "^4.17.2",
     "cron": "^1.8.2",
     "dotenv": "^16.0.0",

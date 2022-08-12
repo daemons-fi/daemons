@@ -1,6 +1,6 @@
 import { IScriptStats, ScriptStats } from "@daemons-fi/db-schema";
 import { Script } from "@daemons-fi/db-schema";
-import { ChainInfo } from ".";
+import { supportedChains } from "../../utils/providers-builder";
 
 export async function updateScriptStats(): Promise<void> {
     // delete all stats from today to prevent duplicates
@@ -8,15 +8,13 @@ export async function updateScriptStats(): Promise<void> {
     await ScriptStats.deleteMany({ date: today });
 
     // prepare and insert the stats for each chain
-    const chains = Object.keys(ChainInfo());
-    for (let chainId of chains) {
+    for (let chainId of Object.keys(supportedChains)) {
         await updateScriptStatsForChain(chainId);
     }
 }
 
 async function updateScriptStatsForChain(chainId: string): Promise<void> {
     const today = new Date().toISOString().slice(0, 10);
-    const chainName = ChainInfo()[chainId];
 
     const scriptsCounts = await Script.aggregate([
         { $match: { chainId: chainId } },
@@ -25,7 +23,7 @@ async function updateScriptStatsForChain(chainId: string): Promise<void> {
 
     let todaysStatsForThisChain: IScriptStats[] = scriptsCounts.map(c => ({
         amount: c.count,
-        chain: chainName,
+        chainId: chainId,
         date: today,
         kind: c._id.substring(c._id.length - 6, 0) // remove 'Script' from script type
     }));

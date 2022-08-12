@@ -1,5 +1,5 @@
-import { ChainInfo } from ".";
 import { Script, UserStats } from "@daemons-fi/db-schema";
+import { supportedChains } from "../../utils/providers-builder";
 
 
 export async function updateUserStats(): Promise<void> {
@@ -8,22 +8,19 @@ export async function updateUserStats(): Promise<void> {
     await UserStats.deleteMany({ date: today });
 
     // prepare and insert the stats for each chain
-    const chains = Object.keys(ChainInfo());
-    for (let chainId of chains) {
+    for (let chainId of Object.keys(supportedChains)) {
         await updateUserStatsForChain(chainId);
     }
 }
 
 async function updateUserStatsForChain(chainId: string): Promise<void> {
     const today = new Date().toISOString().slice(0, 10);
-    const chainName = ChainInfo()[chainId];
-
     const nrUsers = await Script.find({chainId}).distinct('user');
     if (nrUsers.length === 0) return;
 
     await UserStats.build({
         amount: nrUsers.length,
-        chain: chainName,
+        chainId: chainId,
         date: today,
     }).save();
 }
