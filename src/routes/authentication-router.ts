@@ -12,7 +12,7 @@ const routerLogger = rootLogger.child({ source: "authenticationRouter" });
 export const authenticationRouter = express.Router();
 
 authenticationRouter.get(
-    "/is-authenticated/:userAddress",
+    "/is-authenticated/:userAddress/:chainId",
     authenticate,
     async (req: Request, res: Response) => {
         try {
@@ -36,7 +36,8 @@ authenticationRouter.get(
             // retrieve extra info to be sent along with the user
             const unseenTransactions = await Transaction.countDocuments({
                 beneficiaryUser: userAddress,
-                date: { $gt: user.lastLogin }
+                date: { $gt: user.lastLogin },
+                chainId: req.params.chainId
             });
 
             // update last login date

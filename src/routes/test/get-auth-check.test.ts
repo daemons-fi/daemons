@@ -19,7 +19,7 @@ describe("GET api/auth/is-authenticated/:userAddress", () => {
 
     it("returns 200 if the user is authenticated", async () => {
         await supertest(app)
-            .get(`/api/auth/is-authenticated/${userAddress}`)
+            .get(`/api/auth/is-authenticated/${userAddress}/42`)
             .set("Cookie", `token=${jwToken}`)
             .expect(200);
     });
@@ -29,7 +29,7 @@ describe("GET api/auth/is-authenticated/:userAddress", () => {
         expect(users.length).to.equal(0);
 
         await supertest(app)
-            .get(`/api/auth/is-authenticated/${userAddress}`)
+            .get(`/api/auth/is-authenticated/${userAddress}/42`)
             .set("Cookie", `token=${jwToken}`)
             .expect(200);
 
@@ -43,7 +43,7 @@ describe("GET api/auth/is-authenticated/:userAddress", () => {
 
     it("returns the user from DB", async () => {
         const response = await supertest(app)
-            .get(`/api/auth/is-authenticated/${userAddress}`)
+            .get(`/api/auth/is-authenticated/${userAddress}/42`)
             .set("Cookie", `token=${jwToken}`)
             .expect(200);
 
@@ -57,7 +57,7 @@ describe("GET api/auth/is-authenticated/:userAddress", () => {
         await userDocumentFactory({ address: addressWithChecksum, username: "scaloppino" });
 
         const response = await supertest(app)
-            .get(`/api/auth/is-authenticated/${userAddress}`)
+            .get(`/api/auth/is-authenticated/${userAddress}/42`)
             .set("Cookie", `token=${jwToken}`)
             .expect(200);
 
@@ -78,7 +78,7 @@ describe("GET api/auth/is-authenticated/:userAddress", () => {
         await transactionDocumentFactory({beneficiaryUser: addressWithChecksum});
 
         const response = await supertest(app)
-            .get(`/api/auth/is-authenticated/${userAddress}`)
+            .get(`/api/auth/is-authenticated/${userAddress}/42`)
             .set("Cookie", `token=${jwToken}`)
             .expect(200);
 
@@ -92,13 +92,13 @@ describe("GET api/auth/is-authenticated/:userAddress", () => {
         await userDocumentFactory({ address: addressWithChecksum, banned: true });
 
         await supertest(app)
-            .get(`/api/auth/is-authenticated/${userAddress}`)
+            .get(`/api/auth/is-authenticated/${userAddress}/42`)
             .set("Cookie", `token=${jwToken}`)
             .expect(403);
     });
 
     it("returns a 401 error if the user is not authenticated", async () => {
-        await supertest(app).get(`/api/auth/is-authenticated/${userAddress}`).expect(401);
+        await supertest(app).get(`/api/auth/is-authenticated/${userAddress}/42`).expect(401);
     });
 
     it("returns a 401 error and deletes cookie if the JWT does not correspond to the user", async () => {
@@ -106,7 +106,7 @@ describe("GET api/auth/is-authenticated/:userAddress", () => {
         const anotherJwt = jwt.sign({ userAddress: randomUser }, process.env.JWT_SECRET as string);
 
         await supertest(app)
-            .get(`/api/auth/is-authenticated/${userAddress}`)
+            .get(`/api/auth/is-authenticated/${userAddress}/42`)
             .set("Cookie", `token=${anotherJwt}`)
             .expect(401)
             // cookie should be deleted (by clearing the value and setting a past date)
