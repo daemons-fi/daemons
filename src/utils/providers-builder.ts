@@ -29,7 +29,7 @@ export const supportedChains: { [chain: string]: IChainWithContracts } = {
     "80001": {
         id: "80001",
         name: "Mumbai Testnet",
-        rpc_url: () => process.env.FANTOM_TESTNET_RPC!,
+        rpc_url: () => process.env.MUMBAI_RPC!,
         contracts: fantomTestnetContracts
     }
 };
