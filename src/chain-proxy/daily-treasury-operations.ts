@@ -16,6 +16,10 @@ const chainThresholds: { [chain: string]: Thresholds } = {
     "4002": {
         minCommission: 1,
         minPolPool: 1
+    },
+    "80001": {
+        minCommission: 1,
+        minPolPool: 0.1
     }
 };
 
