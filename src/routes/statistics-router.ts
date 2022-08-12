@@ -10,7 +10,8 @@ export const statisticsRouter = express.Router();
 
 export const ChainInfo = (): { [chainId: string]: string } => ({
     "42": "Kovan",
-    "4002": "Fantom Testnet"
+    "4002": "Fantom Testnet",
+    "80001": "Mumbai Testnet"
 });
 
 statisticsRouter.get("/users/:chainId", async (req: Request, res: Response) => {
