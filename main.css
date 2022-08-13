@@ -246,22 +246,55 @@ select option {
 .profile__username-row {
     display: flex;
     flex-direction: row;
+    font-family: var(--regular);
+}
+
+.profile__username {
+    margin-left: 5px;
 }
 
 .profile__username-button {
     cursor: pointer;
     height: 25px;
     width: 25px;
+}
+
+.profile__username-button--edit {
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-pencil%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%23ffffff%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4%27 /%3E%3Cline x1=%2713.5%27 y1=%276.5%27 x2=%2717.5%27 y2=%2710.5%27 /%3E%3C/svg%3E");
 }
 
-.profile__username-button:hover {
+.profile__username-button--edit:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-pencil%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4%27 /%3E%3Cline x1=%2713.5%27 y1=%276.5%27 x2=%2717.5%27 y2=%2710.5%27 /%3E%3C/svg%3E");
+}
+
+.profile__username-button--save {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-check%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%23fff%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M5 12l5 5l10 -10%27 /%3E%3C/svg%3E");
+}
+
+.profile__username-button--save:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-check%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M5 12l5 5l10 -10%27 /%3E%3C/svg%3E");
 }
 
 .profile__username--empty {
     font-style: italic;
     color: var(--grey-500);
+}
+
+.profile__username-input {
+    margin: 0;
+    border-radius: 5px;
+    background-color: transparent;
+    height: 25px;
+    box-sizing: border-box;
+    width: 100%;
+    color: var(--white);
+    font-family: var(--regular);
+    font-size: 1rem;
+    border: none;
+}
+
+.profile__username-input:focus {
+    outline: none;
 }
 
 .profile__address {
@@ -342,8 +375,14 @@ select option {
     cursor: pointer;
 }
 
+.wallet-connector__address-text {
+    min-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .wallet-connector__address--unauthenticated {
-    cursor: pointer;
     line-height: 17px;
     padding: 0 20px;
 }
