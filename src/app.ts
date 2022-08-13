@@ -8,6 +8,7 @@ import { transactionsRouter } from "./routes/transactions-router";
 import { statisticsRouter } from "./routes/statistics-router";
 import { notificationsRouter } from "./routes/notifications-router";
 import { healthRouter } from "./routes/health-router";
+import { profileRouter } from "./routes/profile-router";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(cookieParser());
 
 app.use(healthRouter);
 app.use("/api/auth", authenticationRouter);
+app.use("/api/profile", profileRouter);
 app.use("/api/scripts", scriptsRouter);
 app.use("/api/transactions", transactionsRouter);
 app.use("/api/stats", statisticsRouter);
