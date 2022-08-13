@@ -376,7 +376,8 @@ select option {
 }
 
 .wallet-connector__address-text {
-    min-width: 100px;
+    min-width: 90px;
+    max-width: 120px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
