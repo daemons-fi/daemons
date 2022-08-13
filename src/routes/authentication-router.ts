@@ -48,10 +48,7 @@ authenticationRouter.get(
 
             // and return it otherwise
             return res.status(200).send({
-                address: user.address,
-                username: user.username,
-                banned: user.banned,
-                whitelisted: user.whitelisted,
+                ...(user as any)._doc,
                 unseenTransactions
             });
         } catch (error) {

@@ -21,3 +21,14 @@ profileRouter.post("/username", authenticate, async (req: Request, res: Response
         return res.status(500).send(error);
     }
 });
+
+profileRouter.post("/show-tutorial-tooltip", authenticate, async (req: Request, res: Response) => {
+    try {
+        const { value } = req.body;
+        await User.updateOne({ address: req.userAddress }, { $set: { showTutorial: value } });
+        return res.sendStatus(200);
+    } catch (error) {
+        routerLogger.error({ message: "endpoint error", endpoint: "/username", error });
+        return res.status(500).send(error);
+    }
+});
