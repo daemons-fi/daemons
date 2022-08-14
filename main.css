@@ -2455,6 +2455,8 @@ input[type=range] {
 
 .token-balances__header {
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .token-balances__tokens-list {
@@ -2505,9 +2507,9 @@ input[type=range] {
 }
 
 .designer {
-    display: grid;
-    grid-template-columns: 280px auto 280px;
+    display: flex;
     column-gap: 25px;
+    justify-content: space-between;
 }
 
 /* Choices */
@@ -2553,6 +2555,7 @@ input[type=range] {
     display: flex;
     flex-direction: column;
     row-gap: 30px;
+    min-width: 50%;
 }
 
 .workbench__section {
@@ -2608,8 +2611,7 @@ input[type=range] {
 }
 
 .designer__review-link--disabled {
-    opacity: 0;
-    cursor: not-allowed;
+    display: none;
 }
 
 /* Wallet State */
@@ -2618,6 +2620,137 @@ input[type=range] {
     display: flex;
     flex-direction: column;
     row-gap: 20px;
+}
+
+
+.wallet-state__reload-bt {
+    height: 25px;
+    width: 25px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-refresh%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4%27 /%3E%3Cpath d=%27M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4%27 /%3E%3C/svg%3E");
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+@-moz-keyframes spin {
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+.wallet-state__reload-bt--loading {
+    -webkit-animation: spin 1s linear infinite;
+    -moz-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+    cursor: auto;
+}
+
+.retractable-card {
+    width: 280px;
+    position: relative;
+}
+
+.retractable-card__button {
+    position: absolute;
+    height: 50px;
+    width: 15px;
+    left: -5px;
+    top: 5px;
+    background: var(--secondary-background);
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.retractable-card--retracted {
+    width: 10px;
+}
+
+.retractable-card--retracted .card {
+    display: none;
+}
+
+.retractable-card__button-icon {
+    height: 13px;
+    width: 13px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 xmlns:xlink=%27http://www.w3.org/1999/xlink%27 x=%270px%27 y=%270px%27 viewBox=%270 0 97 97%27 xml:space=%27preserve%27%0Atransform=%27rotate%2890%29%27%3E%3Cpath fill=%27%23FFBA08%27 d=%27M0.561,20.971l45.951,57.605c0.76,0.951,2.367,0.951,3.127,0l45.956-57.609c0.547-0.689,0.709-1.716,0.414-2.61 c-0.061-0.187-0.129-0.33-0.186-0.437c-0.351-0.65-1.025-1.056-1.765-1.056H2.093c-0.736,0-1.414,0.405-1.762,1.056 c-0.059,0.109-0.127,0.253-0.184,0.426C-0.15,19.251,0.011,20.28,0.561,20.971z%27/%3E%3C/svg%3E%0A");
+    transform: rotate(180deg);
+}
+
+.retractable-card__button-icon--retracted {
+    transform: rotate(0);
+}
+
+/* Token Balances Component */
+
+.mm-balances {
+    user-select: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    background: var(--greyish-brown);
+    box-shadow: 5px 5px 15px 0 var(--grey-800);
+}
+
+.mm-balances__header {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.mm-balances__subsection {
+    margin-top: 10px;
+}
+
+.mm-balances__health-factor {
+    font-size: 0.9rem;
+}
+
+.mm-balances__tokens-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.mm-balances__empty {
+    font-size: 0.75rem;
+}
+
+
+/* Token With Balance */
+
+.token-with-balance {
+    display: grid;
+    padding: 3px 0px;
+    grid-template-columns: 30px 80px auto;
+    align-items: center;
+    column-gap: 5px;
+}
+
+.token-with-balance__img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.token-with-balance__name {
+    font-size: 1rem;
+}
+
+.token-with-balance__balance {
+    font-size: 1rem;
+    color: var(--grey-400);
 }
 
 .review {
