@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { fantomTestnetContracts, IContractsList, kovanContracts, mumbaiTestnetContracts } from "@daemons-fi/contracts";
+import { IContractsList, kovanContracts, mumbaiTestnetContracts } from "@daemons-fi/contracts";
 
 export interface IChainWithContracts {
     id: string;
@@ -14,12 +14,6 @@ export const supportedChains: { [chain: string]: IChainWithContracts } = {
         name: "kovan",
         rpc_url: () => process.env.KOVAN_RPC!,
         contracts: kovanContracts
-    },
-    "4002": {
-        id: "4002",
-        name: "Fantom Testnet",
-        rpc_url: () => process.env.FANTOM_TESTNET_RPC!,
-        contracts: fantomTestnetContracts
     },
     "80001": {
         id: "80001",
