@@ -2443,9 +2443,70 @@ input[type=range] {
     text-align: center;
 }
 
+/* Token Balances Component */
+
+.token-balances {
+    user-select: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    background: var(--greyish-brown);
+    box-shadow: 5px 5px 15px 0 var(--grey-800);
+}
+
+.token-balances__header {
+    margin-bottom: 10px;
+}
+
+.token-balances__tokens-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.token-balances__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.token-balances__empty-icon {
+    height: 40px;
+    width: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-wind%27 viewBox=%270 0 24 24%27 stroke-width=%271.5%27 stroke=%27%23FFBA08%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M5 8h8.5a2.5 2.5 0 1 0 -2.34 -3.24%27 /%3E%3Cpath d=%27M3 12h15.5a2.5 2.5 0 1 1 -2.34 3.24%27 /%3E%3Cpath d=%27M4 16h5.5a2.5 2.5 0 1 1 -2.34 3.24%27 /%3E%3C/svg%3E");
+    margin-bottom: 3px;
+}
+
+.token-balances__empty-text {
+    font-size: 0.75rem;
+}
+
+/* Token With Balance */
+
+.token-with-balance {
+    display: grid;
+    padding: 3px 0px;
+    grid-template-columns: 30px 80px auto;
+    align-items: center;
+    column-gap: 5px;
+}
+
+.token-with-balance__img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.token-with-balance__name {
+    font-size: 1rem;
+}
+
+.token-with-balance__balance {
+    font-size: 1rem;
+    color: var(--grey-400);
+}
+
 .designer {
     display: grid;
-    grid-template-columns: 250px auto;
+    grid-template-columns: 280px auto 280px;
     column-gap: 25px;
 }
 
@@ -2473,8 +2534,8 @@ input[type=range] {
 .choice {
     border-radius: 5px;
     padding: 10px 15px;
-    background: var(--secondary-background);
-    box-shadow: 0 1px 15px rgb(0 0 0 / 4%), 0 1px 6px rgb(0 0 0 / 4%);
+    background: var(--greyish-brown);
+    box-shadow: 5px 5px 15px 0 var(--grey-800);
     cursor: pointer;
     display: grid;
     grid-template-columns: auto 25px;
@@ -2488,10 +2549,10 @@ input[type=range] {
 /* Workbench */
 
 .designer__workbench {
+    position: relative;
     display: flex;
     flex-direction: column;
     row-gap: 30px;
-    padding-top: 35px;
 }
 
 .workbench__section {
@@ -2531,7 +2592,7 @@ input[type=range] {
 
 .designer__review-link {
     position: absolute;
-    right: 100px;
+    right: 0;
     box-shadow: 0 1px 15px rgb(0 0 0 / 4%), 0 1px 6px rgb(0 0 0 / 4%);
     text-align: center;
     line-height: 15px;
@@ -2549,6 +2610,14 @@ input[type=range] {
 .designer__review-link--disabled {
     opacity: 0;
     cursor: not-allowed;
+}
+
+/* Wallet State */
+
+.wallet-state {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
 }
 
 .review {
