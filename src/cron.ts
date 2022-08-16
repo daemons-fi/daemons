@@ -1,6 +1,6 @@
 import { CronJob } from "cron";
-import { performDailyTreasuryOperations } from "./chain-proxy/daily-treasury-operations";
-import { updateGasPrices } from "./chain-proxy/gas-price-feed-updater";
+import { performDailyTreasuryOperations } from "./cronjobs/daily-treasury-operations";
+import { updateGasPrices } from "./cronjobs/gas-price-feed-updater";
 import { rootLogger } from "./logger";
 
 export const scheduler = () => {

@@ -1,11 +1,10 @@
 import { BigNumber, ethers, Wallet } from "ethers";
-import { treasuryABI } from "@daemons-fi/contracts";
-import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
+import { bigNumberToFloat, treasuryABI } from "@daemons-fi/contracts";
+import { getProvider, IChainWithContracts, supportedChains } from "./utils/providers-builder";
 import { rootLogger } from "../logger";
+import { DailyStats } from "../models/daily-stats";
 
 const logger = rootLogger.child({ source: "DailyTreasuryOperations" });
-
-const convertToDecimal = (bn: BigNumber) => bn.div(BigNumber.from(10).pow(13)).toNumber() / 100000;
 
 type Thresholds = { minCommission: number; minPolPool: number };
 const chainThresholds: { [chain: string]: Thresholds } = {
@@ -13,13 +12,9 @@ const chainThresholds: { [chain: string]: Thresholds } = {
         minCommission: 0.001,
         minPolPool: 0.001
     },
-    "4002": {
-        minCommission: 1,
-        minPolPool: 1
-    },
     "80001": {
-        minCommission: 1,
-        minPolPool: 0.1
+        minCommission: 0.001,
+        minPolPool: 0.01
     }
 };
 
@@ -46,10 +41,10 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
         logger.error({ message: `Couldn't find thresholds for chain`, chain: chain.id });
 
     const commissionsRaw = await treasuryContract.commissionsPool();
-    const commissions = convertToDecimal(commissionsRaw);
+    const commissions = bigNumberToFloat(commissionsRaw, 6);
 
     const polPoolRaw = await treasuryContract.polPool();
-    const polPool = convertToDecimal(polPoolRaw);
+    const polPool = bigNumberToFloat(polPoolRaw, 6);
 
     logger.debug({
         message: `Daily treasury operation report`,
@@ -59,8 +54,29 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
         treasuryAddress: chain.contracts.Treasury
     });
 
-    await claimCommissions(commissions, thresholds, chain, treasuryContract);
-    await fundLpOrBuyback(polPool, thresholds, chain, treasuryContract, polPoolRaw);
+    const preBalance = await provider.getBalance(walletSigner.address);
+    const claimedCommissions = await claimCommissions(
+        commissions,
+        thresholds,
+        chain,
+        treasuryContract
+    );
+    const { treasuryAddedToLP, treasuryBuybacks } = await fundLpOrBuyback(
+        polPool,
+        thresholds,
+        chain,
+        treasuryContract,
+        polPoolRaw
+    );
+    const postBalance = await provider.getBalance(walletSigner.address);
+    const spent = bigNumberToFloat(preBalance.sub(postBalance), 6);
+    await updateDailyStats(
+        chain.name,
+        spent,
+        claimedCommissions,
+        treasuryAddedToLP,
+        treasuryBuybacks
+    );
 }
 
 async function claimCommissions(
@@ -68,11 +84,12 @@ async function claimCommissions(
     thresholds: Thresholds,
     chain: IChainWithContracts,
     treasuryContract: ethers.Contract
-) {
+): Promise<number> {
     if (commissions > thresholds.minCommission) {
         logger.debug({ message: "Claiming commission", chain: chain.name });
         try {
-            await treasuryContract.claimCommission();
+            await (await treasuryContract.claimCommission()).wait();
+            return commissions;
         } catch (error) {
             logger.error({
                 message: `Error while claiming commissions`,
@@ -81,6 +98,7 @@ async function claimCommissions(
             });
         }
     }
+    return 0;
 }
 
 async function fundLpOrBuyback(
@@ -89,7 +107,7 @@ async function fundLpOrBuyback(
     chain: IChainWithContracts,
     treasuryContract: ethers.Contract,
     polPoolRaw: any
-) {
+): Promise<{ treasuryAddedToLP: number; treasuryBuybacks: number }> {
     if (polPool > thresholds.minPolPool) {
         try {
             const shouldFundLp = await treasuryContract.shouldFundLP();
@@ -103,7 +121,8 @@ async function fundLpOrBuyback(
                 const quoteHalfETHtoDAEM = await treasuryContract.ethToDAEM(polPoolRaw.div(2));
                 const minAmountDAEM = quoteHalfETHtoDAEM.mul(995).div(1000);
 
-                await treasuryContract.fundLP(minAmountDAEM);
+                await (await treasuryContract.fundLP(minAmountDAEM)).wait();
+                return { treasuryAddedToLP: polPool, treasuryBuybacks: 0 };
             } else {
                 logger.debug({ message: "Buyback DAEM", chain: chain.name, percentageDAEMInLP });
 
@@ -111,7 +130,8 @@ async function fundLpOrBuyback(
                 // All ETH will be used to buyback, so we use the full amount.
                 const quoteFullETHtoDAEM = await treasuryContract.ethToDAEM(polPoolRaw);
                 const minAmountDAEM = quoteFullETHtoDAEM.mul(995).div(1000);
-                await treasuryContract.buybackDAEM(minAmountDAEM);
+                await (await treasuryContract.buybackDAEM(minAmountDAEM)).wait();
+                return { treasuryAddedToLP: 0, treasuryBuybacks: polPool };
             }
         } catch (error) {
             logger.error({
@@ -121,4 +141,20 @@ async function fundLpOrBuyback(
             });
         }
     }
+    return { treasuryAddedToLP: 0, treasuryBuybacks: 0 };
+}
+
+async function updateDailyStats(
+    chain: string,
+    spentAmount: number,
+    claimedCommissions: number,
+    treasuryAddedToLP: number,
+    treasuryBuybacks: number
+): Promise<void> {
+    const dailyStat = await DailyStats.fetchOrCreate(chain);
+    dailyStat.treasuryCommissionClaimed += claimedCommissions;
+    dailyStat.treasuryAddedToLP += treasuryAddedToLP;
+    dailyStat.treasuryBuybacks += treasuryBuybacks;
+    dailyStat.treasuryManagementCost += spentAmount;
+    await dailyStat.save();
 }

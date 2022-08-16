@@ -1,7 +1,8 @@
 import { ethers, Wallet } from "ethers";
-import { gasPriceFeedABI } from "@daemons-fi/contracts";
-import { getProvider, IChainWithContracts, supportedChains } from "./providers-builder";
+import { bigNumberToFloat, gasPriceFeedABI } from "@daemons-fi/contracts";
+import { getProvider, IChainWithContracts, supportedChains } from "./utils/providers-builder";
 import { rootLogger } from "../logger";
+import { DailyStats } from "../models/daily-stats";
 
 const logger = rootLogger.child({ source: "GasPriceFeedUpdater" });
 
@@ -40,8 +41,13 @@ async function updateGasPriceForChain(chain: IChainWithContracts): Promise<void>
             return;
         }
 
+        const preBalance = await provider.getBalance(walletSigner.address);
         const tx = await gasPriceFeedContract.setGasPrice(newGasPrice);
         await tx.wait();
+        const postBalance = await provider.getBalance(walletSigner.address);
+        const spent = bigNumberToFloat(preBalance.sub(postBalance), 6);
+        await updateDailyStats(chain.name, spent);
+
         logger.debug({
             message: `Updated gas prices`,
             chain: chain.name,
@@ -58,4 +64,11 @@ async function updateGasPriceForChain(chain: IChainWithContracts): Promise<void>
             error
         });
     }
+}
+
+async function updateDailyStats(chain: string, spentAmount: number): Promise<void> {
+    const dailyStat = await DailyStats.fetchOrCreate(chain);
+    dailyStat.gasOracleUpdates += 1;
+    dailyStat.gasOracleCost += spentAmount;
+    await dailyStat.save();
 }
