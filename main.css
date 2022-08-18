@@ -1549,15 +1549,6 @@ input[type=range] {
     text-align: left;
 }
 
-.tooltip__text {
-    border-radius: 100%;
-    background-color: var(--bright-teal);
-    height: 23px;
-    width: 23px;
-    font-family: var(--bold);
-    text-align: center;
-}
-
 .tooltip__content::after {
     content: "";
     position: absolute;
@@ -1578,9 +1569,27 @@ input[type=range] {
 .tooltip__content--left {
     left: -225px;
 }
+
 .tooltip__content--left::after {
     left: 100%;
     transform: rotate(180deg);
+}
+
+
+/* Icons */
+
+.tooltip__icon {
+    height: 23px;
+    width: 23px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-info-circle%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%279%27 /%3E%3Cline x1=%2712%27 y1=%278%27 x2=%2712.01%27 y2=%278%27 /%3E%3Cpolyline points=%2711 12 12 12 12 16 13 16%27 /%3E%3C/svg%3E");
+}
+
+.tooltip__icon--alert {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-alert-triangle%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%23FFBA08%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M12 9v2m0 4v.01%27 /%3E%3Cpath d=%27M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75%27 /%3E%3C/svg%3E");
+}
+
+.tooltip__icon--success {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-circle-check%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%23136f63%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%279%27 /%3E%3Cpath d=%27M9 12l2 2l4 -4%27 /%3E%3C/svg%3E");
 }
 
 .my-page__layout {
@@ -2151,6 +2160,84 @@ input[type=range] {
     outline: none;
 }
 
+.lp-info {
+    margin-top: 20px;
+    padding: 5px;
+    border: 1px solid black;
+    font-size: 0.9rem;
+}
+
+.lp-info__header {
+    display: grid;
+    grid-template-columns: auto 90px 25px;
+    margin-bottom: 5px;
+    align-items: baseline;
+}
+
+.lp-info__lp-name {
+    text-decoration: underline;
+}
+
+.lp-info__lp-address {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 5px;
+    color: var(--toastify-color-info);
+}
+
+.lp-info__invalid {
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-style: italic;
+}
+
+.lp-info__text {
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.lp-info__loading {
+    height: 70px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+@-moz-keyframes spin {
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+.lp-info__loading-icon {
+    height: 30px;
+    width: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-refresh%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%2300e5c7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Cpath d=%27M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4%27 /%3E%3Cpath d=%27M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4%27 /%3E%3C/svg%3E");
+    margin-left: 10px;
+    -webkit-animation: spin 1s linear infinite;
+    -moz-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+}
+
 .script-block {
     position: relative;
     border-radius: 5px;
@@ -2278,6 +2365,23 @@ input[type=range] {
     color: var(--white);
     height: 40px;
     border-radius: 0;
+}
+
+.script-block__lp-address {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 5px;
+    color: var(--toastify-color-info);
+}
+
+.script-block__lp-address a {
+    color: var(--toastify-color-info);
+}
+
+.script-block__lp-address a:visited {
+    color: var(--toastify-color-info);
 }
 
 /* Balance Block */
