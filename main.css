@@ -2270,6 +2270,10 @@ input[type=range] {
     color: var(--grey-400);
 }
 
+.mm-base-info__token-apy {
+    margin-left: auto;
+}
+
 .script-block {
     position: relative;
     border-radius: 5px;
