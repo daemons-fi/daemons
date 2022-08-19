@@ -2854,7 +2854,10 @@ input[type=range] {
     margin-top: 10px;
 }
 
-.mm-balances__health-factor {
+.mm-balances__account-info {
+    display: flex;
+    font-style: italic;
+    flex-direction: column;
     font-size: 0.9rem;
 }
 
