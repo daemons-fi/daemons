@@ -3185,7 +3185,8 @@ input[type=range] {
 }
 
 .vesting__text {
-    margin-bottom: 5px;
+    margin-top: 3px;
+    margin-bottom: 3px;
     text-align: center;
 }
 
@@ -3203,5 +3204,10 @@ input[type=range] {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.vesting__button--disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
 }
 
