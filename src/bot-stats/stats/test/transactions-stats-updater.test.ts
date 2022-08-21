@@ -30,23 +30,19 @@ describe("Transactions Stats Updater", () => {
 
     it("successfully saves the stats for a multiple chains", async () => {
         await transactionDocumentFactory({ chainId: "42", scriptType: "Swap" });
-        await transactionDocumentFactory({ chainId: "4002", scriptType: "Swap" });
+        await transactionDocumentFactory({ chainId: "42", scriptType: "Swap" });
         await transactionDocumentFactory({ chainId: "80001", scriptType: "Transfer" });
         await transactionDocumentFactory({ chainId: "42", scriptType: "MmBase" });
 
         await updateTransactionStats();
 
-        // we got 4 stats, one for each script kind (3), chain (3) and date (1)
-        // 1 Swap on 42, 1 Swap on 15, 1 Transfer on 0, 1 MmBase on 42
+        // we got 3 stats, one for each script kind (3), chain (2) and date (1)
+        // 2 Swaps on 42, 1 Transfer on 80001, 1 MmBase on 42
         // 0-amount stats are not saved
-        expect(await TransactionStats.count()).to.equal(4);
-        expect(await TransactionStats.count({ kind: "Swap" })).to.equal(2);
-        expect((await TransactionStats.find({ kind: "Swap", chainId: "42" }))[0].amount).to.equal(
-            1
-        );
-        expect(
-            (await TransactionStats.find({ kind: "Swap", chain: "15" }))[0].amount
-        ).to.equal(1);
+        expect(await TransactionStats.count()).to.equal(3);
+        expect(await TransactionStats.count({ kind: "Swap" })).to.equal(1);
+        expect((await TransactionStats.find({ kind: "Swap" }))[0].amount).to.equal(2);
+        expect((await TransactionStats.find({ kind: "Swap" }))[0].chainId).to.equal("42");
         expect(await TransactionStats.count({ kind: "Transfer" })).to.equal(1);
         expect((await TransactionStats.find({ kind: "Transfer" }))[0].amount).to.equal(1);
         expect((await TransactionStats.find({ kind: "Transfer" }))[0].chainId).to.equal("80001");
