@@ -23,12 +23,16 @@ import { BeefyScript } from "@daemons-fi/db-schema";
 import { PassScript } from "@daemons-fi/db-schema";
 import { rootLogger } from "../logger";
 
+let pointer = 0;
+
 const routerLogger = rootLogger.child({source: "scriptsRouter"});
 export const scriptsRouter = express.Router();
 
 scriptsRouter.get("/:chainId", authenticate, async (req: Request, res: Response) => {
     const chainId = String(req.params.chainId);
-    const scripts = await Script.find({ chainId: chainId }).lean();
+    const scripts = await Script.find({ chainId: chainId }).lean().skip(pointer).limit(10);
+    const countScripts = await Script.countDocuments({});
+    pointer = (pointer + 10) % countScripts;
     return res.send(scripts);
 });
 
