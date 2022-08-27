@@ -516,6 +516,8 @@ select option {
   font-family: var(--toastify-font-family);
   cursor: pointer;
   direction: ltr;
+  /* webkit only issue #791 */
+  z-index: 0;
 }
 .Toastify__toast--rtl {
   direction: rtl;
@@ -2710,7 +2712,7 @@ input[type=range] {
     display: flex;
     flex-direction: row;
     column-gap: 25px;
-    margin: auto;
+    margin: 0 auto;
 }
 
 .workbench__deploy-button {
