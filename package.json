@@ -1,5 +1,5 @@
 {
-  "name": "daemonic-bots",
+  "name": "daemons.bots.backend",
   "version": "1.0.0",
   "description": "Daemons' Housekeeping Bots",
   "main": "src/index.ts",
