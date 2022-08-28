@@ -1,5 +1,5 @@
 {
-    "name": "admin",
+    "name": "daemons.admin.backend",
     "version": "1.0.0",
     "description": "Runs tasks for Daemons",
     "main": "src/index.ts",
