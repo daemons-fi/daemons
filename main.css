@@ -1347,6 +1347,17 @@ input[type=range] {
     box-shadow: 5px 5px 5px 0 var(--body-background);
 }
 
+.page-title {
+    font-size: 3.483rem;
+    font-family: var(--medium);
+    margin-bottom: 40px;
+}
+
+.page-title::after {
+    color: var(--blue-green);
+    content: ".";
+}
+
 
 .dashboard-page__layout {
     display: grid;
@@ -1776,17 +1787,6 @@ input[type=range] {
     color: #aaa;
     cursor: pointer;
     text-decoration: underline;
-}
-
-.page-title {
-    font-size: 3.483rem;
-    font-family: var(--medium);
-    margin-bottom: 40px;
-}
-
-.page-title::after {
-    color: var(--blue-green);
-    content: ".";
 }
 
 .tip-jar__header {
