@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const devCORS = ["http://localhost:3000"];
-const prodCORS = ["https://app.daemons.fi"];
+const devCORS = ["http://localhost:3000", "http://localhost:3333"];
+const prodCORS = ["https://app.daemons.fi", "https://execute.daemons.fi"];
 
 const corsWhitelist: Set<string> = new Set(isProduction ? prodCORS : devCORS);
 
