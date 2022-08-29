@@ -1009,6 +1009,60 @@ input[type=range] {
 
 .chain-button__name {}
 
+.exec-state {
+    position: relative;
+}
+
+.exec-state__wallet {}
+
+.exec-state__title {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.exec-state__balances {
+    display: flex;
+    flex-direction: row;
+    column-gap: 50px;
+    margin-bottom: 30px;
+}
+
+.exec-state__token-balance {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    align-items: center;
+}
+
+.exec-state__token-icon {
+    height: 30px;
+    width: 30px;
+    border-radius: 100%;
+}
+
+.exec-state__token-amount {}
+
+.exec-state__exec-stats {
+    margin-bottom: 30px;
+}
+
+.exec-stat__bt {
+    position: absolute;
+    padding: 5px 15px;
+    border-radius: 5px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.exec-stat__bt--start {
+    background-color: var(--blue-green);
+}
+
+.exec-stat__bt--stop {
+    background-color: var(--dark-red);
+}
+
 .card {
     height: 100%;
     display: flex;
@@ -1135,7 +1189,7 @@ input[type=range] {
 
 .execute-page__layout {
     display: grid;
-    grid-template-columns: 60fr 40fr;
+    grid-template-columns: 55fr 45fr;
     column-gap: 20px;
 }
 
