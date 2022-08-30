@@ -847,6 +847,30 @@ input[type=range] {
     background: var(--greyish-brown);
 }
 
+.message-dialog {}
+
+.message-dialog__text {}
+
+.message-dialog__buttons-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.message-dialog__ok-button {
+    width: 50px;
+    font-size: 1rem;
+    text-align: center;
+    padding: 8px 15px;
+    border-radius: 5px;
+    color: white;
+    border: none;
+    background-color: var(--primary-colour);
+    cursor: pointer;
+}
+
 .tooltip {
     position: relative;
     display: inline-block;
