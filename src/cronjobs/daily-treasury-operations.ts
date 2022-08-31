@@ -1,5 +1,5 @@
-import { BigNumber, ethers, Wallet } from "ethers";
-import { bigNumberToFloat, treasuryABI } from "@daemons-fi/contracts";
+import { ethers, Wallet } from "ethers";
+import { bigNumberToFloat, liquidityManagerABI, treasuryABI } from "@daemons-fi/contracts";
 import { getProvider, IChainWithContracts, supportedChains } from "./utils/providers-builder";
 import { rootLogger } from "../logger";
 import { DailyStats } from "../models/daily-stats";
@@ -35,6 +35,11 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
         treasuryABI,
         walletSigner
     );
+    const liquidityManagerContract = new ethers.Contract(
+        chain.contracts.ILiquidityManager,
+        liquidityManagerABI,
+        walletSigner
+    );
 
     const thresholds: Thresholds = chainThresholds[chain.id];
     if (!thresholds)
@@ -66,6 +71,7 @@ async function performDailyTreasuryOperationsForChain(chain: IChainWithContracts
         thresholds,
         chain,
         treasuryContract,
+        liquidityManagerContract,
         polPoolRaw
     );
     const postBalance = await provider.getBalance(walletSigner.address);
@@ -106,12 +112,15 @@ async function fundLpOrBuyback(
     thresholds: Thresholds,
     chain: IChainWithContracts,
     treasuryContract: ethers.Contract,
+    liquidityManagerContract: ethers.Contract,
     polPoolRaw: any
 ): Promise<{ treasuryAddedToLP: number; treasuryBuybacks: number }> {
     if (polPool > thresholds.minPolPool) {
         try {
             const shouldFundLp = await treasuryContract.shouldFundLP();
-            const percentageDAEMInLP = await treasuryContract.percentageDAEMTokensStoredInLP();
+            const percentageDAEMInLP = await liquidityManagerContract.percentageOfDAEMInLP(
+                treasuryContract.address
+            );
 
             if (shouldFundLp) {
                 logger.debug({ message: "Funding LP", chain: chain.name, percentageDAEMInLP });
