@@ -25,7 +25,7 @@ import { rootLogger } from "../logger";
 
 let pointer = 0;
 
-const routerLogger = rootLogger.child({source: "scriptsRouter"});
+const routerLogger = rootLogger.child({ source: "scriptsRouter" });
 export const scriptsRouter = express.Router();
 
 scriptsRouter.get("/:chainId", authenticate, async (req: Request, res: Response) => {
@@ -48,7 +48,11 @@ scriptsRouter.get("/:chainId/:userAddress", authenticate, async (req: Request, r
         const scripts = await Script.find({ user: userAddress, chainId: chainId }).lean();
         return res.send(scripts);
     } catch (error) {
-        routerLogger.error({ message: "endpoint error", endpoint: "/:chainId/:userAddress", error });
+        routerLogger.error({
+            message: "endpoint error",
+            endpoint: "/:chainId/:userAddress",
+            error
+        });
         return res.status(500).send(error);
     }
 });
@@ -131,6 +135,8 @@ scriptsRouter.post("/mark-as-broken", authenticate, async (req: Request, res: Re
     const { scriptId } = req.body;
 
     try {
+        if (await BrokenScript.exists({ scriptId: scriptId })) return res.send();
+
         await BrokenScript.build({
             reporter: req.userAddress!,
             scriptId: scriptId
