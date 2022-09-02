@@ -78,10 +78,10 @@ describe('GET api/scripts', () => {
         expect(ids).to.include(fetchedScripts[2].scriptId);
     });
 
-    it('returns a 401 error if trying to fetch scripts while not authenticated', async () => {
+    it('returns a 200 if trying to fetch scripts while not authenticated', async () => {
         const chainId = "42";
         await supertest(app)
             .get(`/api/scripts/${chainId}`)
-            .expect(401);
+            .expect(200);
     });
 });
