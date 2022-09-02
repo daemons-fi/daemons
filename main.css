@@ -951,6 +951,7 @@ input[type=range] {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
+    border: none;
 }
 
 .setup__line {
@@ -964,6 +965,11 @@ input[type=range] {
     display: flex;
     align-items: center;
     column-gap: 5px;
+}
+
+.setup__address {
+    font-family: monospace;
+    font-size: 0.9rem;
 }
 
 .setup__input {
@@ -1225,7 +1231,7 @@ input[type=range] {
 
 .execute-page__layout {
     display: grid;
-    grid-template-columns: 55fr 45fr;
+    grid-template-columns: 50fr 50fr;
     column-gap: 20px;
 }
 
