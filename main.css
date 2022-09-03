@@ -2109,6 +2109,17 @@ input[type=range] {
     font-size: 0.7rem;
     color: var(--grey-400);
     font-family: monospace;
+    display: flex;
+    column-gap: 5px;
+    align-items: flex-end;
+}
+
+.tokens-modal__add-token {
+    height: 15px;
+    width: 15px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    text-align: center;
 }
 
 .block-amount {
