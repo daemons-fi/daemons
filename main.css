@@ -947,6 +947,10 @@ input[type=range] {
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 class=%27icon icon-tabler icon-tabler-circle-check%27 viewBox=%270 0 24 24%27 stroke-width=%272%27 stroke=%27%23136f63%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath stroke=%27none%27 d=%27M0 0h24v24H0z%27 fill=%27none%27/%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%279%27 /%3E%3Cpath d=%27M9 12l2 2l4 -4%27 /%3E%3C/svg%3E");
 }
 
+.height-100 {
+    height: 100%;
+}
+
 .setup {
     display: flex;
     flex-direction: column;
@@ -1005,7 +1009,7 @@ input[type=range] {
 
 .setup__button--submit {
     margin-left: auto;
-    margin-top: 15px;
+    margin: auto 15px 15px auto;
     font-size: 2rem;
     height: auto;
     line-height: normal;
@@ -1121,6 +1125,26 @@ input[type=range] {
 
 .exec-stat__bt--stop {
     background-color: var(--dark-red);
+}
+
+.exec-state__previous-task--opacity-4 {
+    opacity: 0.2;
+}
+
+.exec-state__previous-task--opacity-3 {
+    opacity: 0.3;
+}
+
+.exec-state__previous-task--opacity-2 {
+    opacity: 0.4;
+}
+
+.exec-state__previous-task--opacity-1 {
+    opacity: 0.5;
+}
+
+.exec-state__previous-task--opacity-0 {
+    opacity: 0.6;
 }
 
 .card {
