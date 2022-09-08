@@ -1015,6 +1015,24 @@ input[type=range] {
     color: var(--bright-teal);
 }
 
+.setup__display-advanced {
+    margin-top: 30px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    column-gap: 5px;
+    align-items: baseline;
+    user-select: none;
+}
+
+.setup__display-advanced-text {
+    text-decoration: underline;
+}
+
+.setup__display-advanced-triangle {
+    font-size: 0.7rem;
+}
 
 /* Chain Button */
 
