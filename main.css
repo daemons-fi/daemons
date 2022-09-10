@@ -1216,15 +1216,25 @@ input[type=range] {
 
 .header {
     padding: 10px 80px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
     background-color: var(--black);
     box-shadow: 0px 1px 10px 1px #000;
 }
 
+.header__content {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+}
+
 .page {
     padding: 40px 80px;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .page-logo {
@@ -1241,7 +1251,7 @@ input[type=range] {
     border-style: groove;
     padding: 2px;
     position: absolute;
-    left: 258px;
+    left: 170px;
     top: 11px;
 }
 
@@ -1450,6 +1460,12 @@ input[type=range] {
     row-gap: 20px;
 }
 
+@media only screen and (max-width: 1200px) {
+    .dashboard-page__layout {
+        display: flex;
+        flex-direction: column;
+    }
+}
 
 /* Treasury stats */
 
@@ -1614,7 +1630,8 @@ input[type=range] {
 
 .my-page__layout {
     display: grid;
-    grid-template-columns: 65fr 35fr;
+    grid-template-columns: auto 400px;
+    grid-template-rows: 400px;
     column-gap: 20px;
 }
 
@@ -1647,7 +1664,7 @@ input[type=range] {
 
 .script {
     position: relative;
-    width: 250px;
+    width: 200px;
     margin: 15px;
     text-align: center;
     padding: 15px;
@@ -1880,7 +1897,8 @@ input[type=range] {
 
 .execute-page__layout {
     display: grid;
-    grid-template-columns: 65fr 35fr;
+    grid-template-columns: auto 400px;
+    grid-template-rows: 400px;
     column-gap: 20px;
 }
 
@@ -3087,8 +3105,14 @@ input[type=range] {
     display: grid;
     grid-template-columns: 50fr 50fr;
     column-gap: 20px;
+    row-gap: 20px;
 }
 
+@media only screen and (max-width: 1200px) {
+    .transaction-page__layout {
+        grid-template-columns: 1fr;
+    }
+}
 
 /* Transactions Panel */
 
