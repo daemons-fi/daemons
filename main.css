@@ -2595,6 +2595,7 @@ input[type=range] {
     padding: 10px 15px;
     background: var(--greyish-brown);
     box-shadow: 5px 5px 15px 0 var(--grey-800);
+    overflow-x: hidden;
 }
 
 .token-balances__header {
