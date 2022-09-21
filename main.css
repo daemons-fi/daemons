@@ -2157,8 +2157,12 @@ input[type=range] {
 
 .block-amount__slider-container {
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 130px 65px auto;
     align-items: center;
+}
+
+.block-amount__slider-container input[type=range] {
+    width: auto;
 }
 
 .block-amount__slider-value {
@@ -2178,7 +2182,35 @@ input[type=range] {
     border: none;
 }
 
+.block-amount__percentage-group {
+    display: flex;
+    align-items: baseline;
+}
+
+.block-amount__percentage-input {
+    border-radius: 5px;
+    padding: 5px;
+    background-color: transparent;
+    height: 30px;
+    box-sizing: border-box;
+    width: 100%;
+    position: relative;
+    color: var(--white);
+    font-size: 1rem;
+    border: none;
+    text-align: right;
+}
+
+.block-amount__percentage-input:hover {
+    background-color: var(--greyish-brown);
+}
+
+
 .block-amount__input:focus {
+    outline: none;
+}
+
+.block-amount__percentage-input:focus {
     outline: none;
 }
 
