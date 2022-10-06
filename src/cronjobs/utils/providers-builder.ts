@@ -9,12 +9,6 @@ export interface IChainWithContracts {
 }
 
 export const supportedChains: { [chain: string]: IChainWithContracts } = {
-    "42": {
-        id: "42",
-        name: "kovan",
-        rpc_url: () => process.env.KOVAN_RPC!,
-        contracts: kovanContracts
-    },
     "80001": {
         id: "80001",
         name: "Mumbai Testnet",

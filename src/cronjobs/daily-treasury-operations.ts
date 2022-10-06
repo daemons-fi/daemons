@@ -8,10 +8,6 @@ const logger = rootLogger.child({ source: "DailyTreasuryOperations" });
 
 type Thresholds = { minCommission: number; minPolPool: number };
 const chainThresholds: { [chain: string]: Thresholds } = {
-    "42": {
-        minCommission: 0.001,
-        minPolPool: 0.001
-    },
     "80001": {
         minCommission: 0.001,
         minPolPool: 0.01
