@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { BaseProvider } from "@ethersproject/providers";
-import { kovanContracts, mumbaiTestnetContracts } from "@daemons-fi/contracts";
+import { mumbaiTestnetContracts } from "@daemons-fi/contracts";
 import { IContractsList } from "@daemons-fi/contracts";
 
 export interface IChainWithContracts {
@@ -14,12 +14,6 @@ export interface IChainWithContracts {
  * The chains currently supported by Daemons
  */
 export const supportedChains: { [chain: string]: IChainWithContracts } = {
-    "42": {
-        id: "42",
-        name: "kovan",
-        rpc_url: () => process.env.KOVAN_RPC!,
-        contracts: kovanContracts
-    },
     "80001": {
         id: "80001",
         name: "Mumbai Testnet",
@@ -27,6 +21,11 @@ export const supportedChains: { [chain: string]: IChainWithContracts } = {
         contracts: mumbaiTestnetContracts
     }
 };
+
+/**
+ * The list of chains currently supported by Daemons
+ */
+export const supportedChainsList = () => Object.keys(supportedChains);
 
 /**
  * Get a provider. If one has already been instantiated for this chain, it will use that.

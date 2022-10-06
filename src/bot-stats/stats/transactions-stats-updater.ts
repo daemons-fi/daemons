@@ -1,5 +1,5 @@
 import { ITransactionStats, Transaction, TransactionStats } from "@daemons-fi/db-schema";
-import { supportedChains } from "../../utils/providers-builder";
+import { supportedChainsList } from "../../utils/providers-builder";
 
 export async function updateTransactionStats(): Promise<void> {
     // add today's partials statistics
@@ -18,8 +18,7 @@ async function updateTransactionsStatsForDate(date: Date): Promise<void> {
     await TransactionStats.deleteMany({ date: yyyymmdd });
 
     // prepare and insert the stats for each chain
-    const chains = Object.keys(supportedChains);
-    for (let chainId of chains) {
+    for (let chainId of supportedChainsList()) {
         await updateTransactionsStatsForChainAndDay(chainId, date);
     }
 }

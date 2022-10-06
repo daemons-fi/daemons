@@ -8,6 +8,7 @@ import { connectToTestDb, closeTestDb, clearTestDb } from "../../test/test-db-ha
 import { TerminatorBot } from "..";
 const sinon = require("sinon");
 const scriptsBuilder = require("../mockable-script-builder");
+const providersBuilder = require("../../utils/providers-builder");
 
 describe("Terminator Bot", () => {
     before(async () => await connectToTestDb());
@@ -34,6 +35,7 @@ describe("Terminator Bot", () => {
         const outcome = new VerificationFailedScript("[SIGNATURE][FINAL]");
         const fakeScript = new FakeScript(outcome);
         sinon.stub(scriptsBuilder, "parseScript").returns(fakeScript);
+        sinon.stub(providersBuilder, "getProvider").returns({});
 
         // let's have the bot run
         const removedScripts = await TerminatorBot.execute();
@@ -65,6 +67,7 @@ describe("Terminator Bot", () => {
         const outcome = new VerificationFailedScript("[PRICE_CONDITION_LOW][TMP]");
         const fakeScript = new FakeScript(outcome);
         sinon.stub(scriptsBuilder, "parseScript").returns(fakeScript);
+        sinon.stub(providersBuilder, "getProvider").returns({});
 
         // let's have the bot run
         const removedScripts = await TerminatorBot.execute();
@@ -89,6 +92,7 @@ describe("Terminator Bot", () => {
         const outcome = new ValidScript();
         const fakeScript = new FakeScript(outcome);
         sinon.stub(scriptsBuilder, "parseScript").returns(fakeScript);
+        sinon.stub(providersBuilder, "getProvider").returns({});
 
         // let's have the bot run
         const removedScripts = await TerminatorBot.execute();

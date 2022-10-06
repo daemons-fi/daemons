@@ -7,7 +7,7 @@ describe("Providers builder", () => {
     });
 
     it("returns a valid provider for supported chains", async () => {
-        const p = getProvider("42");
+        const p = getProvider("80001");
         expect(p).to.not.be.null;
         expect(p._isProvider).to.be.true;
     });

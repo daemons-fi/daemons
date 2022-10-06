@@ -1,6 +1,6 @@
 import { IScriptStats, ScriptStats } from "@daemons-fi/db-schema";
 import { Script } from "@daemons-fi/db-schema";
-import { supportedChains } from "../../utils/providers-builder";
+import { supportedChainsList } from "../../utils/providers-builder";
 
 export async function updateScriptStats(): Promise<void> {
     // delete all stats from today to prevent duplicates
@@ -8,7 +8,7 @@ export async function updateScriptStats(): Promise<void> {
     await ScriptStats.deleteMany({ date: today });
 
     // prepare and insert the stats for each chain
-    for (let chainId of Object.keys(supportedChains)) {
+    for (let chainId of supportedChainsList()) {
         await updateScriptStatsForChain(chainId);
     }
 }

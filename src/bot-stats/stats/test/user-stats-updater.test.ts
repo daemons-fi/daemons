@@ -4,10 +4,15 @@ import { mmBaseScriptDocumentFactory } from "@daemons-fi/db-schema";
 import { swapScriptDocumentFactory } from "@daemons-fi/db-schema";
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../../test/test-db-handler";
 import { updateUserStats } from "../user-stats-updater";
+import Sinon from "sinon";
+const providersBuilder = require("../../../utils/providers-builder");
 
 describe("User Stats Updater", () => {
     before(async () => await connectToTestDb());
-    afterEach(async () => await clearTestDb());
+    afterEach(async () => {
+        Sinon.restore();
+        await clearTestDb();
+    });
     after(async () => await closeTestDb());
 
     const userAddress1 = '0xb79f76ef2c5f0286176833e7b2eee103b1cc3244';
@@ -19,6 +24,7 @@ describe("User Stats Updater", () => {
         await transferScriptDocumentFactory({ chainId: "42", user: userAddress1 });
         await mmBaseScriptDocumentFactory({ chainId: "42", user: userAddress2 });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateUserStats();
 
         // expected 1 stat: {amount: 4, chain: Kovan}
@@ -33,6 +39,7 @@ describe("User Stats Updater", () => {
         await transferScriptDocumentFactory({ chainId: "80001", user: userAddress1 });
         await mmBaseScriptDocumentFactory({ chainId: "42", user: userAddress2 });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateUserStats();
 
         // we got 2 stats: {amount: 2, chain: Kovan}, {amount 1, chain Ethereum}
@@ -47,6 +54,7 @@ describe("User Stats Updater", () => {
         await transferScriptDocumentFactory({ chainId: "42" });
         await mmBaseScriptDocumentFactory({ chainId: "42" });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateUserStats();
 
         // expected 1 stat: {amount: 4, chain: Kovan}

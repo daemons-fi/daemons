@@ -3,10 +3,15 @@ import { TransactionStats } from "@daemons-fi/db-schema";
 import { transactionDocumentFactory } from "@daemons-fi/db-schema";
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../../test/test-db-handler";
 import { updateTransactionStats } from "../transactions-stats-updater";
+import Sinon from "sinon";
+const providersBuilder = require("../../../utils/providers-builder");
 
 describe("Transactions Stats Updater", () => {
     before(async () => await connectToTestDb());
-    afterEach(async () => await clearTestDb());
+    afterEach(async () => {
+        Sinon.restore();
+        await clearTestDb();
+    });
     after(async () => await closeTestDb());
 
     it("successfully saves the stats for a single chain", async () => {
@@ -15,6 +20,7 @@ describe("Transactions Stats Updater", () => {
         await transactionDocumentFactory({ chainId: "42", scriptType: "Transfer" });
         await transactionDocumentFactory({ chainId: "42", scriptType: "MmBase" });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateTransactionStats();
 
         // we got 3 stats, one for each script kind (3), chain (1) and date (1)
@@ -34,6 +40,7 @@ describe("Transactions Stats Updater", () => {
         await transactionDocumentFactory({ chainId: "80001", scriptType: "Transfer" });
         await transactionDocumentFactory({ chainId: "42", scriptType: "MmBase" });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateTransactionStats();
 
         // we got 3 stats, one for each script kind (3), chain (2) and date (1)
@@ -56,6 +63,7 @@ describe("Transactions Stats Updater", () => {
         await transactionDocumentFactory({ chainId: "42", scriptType: "Swap" });
         await transactionDocumentFactory({ chainId: "42", scriptType: "Transfer" });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateTransactionStats();
 
         // expected 2: [Swap, count 2] + [Transfer count 1]

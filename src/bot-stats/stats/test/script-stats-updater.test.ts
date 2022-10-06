@@ -5,10 +5,15 @@ import { transferScriptDocumentFactory } from "@daemons-fi/db-schema";
 import { swapScriptDocumentFactory } from "@daemons-fi/db-schema";
 import { connectToTestDb, closeTestDb, clearTestDb } from "../../../test/test-db-handler";
 import { updateScriptStats } from "../script-stats-updater";
+import Sinon from "sinon";
+const providersBuilder = require("../../../utils/providers-builder");
 
 describe("Script Stats Updater", () => {
     before(async () => await connectToTestDb());
-    afterEach(async () => await clearTestDb());
+    afterEach(async () => {
+        Sinon.restore();
+        await clearTestDb();
+    });
     after(async () => await closeTestDb());
 
     it("successfully saves the stats for a single chain", async () => {
@@ -17,6 +22,7 @@ describe("Script Stats Updater", () => {
         await transferScriptDocumentFactory({ chainId: "42" });
         await mmBaseScriptDocumentFactory({ chainId: "42" });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateScriptStats();
 
         // we got 3 stats, one for each script kind (3), chain (1) and date (1)
@@ -36,6 +42,7 @@ describe("Script Stats Updater", () => {
         await transferScriptDocumentFactory({ chainId: "80001" });
         await mmBaseScriptDocumentFactory({ chainId: "42" });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateScriptStats();
 
         // we got 3 stats, one for each script kind (3), chain (2) and date (1)
@@ -57,6 +64,7 @@ describe("Script Stats Updater", () => {
         await swapScriptDocumentFactory({ chainId: "42" });
         await transferScriptDocumentFactory({ chainId: "42" });
 
+        Sinon.stub(providersBuilder, "supportedChainsList").returns(["42", "80001"]);
         await updateScriptStats();
 
         // expected 2: [Swap, count 2] + [Transfer count 1]
