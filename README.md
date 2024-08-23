@@ -14,6 +14,8 @@ Packages:
 
 An environment in which users can **script operations on the blockchain and have them automatically executed** with a certain frequency or when a condition becomes true.
 
+![Daemons](./images/daemons.gif)
+
 ## Some examples
 
 Daemons scripts include multiple conditions and actions and look like this:
